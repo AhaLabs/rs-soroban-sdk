@@ -65,7 +65,7 @@ macro_rules! bigint {
         $crate::BigInt::from_slice($env, &::bytes_lit::bytes!($x))
     };
     ($env:expr, -$x:tt $(,)?) => {
-        $crate::BigInt::from_sign_and_slice($env, &$crate::Sign::Minus, &::bytes_lit::bytes!($x))
+        $crate::BigInt::from_sign_and_slice($env, &$crate::Sign::Minus, &$crate::__bytes_lit_bytes!($x))
     };
 }
 
