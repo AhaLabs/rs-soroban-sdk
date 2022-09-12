@@ -359,7 +359,6 @@ dependencies = [
 name = "example_token"
 version = "0.0.4"
 dependencies = [
- "bytes-lit",
  "soroban-auth",
  "soroban-sdk",
 ]

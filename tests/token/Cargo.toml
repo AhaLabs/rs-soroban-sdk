@@ -14,7 +14,6 @@ doctest = false
 [dependencies]
 soroban-sdk = {path = "../../soroban-sdk"}
 soroban-auth = {path = "../../soroban-auth"}
-bytes-lit = "0.0.3"
 
 [dev-dependencies]
 soroban-sdk = {path = "../../soroban-sdk", features = ["testutils"]}
