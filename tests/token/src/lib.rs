@@ -1,6 +1,6 @@
 #![no_std]
 use soroban_auth::{Identifier, Signature};
-use soroban_sdk::{contracterror, contractimpl, contracttype, BigInt, Env, Status};
+use soroban_sdk::{contracterror, contractimpl, contracttype, symbol, BigInt, Env, Status};
 
 pub struct Contract;
 
@@ -45,12 +45,12 @@ impl Contract {
 
     pub fn send(
         env: Env,
-        _nonce: BigInt,
+        seq: BigInt,
         from: Signature,
         to: Identifier,
         amount: BigInt,
     ) -> Result<(), Error> {
-        // TODO: auth
+        soroban_auth::check_auth(&env, &from, symbol!("send"), (&seq, &from, &to, &amount));
 
         let from = from.get_identifier(&env);
 
@@ -86,12 +86,12 @@ impl Contract {
 
     pub fn mint(
         env: Env,
-        _nonce: BigInt,
-        _admin: Signature,
+        seq: BigInt,
+        admin: Signature,
         to: Identifier,
         amount: BigInt,
     ) -> Result<(), Error> {
-        // TODO: auth
+        soroban_auth::check_auth(&env, &admin, symbol!("send"), (&seq, &to, &amount));
 
         if amount < 0 {
             return Err(Error::AmountNegative);
