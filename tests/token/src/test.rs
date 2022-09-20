@@ -1,5 +1,5 @@
 use soroban_auth::{Ed25519Signature, Identifier, Signature};
-use soroban_sdk::{bigint, BytesN, Env, Status};
+use soroban_sdk::{bigint, BytesN, Env};
 
 use crate::{Config, Contract, ContractClient};
 
@@ -15,14 +15,14 @@ fn test() {
     let bbb = BytesN::from_array(&env, &[3; 32]);
 
     assert_eq!(
-        client.initialize(&Config {
+        client.try_initialize(&Config {
             admin: soroban_auth::Identifier::Ed25519(admin.clone()),
         }),
-        Status::OK
+        Ok(Ok(())),
     );
 
     assert_eq!(
-        client.mint(
+        client.try_mint(
             &bigint!(&env, 0),
             &Signature::Ed25519(Ed25519Signature {
                 public_key: admin.clone(),
@@ -31,7 +31,7 @@ fn test() {
             &Identifier::Ed25519(aaa.clone()),
             &bigint!(&env, 10),
         ),
-        Status::OK,
+        Ok(Ok(())),
     );
 
     assert_eq!(
@@ -40,7 +40,7 @@ fn test() {
     );
 
     assert_eq!(
-        client.send(
+        client.try_send(
             &bigint!(&env, 0),
             &Signature::Ed25519(Ed25519Signature {
                 public_key: aaa.clone(),
@@ -49,7 +49,7 @@ fn test() {
             &Identifier::Ed25519(bbb.clone()),
             &bigint!(&env, 3),
         ),
-        Status::OK,
+        Ok(Ok(())),
     );
 
     assert_eq!(

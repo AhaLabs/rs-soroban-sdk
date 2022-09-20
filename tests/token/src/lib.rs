@@ -1,29 +1,17 @@
 #![no_std]
 use soroban_auth::{Identifier, Signature};
-use soroban_sdk::{contractimpl, contracttype, xdr::ScStatusType, BigInt, Env, Status};
+use soroban_sdk::{contracterror, contractimpl, contracttype, BigInt, Env, Status};
 
 pub struct Contract;
 
+#[contracterror]
 #[repr(u32)]
-pub enum ErrorCodes {
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Error {
     AlreadyInitialized = 1,
     AmountNegative = 2,
     InsufficientBalance = 3,
 }
-
-const OK: Status = Status::OK;
-const ERROR_ALREADY_INITIALIZED: Status = Status::from_type_and_code(
-    ScStatusType::UnknownError,
-    ErrorCodes::AlreadyInitialized as u32,
-);
-const ERROR_AMOUNT_NEGATIVE: Status = Status::from_type_and_code(
-    ScStatusType::UnknownError,
-    ErrorCodes::AmountNegative as u32,
-);
-const ERROR_INSUFFICIENT_BALANCE: Status = Status::from_type_and_code(
-    ScStatusType::UnknownError,
-    ErrorCodes::InsufficientBalance as u32,
-);
 
 #[contracttype]
 pub struct Config {
@@ -38,12 +26,12 @@ pub enum DataKey {
 
 #[contractimpl]
 impl Contract {
-    pub fn initialize(env: Env, config: Config) -> Status {
+    pub fn initialize(env: Env, config: Config) -> Result<(), Error> {
         if env.contract_data().has(DataKey::Config) {
-            ERROR_ALREADY_INITIALIZED
+            Err(Error::AlreadyInitialized)
         } else {
             env.contract_data().set(DataKey::Config, config);
-            OK
+            Ok(())
         }
     }
 
@@ -61,13 +49,13 @@ impl Contract {
         from: Signature,
         to: Identifier,
         amount: BigInt,
-    ) -> Status {
+    ) -> Result<(), Error> {
         // TODO: auth
 
         let from = from.get_identifier(&env);
 
         if amount < 0 {
-            return ERROR_AMOUNT_NEGATIVE;
+            return Err(Error::AmountNegative);
         }
 
         let data = env.contract_data();
@@ -90,9 +78,9 @@ impl Contract {
         if from_balance >= 0 {
             data.set(&from_balance_key, from_balance);
             data.set(&to_balance_key, to_balance);
-            OK
+            Ok(())
         } else {
-            ERROR_INSUFFICIENT_BALANCE
+            Err(Error::InsufficientBalance)
         }
     }
 
@@ -102,11 +90,11 @@ impl Contract {
         _admin: Signature,
         to: Identifier,
         amount: BigInt,
-    ) -> Status {
+    ) -> Result<(), Error> {
         // TODO: auth
 
         if amount < 0 {
-            return ERROR_AMOUNT_NEGATIVE;
+            return Err(Error::AmountNegative);
         }
 
         let data = env.contract_data();
@@ -120,7 +108,7 @@ impl Contract {
         to_balance += amount;
 
         data.set(&to_balance_key, to_balance);
-        OK
+        Ok(())
     }
 }
 
