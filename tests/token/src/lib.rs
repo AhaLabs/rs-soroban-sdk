@@ -1,6 +1,8 @@
 #![no_std]
 use soroban_auth::{Identifier, Signature};
-use soroban_sdk::{contracterror, contractimpl, contracttype, symbol, BigInt, Env, Status};
+use soroban_sdk::{
+    contracterror, contractimpl, contracttype, symbol, BigInt, Env, IntoVal, Status,
+};
 
 pub struct Contract;
 
