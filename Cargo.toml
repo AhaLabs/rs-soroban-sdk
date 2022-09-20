@@ -22,6 +22,7 @@ members = [
     "tests/events",
     "tests/logging",
     "tests/result",
+    "tests/token",
 ]
 
 [patch.crates-io]
