@@ -14,16 +14,10 @@ use super::{
 };
 
 #[cfg(doc)]
-use crate::{ContractData, Map, Vec};
+use crate::{contract_data::ContractData, Map, Vec};
 
 #[cfg(not(target_family = "wasm"))]
 use super::xdr::ScVal;
-
-#[deprecated(note = "use soroban_sdk::Bytes")]
-pub type Binary = Bytes;
-
-#[deprecated(note = "use soroban_sdk::BytesN")]
-pub type FixedBinary<const N: usize> = BytesN<N>;
 
 /// Create a [Bytes] with an array, or an integer or hex literal.
 ///
@@ -66,7 +60,41 @@ macro_rules! bytes {
         $crate::Bytes::from_array($env, &[$($x),+])
     };
     ($env:expr, $x:tt $(,)?) => {
-        $crate::Bytes::from_array($env, &::bytes_lit::bytes!($x))
+        $crate::Bytes::from_array($env, &$crate::__bytes_lit_bytes!($x))
+    };
+}
+
+/// Create a [BytesN] with an array, or an integer or hex literal.
+///
+/// The first argument in the list must be a reference to an [Env].
+///
+/// The second argument can be an [u8] array, or an integer literal of unbounded
+/// size in any form: base10, hex, etc.
+///
+/// ### Examples
+///
+/// ```
+/// use soroban_sdk::{Env, bytesn};
+///
+/// let env = Env::default();
+/// let bytes = bytesn!(&env, 0xfded3f55dec47250a52a8c0bb7038e72fa6ffaae33562f77cd2b629ef7fd424d);
+/// assert_eq!(bytes.len(), 32);
+/// ```
+///
+/// ```
+/// use soroban_sdk::{Env, bytesn};
+///
+/// let env = Env::default();
+/// let bytes = bytesn!(&env, [2, 0]);
+/// assert_eq!(bytes.len(), 2);
+/// ```
+#[macro_export]
+macro_rules! bytesn {
+    ($env:expr, [$($x:expr),+ $(,)?] $(,)?) => {
+        $crate::BytesN::from_array($env, &[$($x),+])
+    };
+    ($env:expr, $x:tt $(,)?) => {
+        $crate::BytesN::from_array($env, &$crate::__bytes_lit_bytes!($x))
     };
 }
 
@@ -523,7 +551,7 @@ impl Bytes {
     pub fn extend_from_slice(&mut self, slice: &[u8]) {
         let env = self.env();
         self.0 = env
-            .bytes_copy_from_slice(self.to_object(), self.len().into(), &slice)
+            .bytes_copy_from_slice(self.to_object(), self.len().into(), slice)
             .in_env(env);
     }
 
@@ -593,7 +621,7 @@ impl Iterator for BinIter {
     type Item = u8;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.0.len() == 0 {
+        if self.0.is_empty() {
             None
         } else {
             let val = self.0.env().bytes_front(self.0 .0.to_object());
@@ -1078,6 +1106,30 @@ mod test {
             b.push(2);
             b.push(1);
             b
+        });
+        assert_eq!(bytes!(&env, 0x0000030201), {
+            Bytes::from_array(&env, &[0, 0, 3, 2, 1])
+        });
+    }
+
+    #[test]
+    fn macro_bytesn() {
+        let env = Env::default();
+        assert_eq!(bytesn!(&env, 1), { BytesN::from_array(&env, &[1]) });
+        assert_eq!(bytesn!(&env, 1,), { BytesN::from_array(&env, &[1]) });
+        assert_eq!(bytesn!(&env, [3, 2, 1,]), {
+            BytesN::from_array(&env, &[3, 2, 1])
+        });
+    }
+
+    #[test]
+    fn macro_bytesn_hex() {
+        let env = Env::default();
+        assert_eq!(bytesn!(&env, 0x030201), {
+            BytesN::from_array(&env, &[3, 2, 1])
+        });
+        assert_eq!(bytesn!(&env, 0x0000030201), {
+            BytesN::from_array(&env, &[0, 0, 3, 2, 1])
         });
     }
 

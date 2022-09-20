@@ -62,10 +62,10 @@ macro_rules! bigint {
         $crate::BigInt::from_slice($env, &[$($x),+])
     };
     ($env:expr, $x:tt $(,)?) => {
-        $crate::BigInt::from_slice($env, &$crate::__bytes_lit_bytes!($x))
+        $crate::BigInt::from_slice($env, &$crate::__bytes_lit_bytesmin!($x))
     };
     ($env:expr, -$x:tt $(,)?) => {
-        $crate::BigInt::from_sign_and_slice($env, &$crate::Sign::Minus, &$crate::__bytes_lit_bytes!($x))
+        $crate::BigInt::from_sign_and_slice($env, &$crate::Sign::Minus, &$crate::__bytes_lit_bytesmin!($x))
     };
 }
 
@@ -105,7 +105,7 @@ pub enum Sign {
 }
 
 impl Sign {
-    pub(crate) const fn to_raw(&self) -> RawVal {
+    pub(crate) const fn to_raw(self) -> RawVal {
         match self {
             Sign::Minus => RawVal::I32_NEGATIVE_ONE,
             Sign::NoSign => RawVal::I32_ZERO,
@@ -128,7 +128,7 @@ impl Display for BigInt {
         let env = self.env();
         let bi = self.0.to_object();
         let obj: Object = env.bigint_to_radix_be(bi, 10u32.into());
-        if let Ok(bin) = TryIntoVal::<_, Bytes>::try_into_val(obj, &env) {
+        if let Ok(bin) = TryIntoVal::<_, Bytes>::try_into_val(obj, env) {
             if self.sign() == Sign::Minus {
                 write!(f, "-")?;
             }
@@ -1551,6 +1551,8 @@ mod test {
 
         assert_eq!(bigint!(&env, 0x10), BigInt::from_u64(&env, 16),);
 
+        assert_eq!(bigint!(&env, 0x0010), BigInt::from_u64(&env, 16),);
+
         let big = bigint!(&env, 340_282_366_920_938_463_463_374_607_431_768_211_456);
         assert_eq!(big.bits(), 129);
 
@@ -1669,6 +1671,8 @@ mod test {
 
         assert_eq!(&mut bigint!(&env, 1) + &1, bigint!(&env, 2));
         assert_eq!(&bigint!(&env, 1) + &mut 1, bigint!(&env, 2));
+
+        assert_eq!(bigint!(&env, 1) + 1, &bigint!(&env, 2));
     }
 
     #[test]
@@ -1692,5 +1696,9 @@ mod test {
         let mut b = bigint!(&env, 1);
         b += &mut 1;
         assert_eq!(b, bigint!(&env, 2));
+
+        let mut b = bigint!(&env, 1);
+        b += &mut 1;
+        assert_eq!(b, &bigint!(&env, 2));
     }
 }

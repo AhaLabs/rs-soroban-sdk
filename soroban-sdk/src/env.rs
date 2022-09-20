@@ -1,3 +1,4 @@
+use core::convert::TryInto;
 use core::fmt::Debug;
 
 #[cfg(target_family = "wasm")]
@@ -23,10 +24,12 @@ pub mod internal {
     }
 }
 
+// Testutils from the environmen are pub here, and then pub re-exported out of
+// the SDK in the crate::testutils mod.
 #[cfg(feature = "testutils")]
-use internal::budget::Budget;
-#[cfg(feature = "testutils")]
-pub use internal::LedgerInfo;
+pub mod testutils {
+    pub use super::internal::LedgerInfo;
+}
 
 pub use internal::meta;
 pub use internal::xdr;
@@ -47,7 +50,10 @@ pub use internal::Val;
 pub type EnvVal = internal::EnvVal<Env, RawVal>;
 pub type EnvObj = internal::EnvVal<Env, Object>;
 
-use crate::{deploy::Deployer, Bytes, BytesN, ContractData, Events, Ledger, Vec};
+use crate::{
+    contract_data::ContractData, deploy::Deployer, events::Events, ledger::Ledger, logging::Logger,
+    Bytes, BytesN, Vec,
+};
 
 /// The [Env] type provides access to the environment the contract is executing
 /// within.
@@ -86,20 +92,42 @@ impl Env {
     /// number of `args` do not match the argument count of the referenced
     /// contract function.
     ///
-    /// Will also panic if the value returned from the contract cannot be
-    /// converted into the type `T`.
+    /// Will panic if the contract that is invoked fails or aborts in anyway.
     ///
-    /// ### TODO
-    ///
-    /// Return a [Result] instead of panic.
-    pub fn invoke_contract<T: TryFromVal<Env, RawVal>>(
+    /// Will panic if the value returned from the contract cannot be converted
+    /// into the type `T`.
+    pub fn invoke_contract<T>(
         &self,
         contract_id: &BytesN<32>,
         func: &Symbol,
-        args: crate::vec::Vec<EnvVal>,
-    ) -> T {
+        args: Vec<RawVal>,
+    ) -> T
+    where
+        T: TryFromVal<Env, RawVal>,
+    {
         let rv = internal::Env::call(self, contract_id.to_object(), *func, args.to_object());
-        T::try_from_val(&self, rv).map_err(|_| ()).unwrap()
+        T::try_from_val(self, rv.clone())
+            .map_err(|_| ConversionError)
+            .unwrap()
+    }
+
+    /// Invokes a function of a contract that is registered in the [Env],
+    /// returns an error if the invocation fails for any reason.
+    pub fn try_invoke_contract<T, E>(
+        &self,
+        contract_id: &BytesN<32>,
+        func: &Symbol,
+        args: Vec<RawVal>,
+    ) -> Result<Result<T, T::Error>, Result<E, E::Error>>
+    where
+        T: TryFromVal<Env, RawVal>,
+        E: TryFrom<Status>,
+    {
+        let rv = internal::Env::try_call(self, contract_id.to_object(), *func, args.to_object());
+        match Status::try_from_val(self, rv) {
+            Ok(status) => Err(E::try_from(status)),
+            Err(ConversionError) => Ok(T::try_from_val(self, rv)),
+        }
     }
 
     /// Get a [ContractData] for accessing and update contract data that has
@@ -113,6 +141,12 @@ impl Env {
     #[inline(always)]
     pub fn ledger(&self) -> Ledger {
         Ledger::new(self)
+    }
+
+    /// Get the [Logger] for logging debug events.
+    #[inline(always)]
+    pub fn logger(&self) -> Logger {
+        Logger::new(self)
     }
 
     /// Get [Events] for publishing events associated with the
@@ -259,6 +293,10 @@ use std::rc::Rc;
 #[cfg(feature = "testutils")]
 #[cfg_attr(feature = "docs", doc(cfg(feature = "testutils")))]
 impl Env {
+    pub(crate) fn host(&self) -> &internal::Host {
+        &self.env_impl
+    }
+
     fn with_empty_recording_storage() -> Env {
         struct EmptySnapshotSource();
 
@@ -280,13 +318,17 @@ impl Env {
 
         let rf = Rc::new(EmptySnapshotSource());
         let storage = internal::storage::Storage::with_recording_footprint(rf);
-        let env_impl = internal::EnvImpl::with_storage_and_budget(storage, Budget::default());
+        let env_impl = internal::EnvImpl::with_storage_and_budget(
+            storage,
+            internal::budget::Budget::default(),
+        );
 
-        let l = LedgerInfo {
+        let l = internal::LedgerInfo {
             protocol_version: 0,
             sequence_number: 0,
             timestamp: 0,
             network_passphrase: vec![0u8],
+            base_reserve: 0,
         };
         env_impl.set_ledger_info(l);
         Env { env_impl }
@@ -294,7 +336,7 @@ impl Env {
 
     /// Sets ledger information in the [Env], which will be accessible via
     /// [Env::ledger].
-    pub fn set_ledger(&self, li: LedgerInfo) {
+    pub fn set_ledger(&self, li: internal::LedgerInfo) {
         self.env_impl.set_ledger_info(li)
     }
 
@@ -380,16 +422,6 @@ impl Env {
         self.env_impl
             .register_test_contract_token(contract_id.to_object())
             .unwrap();
-    }
-
-    #[doc(hidden)]
-    pub fn invoke_contract_external_raw(&self, hf: xdr::HostFunction, args: xdr::ScVec) -> RawVal {
-        self.env_impl.invoke_function_raw(hf, args).unwrap()
-    }
-
-    #[doc(hidden)]
-    pub fn invoke_contract_external(&self, hf: xdr::HostFunction, args: xdr::ScVec) -> xdr::ScVal {
-        self.env_impl.invoke_function(hf, args).unwrap()
     }
 
     #[cfg(not(target_family = "wasm"))]
@@ -513,20 +545,20 @@ impl internal::EnvBase for Env {
         self.env_impl.bytes_new_from_slice(mem)
     }
 
-    fn log_static_fmt_val(&self, _: &'static str, _: RawVal) {
-        unimplemented!()
+    fn log_static_fmt_val(&self, fmt: &'static str, v: RawVal) {
+        self.env_impl.log_static_fmt_val(fmt, v);
     }
 
-    fn log_static_fmt_static_str(&self, _: &'static str, _: &'static str) {
-        unimplemented!()
+    fn log_static_fmt_static_str(&self, fmt: &'static str, s: &'static str) {
+        self.env_impl.log_static_fmt_static_str(fmt, s);
     }
 
-    fn log_static_fmt_val_static_str(&self, _: &'static str, _: RawVal, _: &'static str) {
-        unimplemented!()
+    fn log_static_fmt_val_static_str(&self, fmt: &'static str, v: RawVal, s: &'static str) {
+        self.env_impl.log_static_fmt_val_static_str(fmt, v, s);
     }
 
-    fn log_static_fmt_general(&self, _: &'static str, _: &[RawVal], _: &[&'static str]) {
-        unimplemented!()
+    fn log_static_fmt_general(&self, fmt: &'static str, v: &[RawVal], s: &[&'static str]) {
+        self.env_impl.log_static_fmt_general(fmt, v, s);
     }
 }
 

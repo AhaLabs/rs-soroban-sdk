@@ -1,3 +1,4 @@
+//! Ledger contains types for retrieving information about the current ledger.
 use crate::{
     env::internal::{self, RawValConvertible},
     Bytes, Env,
@@ -31,7 +32,7 @@ use crate::{
 /// #     let env = Env::default();
 /// #     let contract_id = BytesN::from_array(&env, &[0; 32]);
 /// #     env.register_contract(&contract_id, Contract);
-/// #     f::invoke(&env, &contract_id);
+/// #     ContractClient::new(&env, &contract_id).f();
 /// # }
 /// # #[cfg(not(feature = "testutils"))]
 /// # fn main() { }
