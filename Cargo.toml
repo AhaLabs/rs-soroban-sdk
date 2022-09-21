@@ -21,7 +21,6 @@ members = [
     "tests/create_contract",
     "tests/events",
     "tests/logging",
-    "tests/result",
     "tests/errors",
     "tests/token",
 ]
