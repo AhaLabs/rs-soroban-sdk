@@ -1,5 +1,4 @@
 use core::convert::TryInto;
-use core::fmt::Debug;
 
 #[cfg(target_family = "wasm")]
 pub mod internal {
@@ -83,6 +82,15 @@ impl Default for Env {
 }
 
 impl Env {
+    /// Panic with the given error.
+    ///
+    /// Equivalent to `panic!`, but with an error value instead of a string.
+    #[doc(hidden)]
+    pub fn panic_error(&self, error: impl Into<Status>) {
+        _ = internal::Env::fail_with_status(self, error.into());
+        unreachable!()
+    }
+
     /// Invokes a function of a contract that is registered in the [Env].
     ///
     /// # Panics
@@ -181,45 +189,6 @@ impl Env {
         bin.try_into().unwrap()
     }
 
-    #[doc(hidden)]
-    #[deprecated(note = "use contract_data().has(key)")]
-    pub fn has_contract_data<K>(&self, key: K) -> bool
-    where
-        K: IntoVal<Env, RawVal>,
-    {
-        self.contract_data().has(key)
-    }
-
-    #[doc(hidden)]
-    #[deprecated(note = "use contract_data().get(key)")]
-    pub fn get_contract_data<K, V>(&self, key: K) -> V
-    where
-        V::Error: Debug,
-        K: IntoVal<Env, RawVal>,
-        V: TryFromVal<Env, RawVal>,
-    {
-        self.contract_data().get_unchecked(key).unwrap()
-    }
-
-    #[doc(hidden)]
-    #[deprecated(note = "use contract_data().set(key)")]
-    pub fn put_contract_data<K, V>(&self, key: K, val: V)
-    where
-        K: IntoVal<Env, RawVal>,
-        V: IntoVal<Env, RawVal>,
-    {
-        self.contract_data().set(key, val);
-    }
-
-    #[doc(hidden)]
-    #[deprecated(note = "use contract_data().remove(key)")]
-    pub fn del_contract_data<K>(&self, key: K)
-    where
-        K: IntoVal<Env, RawVal>,
-    {
-        self.contract_data().remove(key);
-    }
-
     /// Computes a SHA-256 hash.
     pub fn compute_hash_sha256(&self, msg: &Bytes) -> BytesN<32> {
         let bin_obj = internal::Env::compute_hash_sha256(self, msg.into());
@@ -288,6 +257,8 @@ impl Env {
 
 #[cfg(feature = "testutils")]
 use crate::testutils::ContractFunctionSet;
+#[cfg(feature = "testutils")]
+use core::fmt::Debug;
 #[cfg(feature = "testutils")]
 use std::rc::Rc;
 #[cfg(feature = "testutils")]
