@@ -2,8 +2,8 @@ use deluxe::HasAttributes;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use syn::{
-    punctuated::Punctuated, spanned::Spanned, Attribute, FnArg, Item, ItemTrait,
-    PatType, Signature, Token, TraitItem, TraitItemFn, Type,
+    punctuated::Punctuated, spanned::Spanned, Attribute, FnArg, Item, ItemTrait, PatType,
+    Signature, Token, TraitItem, TraitItemFn, Type,
 };
 
 pub(crate) mod args;
