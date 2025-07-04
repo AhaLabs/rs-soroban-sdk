@@ -2,6 +2,7 @@ extern crate proc_macro;
 
 mod arbitrary;
 mod attribute;
+mod contracttrait;
 mod derive_args;
 mod derive_client;
 mod derive_enum;
@@ -658,4 +659,143 @@ pub fn contractimport(metadata: TokenStream) -> TokenStream {
         Err(e) => Error::new(Span::call_site(), e.to_string()).into_compile_error(),
     }
     .into()
+}
+
+/// # Creates a Contract Trait
+///
+/// A contract trait is defines an interface of a contract and declaritive macro with the same name.
+///
+/// When writing a soroban contract, you must expose a methods in an implementation with `#[contractimpl]`.
+/// This works for implementations of traits, but the implementation must define all methods of the trait.
+///
+/// For example, consider the following trait and a default implementation:
+///
+/// ```ignore
+/// trait Administratable {
+///    fn admin(env: &Env) -> Address;
+///    fn set_admin(env: &Env, new_admin: &Address);
+/// }
+///
+/// struct Admin;
+/// impl Administratable for Admin {
+///    fn admin(env: &Env) -> Address {
+///  //...
+///
+/// }
+///
+/// #[contract]
+/// pub struct Contract;
+/// #[contractimpl]
+/// impl Administratable Contract {
+///     fn admin(env: &Env) -> Address {
+///        Admin::admin(env)
+///     }
+///     fn set_admin(env: &Env, new_admin: &Address) {
+///        Admin::set_admin(env, new_admin);
+///     }
+/// }
+/// ```
+///
+/// Now this works, but it is not very convenient and is very verbose.
+/// One way to make this more convenient is to use an associated type in the trait:
+///
+/// ```ignore
+/// trait Administratable {
+///   type Impl: Administratable;
+///   fn admin(env: &Env) -> Address {
+///     Self::Impl::admin(env)}
+///   }
+///   fn set_admin(env: &Env, new_admin: &Address) {
+///      Self::Impl::set_admin(env, new_admin);
+///   }
+/// }
+/// #[contractimpl]
+/// impl Administratable for Contract {
+///     type Impl = Admin;
+/// }
+/// ```
+///
+/// While this will compile and `Contract` now implements `Administratable`, the methods will not be exposed as contract methods because
+/// `contractimpl` only has the context of what is in the `impl` block.
+///
+/// Adding the methods is even worse than before with the extra line.
+/// ```ignore
+/// #[contractimpl]
+/// impl Administratable Contract {
+///     type Impl = Admin;
+///     fn admin(env: &Env) -> Address {
+///        Self::Impl::admin(env)
+///     }
+///     fn set_admin(env: &Env, new_admin: &Address) {
+///        Self::Impl::set_admin(env, new_admin);
+///     }
+/// }
+/// ```
+///
+/// To get around this can use the `#[contracttrait]` macro
+/// ```ignore
+/// #[contracttrait(default = Admin)]
+/// trait Administratable {
+///    fn admin(env: &Env) -> Address;
+///    fn set_admin(env: &Env, new_admin: &Address);
+/// }
+/// ```
+/// Generates:
+/// ```ignore
+/// trait Administratable {
+///   type Impl: Administratable;
+///   fn admin(env: &Env) -> Address {
+///     Self::Impl::admin(env)}
+///   }
+///   fn set_admin(env: &Env, new_admin: &Address) {
+///      Self::Impl::set_admin(env, new_admin);
+///   }
+/// }
+/// ```
+/// It also generates a macro which will generate the `impl` block for you.
+/// And implement the trait for the contract type.
+/// ```ignore
+/// #[macro_export]
+/// macro_rules! Administratable {
+/// //
+/// ```
+///
+/// ```ignore
+///
+/// #[contract]
+/// pub struct Contract;
+/// Administratable!(Contract);
+/// ```
+///
+///
+/// T
+/// # Panics
+///
+/// This macro will panic if:
+/// - The input `TokenStream` cannot be parsed into a valid Rust item.
+/// - The `contracttrait::generate` function fails to generate the companion trait.
+///
+#[proc_macro_attribute]
+pub fn contracttrait(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let (parsed_args, parsed) = match contracttrait::args::parse(attr, item) {
+        Ok((args, item)) => (args, item),
+        Err(e) => return e.into_compile_error().into(),
+    };
+    contracttrait::generate(&parsed_args, &parsed).into()
+}
+
+/// Derives a contract trait for the given Contract struct.
+///
+/// ```ignore
+/// #[contract]
+/// #[derive_contract(Administratable, Upgradable(ext = AdministratableExt))]
+/// pub struct Contract;
+/// ```
+#[proc_macro_attribute]
+pub fn derive_contract(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let (parsed_args, parsed) = match contracttrait::args::parse(attr, item) {
+        Ok((args, item)) => (args, item),
+        Err(e) => return e.into_compile_error().into(),
+    };
+    contracttrait::derive_contract(&parsed_args, &parsed).into()
 }
