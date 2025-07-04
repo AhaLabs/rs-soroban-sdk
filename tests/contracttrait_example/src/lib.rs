@@ -6,7 +6,7 @@ use soroban_sdk::{contract, derive_contract, Env};
 
 #[contract]
 #[derive_contract(
-    Administratable, 
+    Administratable,
     Upgradable(ext = AdministratableExt)
 )]
 pub struct Contract;
