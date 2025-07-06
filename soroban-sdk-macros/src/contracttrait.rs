@@ -1,4 +1,5 @@
 use deluxe::HasAttributes;
+use itertools::Itertools;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use syn::{
@@ -13,7 +14,7 @@ use args::{InnerArgs, MyMacroArgs, MyTraitMacroArgs};
 use syn::Error;
 use util::{has_attr, BoolExt};
 
-pub fn generate(args: &MyTraitMacroArgs, item: &Item) -> TokenStream {
+pub fn generate(args: MyTraitMacroArgs, item: &Item) -> TokenStream {
     inner_generate(args, item).unwrap_or_else(|e| e.to_compile_error())
 }
 
@@ -35,11 +36,9 @@ fn generate_method(
     let args = args_to_idents(&sig.inputs);
     let attrs = &method.attrs;
     if has_attr(attrs, "internal") {
-        method.attrs = method
+        method
             .attrs
-            .into_iter()
-            .filter(|attr| !attr.path().is_ident("internal"))
-            .collect::<Vec<Attribute>>();
+            .retain(|attr| !attr.path().is_ident("internal"));
         let method_stream = if method.default.is_none() {
             generate_trait_method(&method, name, &args)
         } else {
@@ -131,7 +130,7 @@ fn inner_generate(
         default,
         ext_required,
         is_ext,
-    }: &MyTraitMacroArgs,
+    }: MyTraitMacroArgs,
     item: &Item,
 ) -> Result<TokenStream, Error> {
     let Item::Trait(input_trait) = &item else {
@@ -198,7 +197,7 @@ fn inner_generate(
         .as_ref()
         .map_or_else(|| quote! {$contract_name}, Ident::to_token_stream);
 
-    let default_used = if *ext_required {
+    let default_used = if ext_required {
         quote! { #never_ident<$crate::#default_impl> }
     } else {
         quote! { $crate::#default_impl }
@@ -269,16 +268,14 @@ pub fn derive_contract_inner(args: &MyMacroArgs, trait_impls: &Item) -> Result<T
     let macro_calls = args
         .args
         .iter()
+        .sorted_by(|(a, _), (b, _)| a.to_string().cmp(&b.to_string()))
         .map(|(trait_ident, InnerArgs { exts, default })| {
             if exts.is_empty() && default.is_none() {
                 return quote! { #trait_ident!(#strukt_name); };
             }
-            let init = default.as_ref().map_or_else(
-                || quote! {#trait_ident!()},
-                |default| {
-                    quote! {#default }
-                },
-            );
+            let init = default
+                .as_ref()
+                .map_or_else(|| quote! {#trait_ident!()}, Ident::to_token_stream);
             let default_impl = exts.iter().fold(
                 init,
                 |acc, extension| quote! { #extension<#strukt_name, #acc> },
@@ -315,7 +312,7 @@ mod tests {
         };
         let default = Some(format_ident!("Admin"));
         let result: TokenStream = generate(
-            &MyTraitMacroArgs {
+            MyTraitMacroArgs {
                 default,
                 ..Default::default()
             },
@@ -400,8 +397,8 @@ mod tests {
         );
         let output = quote! {
         pub struct Contract;
-        Upgradable ! (Contract , AdministratableExt < Contract , Upgradable ! () >);
         Administratable!(Contract);
+        Upgradable ! (Contract , AdministratableExt < Contract , Upgradable ! () >);
         };
         equal_tokens(&output, &result);
     }

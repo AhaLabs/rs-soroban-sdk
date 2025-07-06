@@ -781,7 +781,7 @@ pub fn contracttrait(attr: TokenStream, item: TokenStream) -> TokenStream {
         Ok((args, item)) => (args, item),
         Err(e) => return e.into_compile_error().into(),
     };
-    contracttrait::generate(&parsed_args, &parsed).into()
+    contracttrait::generate(parsed_args, &parsed).into()
 }
 
 /// Derives a contract trait for the given Contract struct.
