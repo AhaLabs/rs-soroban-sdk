@@ -1,13 +1,12 @@
 #![no_std]
-
-use test_contracttrait_lib::{Administratable, AdministratableExt, Upgradable};
+use test_contracttrait_lib::{Administratable, Upgradable};
 
 use soroban_sdk::{contract, derive_contract, Env};
 
 #[contract]
 #[derive_contract(
     Administratable,
-    Upgradable(ext = AdministratableExt)
+    Upgradable
 )]
 pub struct Contract;
 
@@ -17,3 +16,5 @@ impl Contract {
         Self::init(env, &admin);
     }
 }
+
+fn main(){}

@@ -1,5 +1,5 @@
 [package]
-name = "contracttrait_example"
+name = "test_contracttrait_example"
 version.workspace = true
 authors = ["Stellar Development Foundation <info@stellar.org>"]
 license = "Apache-2.0"
@@ -15,8 +15,11 @@ doctest = false
 testutils = []
 
 [dependencies]
-soroban-sdk = {path = "../../soroban-sdk"}
-contracttrait_lib = {path = "../contracttrait_lib"}
+soroban-sdk = { path = "../../soroban-sdk" }
+test_contracttrait_lib = { path = "../contracttrait_lib" }
 
 [dev-dependencies]
-soroban-sdk = {path = "../../soroban-sdk", features = ["testutils"]}
+soroban-sdk = { path = "../../soroban-sdk", features = ["testutils"] }
+test_contracttrait_lib = { path = "../contracttrait_lib" }
+trybuild = "1.0"
+

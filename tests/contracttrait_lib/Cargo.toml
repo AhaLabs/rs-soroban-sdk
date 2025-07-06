@@ -1,5 +1,5 @@
 [package]
-name = "contracttrait_lib"
+name = "test_contracttrait_lib"
 version.workspace = true
 authors = ["Stellar Development Foundation <info@stellar.org>"]
 license = "Apache-2.0"
