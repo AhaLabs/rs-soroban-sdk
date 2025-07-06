@@ -321,7 +321,6 @@ mod tests {
             },
             &input,
         );
-        println!("{}", format_snippet(&result.to_string()));
 
         let output = quote! {
         pub trait Administratable {
@@ -399,11 +398,10 @@ mod tests {
             },
             &input,
         );
-        println!("{}", format_snippet(&result.to_string()));
         let output = quote! {
         pub struct Contract;
         Upgradable ! (Contract , AdministratableExt < Contract , Upgradable ! () >);
-        Administratable!(Contract, Administratable!());
+        Administratable!(Contract);
         };
         equal_tokens(&output, &result);
     }
