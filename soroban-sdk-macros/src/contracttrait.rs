@@ -46,6 +46,12 @@ fn generate_method(
         };
         return Some((None, method_stream));
     }
+    if method.default.is_some() {
+        return Some((
+            Some(generate_static_method(item_trait, sig, attrs, name, &args)),
+            method.to_token_stream(),
+        ));
+    }
     Some((
         Some(generate_static_method(item_trait, sig, attrs, name, &args)),
         generate_trait_method(&method, name, &args),
