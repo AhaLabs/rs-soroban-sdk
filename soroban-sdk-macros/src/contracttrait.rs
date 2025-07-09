@@ -248,10 +248,12 @@ One should be passed, e.g. `#[derive_contract(Administratable(default = MyAdmin)
             #macro_rules_name!($contract_name, #default_used);
         };
         ($contract_name:ident, $impl_name:path) => {
-            // #ensure_extension
             impl #trait_ident for $contract_name {
                 type Impl = $impl_name;
             }
+            #macro_rules_name!($contract_name, $contract_name, $impl_name);
+        };
+        ($contract_name:ident, $_:ident, $impl_name:path) => {
             #[soroban_sdk::contractimpl]
             impl $contract_name {
                 #(#generated_methods)*
@@ -279,6 +281,7 @@ pub fn derive_contract_inner(args: &MyMacroArgs, trait_impls: &Item) -> Result<T
             if exts.is_empty() && default.is_none() {
                 return quote! { #trait_ident!(#strukt_name); };
             }
+            let is_self = default.as_ref().map(|i| i == strukt_name).unwrap_or(false);
             let init = default
                 .as_ref()
                 .map_or_else(|| quote! {#trait_ident!()}, Ident::to_token_stream);
@@ -286,8 +289,14 @@ pub fn derive_contract_inner(args: &MyMacroArgs, trait_impls: &Item) -> Result<T
                 init,
                 |acc, extension| quote! { #extension<#strukt_name, #acc> },
             );
-            quote! {
-                #trait_ident!(#strukt_name, #default_impl);
+            if is_self {
+                quote! {
+                    #trait_ident!(#strukt_name, #strukt_name, #default_impl);
+                }
+            } else {
+                quote! {
+                    #trait_ident!(#strukt_name, #default_impl);
+                }
             }
         });
     let output = quote! {
@@ -345,11 +354,13 @@ mod tests {
                 Administratable!($contract_name, $crate::Admin);
             };
 
-            ($contract_name: ident, $impl_name: path) => {
+             ($contract_name: ident, $impl_name: path) => {
                 impl Administratable for $contract_name {
                     type Impl = $impl_name;
                 }
-
+                Administratable!($contract_name, $contract_name, $impl_name);
+             };
+            ($contract_name: ident, $_: ident, $impl_name: path) => {
                 #[soroban_sdk::contractimpl]
                 impl $contract_name {
                     #[doc = r" Get current admin"]
