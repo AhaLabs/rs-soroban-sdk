@@ -131,6 +131,41 @@ fn generate_trait_method(method: &syn::TraitItemFn, name: &Ident, args: &[&Ident
     method.to_token_stream()
 }
 
+fn generate_never_impl(
+    trait_ident: &syn::Ident,
+    never_ident: &syn::Ident,
+    items: &[TraitItemFn],
+) -> TokenStream {
+    let methods = items.iter().map(
+            |TraitItemFn {
+                 attrs,
+                 sig,
+                 ..
+             }| {
+                 let message = format!(
+            "The contract trait `{trait_ident}` requires an extension for authentication but none were provided.\
+            E.g. #[derive_contract(Administratable, Upgradable(ext = AdministratableExt))]",
+        );
+                quote! {
+                    #(#attrs)*
+                    #sig {
+                        compile_error!(#message);
+                    }
+                }
+
+             },
+        ).collect::<Vec<_>>();
+    quote! {
+        pub struct #never_ident<N>(
+            core::marker::PhantomData<N>,
+        );
+        impl<N:#trait_ident> #trait_ident for #never_ident<N> {
+            type Impl = N;
+            #(#methods)*
+        }
+    }
+}
+
 fn inner_generate(
     MyTraitMacroArgs {
         default,
@@ -160,38 +195,15 @@ fn inner_generate(
         .collect::<Result<Vec<TraitItemFn>, _>>()?;
 
     let never_ident = format_ident!("{}Never", trait_ident);
-    let never_ext_impl = ext_required.then_default(|| {
-        let methods = items.iter().map(
-            |TraitItemFn {
-                 attrs,
-                 sig,
-                 ..
-             }| {
-                 let message = format!(
-            "The contract trait `{trait_ident}` requires an extension for authentication but none were provided.\
-            E.g. #[derive_contract(Administratable, Upgradable(ext = AdministratableExt))]",
-        );
-                quote! {
-                    #(#attrs)*
-                    #sig {
-                        compile_error!(#message);
-                    }
-                }
+    let never_ext_impl =
+        ext_required.then_default(|| generate_never_impl(trait_ident, &never_ident, &items));
 
-             },
-        ).collect::<Vec<_>>();
-        quote! {
-            pub struct #never_ident<N>(
-                core::marker::PhantomData<N>,
-            );
-            impl<N:#trait_ident> #trait_ident for #never_ident<N> {
-                type Impl = N;
-                #(#methods)*
-            }
-        }
-    });
-
-    trait_.items = items.into_iter().map(TraitItem::Fn).collect();
+    trait_.items = trait_
+        .items
+        .into_iter()
+        .filter(|item| !matches!(item, TraitItem::Fn(_)))
+        .chain(items.into_iter().map(TraitItem::Fn))
+        .collect();
     trait_.items.insert(
         0,
         syn::parse_quote! {
@@ -316,6 +328,7 @@ mod tests {
     fn first() {
         let input: Item = syn::parse_quote! {
             pub trait Administratable {
+                type Other;
                 /// Get current admin
                 fn admin_get(env: Env) -> soroban_sdk::Address;
                 fn admin_set(env: Env, new_admin: &soroban_sdk::Address);
@@ -337,6 +350,7 @@ mod tests {
         let output = quote! {
         pub trait Administratable {
             type Impl: Administratable;
+            type Other;
             #[doc = r" Get current admin"]
             fn admin_get(env: Env) -> soroban_sdk::Address {
                 Self::Impl::admin_get(env)
