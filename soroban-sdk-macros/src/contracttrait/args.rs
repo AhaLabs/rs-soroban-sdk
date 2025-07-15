@@ -20,13 +20,13 @@ pub struct MyTraitMacroArgs {
 #[derive(deluxe::ParseMetaItem)]
 pub struct MyMacroArgs {
     #[deluxe(rest)]
-    pub args: std::collections::HashMap<syn::Ident, InnerArgs>,
+    pub args: std::collections::HashMap<syn::Path, InnerArgs>,
 }
 
-#[derive(ParseMetaItem)]
+#[derive(ParseMetaItem, Default)]
 pub struct InnerArgs {
     #[deluxe(append, rename = ext)]
     pub exts: Vec<syn::Path>,
     #[deluxe(default)]
-    pub default: Option<syn::Ident>,
+    pub default: Option<syn::Path>,
 }

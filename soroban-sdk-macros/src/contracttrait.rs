@@ -3,8 +3,8 @@ use itertools::Itertools;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, ToTokens};
 use syn::{
-    punctuated::Punctuated, spanned::Spanned, Attribute, FnArg, Item, ItemTrait, PatType,
-    Signature, Token, TraitItem, TraitItemFn, Type,
+    parse_quote, punctuated::Punctuated, spanned::Spanned, Attribute, FnArg, Item, ItemImpl,
+    ItemTrait, PatType, PathSegment, Signature, Token, TraitItem, TraitItemFn, Type,
 };
 
 pub(crate) mod args;
@@ -12,9 +12,9 @@ mod util;
 
 use args::{InnerArgs, MyMacroArgs, MyTraitMacroArgs};
 use syn::Error;
-use util::{has_attr, BoolExt};
+use util::has_attr;
 
-pub fn generate(args: MyTraitMacroArgs, item: &Item) -> TokenStream {
+pub fn generate_trait(args: MyTraitMacroArgs, item: &ItemTrait) -> TokenStream {
     inner_generate(args, item).unwrap_or_else(|e| e.to_compile_error())
 }
 
@@ -172,11 +172,8 @@ fn inner_generate(
         ext_required,
         is_ext,
     }: MyTraitMacroArgs,
-    item: &Item,
+    input_trait: &ItemTrait,
 ) -> Result<TokenStream, Error> {
-    let Item::Trait(input_trait) = &item else {
-        return Err(Error::new(item.span(), "Input must be a trait"));
-    };
     let (generated_methods, trait_methods): (Vec<_>, Vec<_>) = input_trait
         .items
         .iter()
@@ -186,8 +183,6 @@ fn inner_generate(
 
     let trait_ident = &input_trait.ident;
     let macro_rules_name = trait_ident;
-    let attrs = input_trait.attrs.as_slice();
-
     let mut trait_ = input_trait.clone();
     let items = trait_methods
         .into_iter()
@@ -196,7 +191,7 @@ fn inner_generate(
 
     let never_ident = format_ident!("{}Never", trait_ident);
     let never_ext_impl =
-        ext_required.then_default(|| generate_never_impl(trait_ident, &never_ident, &items));
+        ext_required.then(|| generate_never_impl(trait_ident, &never_ident, &items));
 
     trait_.items = trait_
         .items
@@ -221,7 +216,7 @@ fn inner_generate(
         quote! { $crate::#default_impl }
     };
 
-    let ensure_default = default.is_none().then_default(|| {
+    let ensure_default = default.is_none().then(|| {
         let message = format!(
             "The contract trait `{trait_ident}` does not provide default implementation. \
 One should be passed, e.g. `#[derive_contract(Administratable(default = MyAdmin))"
@@ -231,7 +226,7 @@ One should be passed, e.g. `#[derive_contract(Administratable(default = MyAdmin)
         }
     });
 
-    let extension_type = is_ext.then_default(|| {
+    let extension_type = is_ext.then(|| {
         let extension_strukt = format_ident!("{trait_ident}Ext");
         quote! {
             pub struct #extension_strukt<T: #trait_ident, N>(
@@ -248,7 +243,6 @@ One should be passed, e.g. `#[derive_contract(Administratable(default = MyAdmin)
 
     let output = quote! {
 
-    #(#attrs)*
     #trait_
     #extension_type
     #(#docs)*
@@ -263,9 +257,9 @@ One should be passed, e.g. `#[derive_contract(Administratable(default = MyAdmin)
             impl #trait_ident for $contract_name {
                 type Impl = $impl_name;
             }
-            #macro_rules_name!($contract_name, $contract_name, $impl_name);
+            #macro_rules_name!($contract_name, $contract_name, $contract_name);
         };
-        ($contract_name:ident, $_:ident, $impl_name:path) => {
+        ($contract_name:ident, $_a:ident, $_b:ident) => {
             #[soroban_sdk::contractimpl]
             impl $contract_name {
                 #(#generated_methods)*
@@ -280,6 +274,72 @@ One should be passed, e.g. `#[derive_contract(Administratable(default = MyAdmin)
     Ok(output)
 }
 
+pub fn derive_trait_impl_external(mut impl_: ItemImpl, args: &InnerArgs) -> TokenStream {
+    let Some((_, trait_, _)) = impl_.trait_.as_ref() else {
+        return Error::new(impl_.span(), "Input must be a impl with a trait")
+            .into_compile_error()
+            .into();
+    };
+    let type_path = match *impl_.self_ty.clone() {
+        Type::Path(type_path) => type_path.path,
+        _ => todo!(),
+    };
+    let strukt_ident: Ident = parse_quote!(#type_path);
+    let (macro_calls, default) = derive_trait_impl(trait_, args, strukt_ident, true);
+    if !impl_.items.iter().any(
+        |item| matches!(item, syn::ImplItem::Type(syn::ImplItemType {ident, ..}) if ident == "Impl"),
+    ) {
+        impl_.items.insert(
+            0,
+          syn::parse_quote! {
+            type Impl = #default;
+          });
+    }
+    quote! {
+        #impl_
+        #macro_calls
+    }
+}
+
+pub fn derive_trait_impl(
+    trait_ident: &syn::Path,
+    InnerArgs { exts, default }: &InnerArgs,
+    strukt_type: syn::Ident,
+    is_impl_: bool,
+) -> (TokenStream, TokenStream) {
+    if exts.is_empty() && default.is_none() && !is_impl_ {
+        return (
+            quote! { #trait_ident!(#strukt_type); },
+            TokenStream::default(),
+        );
+    }
+    let is_self = default
+        .as_ref()
+        .map(|i| {
+            let ident: Ident = parse_quote!(#i);
+
+            ident == strukt_type
+        })
+        .unwrap_or(false);
+    let init = default
+        .as_ref()
+        .map_or_else(|| quote! {#trait_ident!()}, ToTokens::to_token_stream);
+    let default_impl = exts.iter().fold(
+        init,
+        |acc, extension| quote! { #extension<#strukt_type, #acc> },
+    );
+    let call = if is_self || is_impl_ {
+        quote! {
+            #trait_ident!(#strukt_type, #strukt_type, #strukt_type);
+        }
+    } else {
+        quote! {
+            #trait_ident!(#strukt_type, #default_impl);
+        }
+    };
+    (call, default_impl)
+}
+
 pub fn derive_contract_inner(args: &MyMacroArgs, trait_impls: &Item) -> Result<TokenStream, Error> {
     let Item::Struct(strukt) = trait_impls else {
         return Err(Error::new(trait_impls.span(), "Input must be a struct"));
@@ -288,28 +348,13 @@ pub fn derive_contract_inner(args: &MyMacroArgs, trait_impls: &Item) -> Result<T
     let macro_calls = args
         .args
         .iter()
-        .sorted_by(|(a, _), (b, _)| a.to_string().cmp(&b.to_string()))
-        .map(|(trait_ident, InnerArgs { exts, default })| {
-            if exts.is_empty() && default.is_none() {
-                return quote! { #trait_ident!(#strukt_name); };
-            }
-            let is_self = default.as_ref().map(|i| i == strukt_name).unwrap_or(false);
-            let init = default
-                .as_ref()
-                .map_or_else(|| quote! {#trait_ident!()}, Ident::to_token_stream);
-            let default_impl = exts.iter().fold(
-                init,
-                |acc, extension| quote! { #extension<#strukt_name, #acc> },
-            );
-            if is_self {
-                quote! {
-                    #trait_ident!(#strukt_name, #strukt_name, #default_impl);
-                }
-            } else {
-                quote! {
-                    #trait_ident!(#strukt_name, #default_impl);
-                }
-            }
+        .sorted_by(|(a, _), (b, _)| {
+            a.to_token_stream()
+                .to_string()
+                .cmp(&b.to_token_stream().to_string())
+        })
+        .map(|(trait_ident, args)| {
+            derive_trait_impl(trait_ident, args, strukt_name.clone(), false).0
         });
     let output = quote! {
         #strukt
@@ -325,10 +370,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn first() {
-        let input: Item = syn::parse_quote! {
+    fn contracttrait_on_trait() {
+        let input: ItemTrait = syn::parse_quote! {
             pub trait Administratable {
-                type Other;
                 /// Get current admin
                 fn admin_get(env: Env) -> soroban_sdk::Address;
                 fn admin_set(env: Env, new_admin: &soroban_sdk::Address);
@@ -339,7 +383,7 @@ mod tests {
             }
         };
         let default = Some(format_ident!("Admin"));
-        let result: TokenStream = generate(
+        let actual: TokenStream = generate_trait(
             MyTraitMacroArgs {
                 default,
                 ..Default::default()
@@ -347,10 +391,9 @@ mod tests {
             &input,
         );
 
-        let output = quote! {
+        let expected = quote! {
         pub trait Administratable {
             type Impl: Administratable;
-            type Other;
             #[doc = r" Get current admin"]
             fn admin_get(env: Env) -> soroban_sdk::Address {
                 Self::Impl::admin_get(env)
@@ -372,9 +415,9 @@ mod tests {
                 impl Administratable for $contract_name {
                     type Impl = $impl_name;
                 }
-                Administratable!($contract_name, $contract_name, $impl_name);
+                Administratable!($contract_name, $contract_name, $contract_name);
              };
-            ($contract_name: ident, $_: ident, $impl_name: path) => {
+            ($contract_name: ident, $_a: ident, $_b: ident) => {
                 #[soroban_sdk::contractimpl]
                 impl $contract_name {
                     #[doc = r" Get current admin"]
@@ -395,8 +438,58 @@ mod tests {
 
 
                 };
-        equal_tokens(&output, &result);
+        equal_tokens(&expected, &actual);
     }
+    // #[test]
+    // fn generic() {
+    //     let input: Item = syn::parse_quote! {
+    //         pub trait Generic<T> {
+    //             fn pass_generic(env: Env, t: T);
+    //         }
+    //     };
+    //     let default = Some(format_ident!("Admin"));
+    //     let result: TokenStream = generate(
+    //         MyTraitMacroArgs {
+    //             default,
+    //             ..Default::default()
+    //         },
+    //         &input,
+    //     );
+
+    //     let output = quote! {
+    //     pub trait Administratable<T> {
+    //         type Impl: Administratable<T>;
+    //         fn pass_generic(env: Env, t: T);
+    //     }
+    //     #[macro_export]
+    //     macro_rules! Administratable {
+    //         ($contract_name: ident) => {
+    //             Administratable!($contract_name, $crate::Admin);
+    //         };
+
+    //          ($contract_name: ident, $impl_name: path) => {
+    //             impl Administratable for $contract_name {
+    //                 type Impl = $impl_name;
+    //             }
+    //             Administratable!($contract_name, $contract_name, $impl_name);
+    //          };
+    //         ($contract_name: ident, $_: ident, $impl_name: path) => {
+    //             #[soroban_sdk::contractimpl]
+    //             impl $contract_name {
+    //                 pub fn pass_generic(env: Env, t: T); {
+    //                     < $contract_name as Administratable >::admin_get(env)
+    //                 }
+    //             }
+    //         };
+
+    //         () => {
+    //             $crate::Admin
+    //         };
+    //     }
+
+    //             };
+    //     equal_tokens(&output, &result);
+    // }
 
     #[test]
     fn derive() {
@@ -405,16 +498,16 @@ mod tests {
         };
         let args = vec![
             (
-                format_ident!("Administratable"),
+                syn::parse_quote! {Administratable},
                 InnerArgs {
                     exts: vec![],
                     default: None,
                 },
             ),
             (
-                format_ident!("Upgradable"),
+                syn::parse_quote!(Upgradable),
                 InnerArgs {
-                    exts: vec![format_ident!("AdministratableExt").into()],
+                    exts: vec![syn::parse_quote!(AdministratableExt)],
                     default: None,
                 },
             ),
@@ -430,6 +523,23 @@ mod tests {
         pub struct Contract;
         Administratable!(Contract);
         Upgradable ! (Contract , AdministratableExt < Contract , Upgradable ! () >);
+        };
+        equal_tokens(&output, &result);
+    }
+
+    #[test]
+    fn derive_on_impl() {
+        let input = syn::parse_quote! {
+            impl Administratable for Contract {}
+        };
+        let args = InnerArgs::default();
+
+        let result = derive_trait_impl_external(input, &args);
+        let output = quote! {
+        impl Administratable for Contract {
+            type Impl = Administratable!();
+        }
+        Administratable!(Contract, Contract, Contract);
         };
         equal_tokens(&output, &result);
     }

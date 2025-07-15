@@ -777,11 +777,27 @@ pub fn contractimport(metadata: TokenStream) -> TokenStream {
 ///
 #[proc_macro_attribute]
 pub fn contracttrait(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let (parsed_args, parsed) = match contracttrait::args::parse(attr, item) {
-        Ok((args, item)) => (args, item),
-        Err(e) => return e.into_compile_error().into(),
-    };
-    contracttrait::generate(parsed_args, &parsed).into()
+    match syn::parse(item) {
+        Ok(syn::Item::Trait(trait_)) => match deluxe::parse2(attr.into()) {
+            Ok(parsed_args) => contracttrait::generate_trait(parsed_args, &trait_).into(),
+            Err(e) => {
+                return e.into_compile_error().into();
+            }
+        },
+        Ok(syn::Item::Impl(impl_)) => match deluxe::parse2(attr.into()) {
+            Ok(parsed_args) => {
+                contracttrait::derive_trait_impl_external(impl_, &parsed_args).into()
+            }
+            Err(e) => {
+                return e.into_compile_error().into();
+            }
+        },
+        _ => {
+            return Error::new(Span::call_site(), "Input must be a trait or impl")
+                .into_compile_error()
+                .into();
+        }
+    }
 }
 
 /// Derives a contract trait for the given Contract struct.

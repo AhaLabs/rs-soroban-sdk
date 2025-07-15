@@ -18,20 +18,6 @@ pub(crate) fn has_attr(attrs: &[syn::Attribute], ident_str: &str) -> bool {
     attrs.iter().any(|attr| attr.path().is_ident(ident_str))
 }
 
-pub trait BoolExt {
-    fn then_default<T: Default>(&self, f: impl FnOnce() -> T) -> T;
-}
-
-impl BoolExt for bool {
-    fn then_default<T: Default>(&self, f: impl FnOnce() -> T) -> T {
-        if *self {
-            f()
-        } else {
-            T::default()
-        }
-    }
-}
-
 /// Format the given snippet. The snippet is expected to be *complete* code.
 /// When we cannot parse the given snippet, this function returns `None`.
 #[allow(unused)]
