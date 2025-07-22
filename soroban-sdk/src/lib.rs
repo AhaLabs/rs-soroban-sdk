@@ -882,7 +882,6 @@ pub use soroban_sdk_macros::contractspecfn;
 pub use soroban_sdk_macros::contractfile;
 
 pub use soroban_sdk_macros::contracttrait;
-pub use soroban_sdk_macros::derive_contract;
 
 /// Panic with the given error.
 ///

@@ -765,13 +765,13 @@ pub fn contractimport(metadata: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn contracttrait(attr: TokenStream, item: TokenStream) -> TokenStream {
     match syn::parse(item) {
-        Ok(syn::Item::Trait(trait_)) => match deluxe::parse2(attr.into()) {
+        Ok(syn::Item::Trait(trait_)) => match contracttrait::args::parse(attr) {
             Ok(parsed_args) => contracttrait::generate_trait(parsed_args, &trait_).into(),
             Err(e) => {
                 return e.into_compile_error().into();
             }
         },
-        Ok(syn::Item::Impl(impl_)) => match deluxe::parse2(attr.into()) {
+        Ok(syn::Item::Impl(impl_)) => match contracttrait::args::parse(attr) {
             Ok(parsed_args) => {
                 contracttrait::derive_trait_impl_external(impl_, &parsed_args).into()
             }
@@ -785,20 +785,4 @@ pub fn contracttrait(attr: TokenStream, item: TokenStream) -> TokenStream {
                 .into();
         }
     }
-}
-
-/// Derives a contract trait for the given Contract struct.
-///
-/// ```ignore
-/// #[contract]
-/// #[derive_contract(Administratable, Upgradable(ext = AdministratableExt))]
-/// pub struct Contract;
-/// ```
-#[proc_macro_attribute]
-pub fn derive_contract(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let (parsed_args, parsed) = match contracttrait::args::parse(attr, item) {
-        Ok((args, item)) => (args, item),
-        Err(e) => return e.into_compile_error().into(),
-    };
-    contracttrait::derive_contract(&parsed_args, &parsed).into()
 }

@@ -1,7 +1,7 @@
-use crate::admin::{Administratable, AdministratableExt};
+// use crate::admin::Administratable;
 use soroban_sdk::contracttrait;
 
-#[contracttrait(default = Upgrader, extension_required = true)]
+#[contracttrait(default = Upgrader, default_required = true)]
 pub trait Upgradable {
     fn upgrade(env: &soroban_sdk::Env, wasm_hash: soroban_sdk::BytesN<32>);
 }
@@ -15,10 +15,10 @@ impl Upgradable for Upgrader {
     }
 }
 
-impl<T: Administratable, N: Upgradable> Upgradable for AdministratableExt<T, N> {
-    type Impl = N;
-    fn upgrade(env: &soroban_sdk::Env, wasm_hash: soroban_sdk::BytesN<32>) {
-        T::require_admin(env);
-        N::upgrade(env, wasm_hash);
-    }
-}
+// impl<T: Administratable, N: Upgradable> Upgradable for AdministratableExt<T, N> {
+//     type Impl = N;
+//     fn upgrade(env: &soroban_sdk::Env, wasm_hash: soroban_sdk::BytesN<32>) {
+//         T::require_admin(env);
+//         N::upgrade(env, wasm_hash);
+//     }
+// }
