@@ -18,6 +18,38 @@ pub(crate) fn has_attr(attrs: &[syn::Attribute], ident_str: &str) -> bool {
     attrs.iter().any(|attr| attr.path().is_ident(ident_str))
 }
 
+pub fn arg_to_ident(arg: &syn::FnArg) -> Option<&syn::Ident> {
+    if let syn::FnArg::Typed(syn::PatType { pat, .. }) = arg {
+        if let syn::Pat::Ident(pat_ident) = &**pat {
+            return Some(&pat_ident.ident);
+        }
+    }
+    None
+}
+
+pub fn args_to_idents(
+    inputs: &syn::punctuated::Punctuated<syn::FnArg, syn::Token!(,)>,
+) -> Vec<&syn::Ident> {
+    inputs.iter().filter_map(arg_to_ident).collect::<Vec<_>>()
+}
+
+pub fn is_env(path: &syn::TypePath) -> bool {
+    path.path
+        .segments
+        .last()
+        .map(|seg| seg.ident == "Env")
+        .unwrap_or(false)
+}
+
+pub fn is_env_reference(ty: &syn::Type) -> bool {
+    match ty {
+        syn::Type::Reference(syn::TypeReference { elem, .. }) => {
+            matches!(elem.as_ref(), syn::Type::Path(path) if is_env(path))
+        }
+        _ => false,
+    }
+}
+
 /// Format the given snippet. The snippet is expected to be *complete* code.
 /// When we cannot parse the given snippet, this function returns `None`.
 #[allow(unused)]

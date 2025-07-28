@@ -1,8 +1,8 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::{quote, ToTokens};
 use syn::{
-    parse_quote, punctuated::Punctuated, spanned::Spanned, Attribute, FnArg, ItemImpl, ItemTrait,
-    PatType, Signature, Token, TraitItem, TraitItemFn, TraitItemType, Type,
+    parse_quote, spanned::Spanned, Attribute, FnArg, ItemImpl, ItemTrait, PatType, Signature,
+    TraitItem, TraitItemFn, TraitItemType, Type,
 };
 
 pub(crate) mod args;
@@ -10,7 +10,7 @@ mod util;
 
 use args::{ImplArgs, TraitArgs};
 use syn::Error;
-use util::has_attr;
+use util::{args_to_idents, has_attr, is_env_reference};
 
 pub fn generate_trait(args: TraitArgs, item: &ItemTrait) -> TokenStream {
     inner_generate(args, item).unwrap_or_else(|e| e.to_compile_error())
@@ -52,18 +52,6 @@ fn generate_method(
     ))
 }
 
-fn arg_to_ident(arg: &FnArg) -> Option<&Ident> {
-    if let FnArg::Typed(PatType { pat, .. }) = arg {
-        if let syn::Pat::Ident(pat_ident) = &**pat {
-            return Some(&pat_ident.ident);
-        }
-    }
-    None
-}
-pub fn args_to_idents(inputs: &Punctuated<FnArg, Token!(,)>) -> Vec<&Ident> {
-    inputs.iter().filter_map(arg_to_ident).collect::<Vec<_>>()
-}
-
 fn generate_static_method(
     trait_name: &ItemTrait,
     sig: &Signature,
@@ -79,8 +67,12 @@ fn generate_static_method(
         .inputs
         .iter()
         .zip(args.iter())
-        .filter_map(|(input, arg_name)| {
+        .enumerate()
+        .filter_map(|(index, (input, arg_name))| {
             if let FnArg::Typed(PatType { pat, ty, .. }) = input {
+                if index == 0 && is_env_reference(ty) {
+                    return Some((quote! {#input}, quote! {#arg_name}));
+                };
                 let (new_ty, call_expr) = transform_type_and_call(ty, arg_name);
                 Some((quote! { #pat: #new_ty }, call_expr))
             } else {
@@ -265,10 +257,10 @@ mod tests {
         let input: ItemTrait = syn::parse_quote! {
             pub trait Administratable {
                 /// Get current admin
-                fn admin_get(env: Env) -> soroban_sdk::Address;
-                fn admin_set(env: Env, new_admin: &soroban_sdk::Address);
+                fn admin_get(env: &Env) -> soroban_sdk::Address;
+                fn admin_set(env: &Env, new_admin: &soroban_sdk::Address);
                 #[internal]
-                fn require_auth(env: Env) {
+                fn require_auth(env: &Env) {
                     Self::admin_get(env).require_auth();
                 }
             }
@@ -286,13 +278,13 @@ mod tests {
         pub trait Administratable {
             type Impl: Administratable;
             #[doc = r" Get current admin"]
-            fn admin_get(env: Env) -> soroban_sdk::Address {
+            fn admin_get(env: &Env) -> soroban_sdk::Address {
                 Self::Impl::admin_get(env)
             }
-            fn admin_set(env: Env, new_admin: &soroban_sdk::Address) {
+            fn admin_set(env: &Env, new_admin: &soroban_sdk::Address) {
                 Self::Impl::admin_set(env, new_admin)
             }
-            fn require_auth(env: Env) {
+            fn require_auth(env: &Env) {
                 Self::admin_get(env).require_auth();
             }
         }
@@ -306,11 +298,11 @@ mod tests {
                 #[soroban_sdk::contractimpl]
                 impl $contract_name {
                     #[doc = r" Get current admin"]
-                    pub fn admin_get(env: Env) -> soroban_sdk::Address {
+                    pub fn admin_get(env: &Env) -> soroban_sdk::Address {
                         < $contract_name as Administratable >::admin_get(env)
                     }
 
-                    pub fn admin_set(env: Env, new_admin: soroban_sdk::Address) {
+                    pub fn admin_set(env: &Env, new_admin: soroban_sdk::Address) {
                         < $contract_name as Administratable >::admin_set(env, &new_admin)
                     }
                 }
