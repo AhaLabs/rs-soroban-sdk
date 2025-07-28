@@ -90,50 +90,22 @@
               }
             ],
             "data": {
-              "vec": [
+              "map": [
                 {
-                  "symbol": "yo"
+                  "key": {
+                    "symbol": "value"
+                  },
+                  "val": {
+                    "symbol": "yo"
+                  }
                 },
                 {
-                  "u32": 2
-                },
-                {
-                  "vec": []
-                },
-                {
-                  "string": "asdf"
-                },
-                {
-                  "map": [
-                    {
-                      "key": {
-                        "symbol": "value"
-                      },
-                      "val": {
-                        "u32": 1
-                      }
-                    }
-                  ]
-                },
-                {
-                  "vec": [
-                    {
-                      "u32": 2
-                    }
-                  ]
-                },
-                {
-                  "vec": [
-                    {
-                      "symbol": "Value"
-                    },
-                    {
-                      "u32": 3
-                    }
-                  ]
-                },
-                {
-                  "u32": 4
+                  "key": {
+                    "symbol": "value2"
+                  },
+                  "val": {
+                    "u32": 2
+                  }
                 }
               ]
             }
