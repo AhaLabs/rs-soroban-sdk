@@ -8,6 +8,7 @@ pub fn parse<T: FromMeta>(args: proc_macro::TokenStream) -> Result<T, syn::Error
 pub struct TraitArgs {
     pub default_required: Option<bool>,
     pub default: Option<syn::Path>,
+    pub no_impl: Option<bool>,
 }
 
 #[derive(Debug, Default, FromMeta)]

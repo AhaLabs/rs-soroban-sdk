@@ -125,9 +125,12 @@ fn inner_generate(
     TraitArgs {
         default,
         default_required,
+        no_impl,
     }: TraitArgs,
     input_trait: &ItemTrait,
 ) -> Result<TokenStream, Error> {
+    let requires_default = default_required.unwrap_or_default();
+    let no_impl = no_impl.unwrap_or_default();
     let (generated_methods, trait_methods): (Vec<_>, Vec<_>) = input_trait
         .items
         .iter()
@@ -149,7 +152,7 @@ fn inner_generate(
         .filter(|item| !matches!(item, TraitItem::Fn(_)))
         .chain(items.into_iter().map(TraitItem::Fn))
         .collect();
-    if !trait_.items.iter().any(is_trait_item_type) {
+    if !trait_.items.iter().any(is_trait_item_type) && (requires_default || default.is_some()) {
         trait_.items.insert(
             0,
             syn::parse_quote! {
@@ -163,7 +166,7 @@ fn inner_generate(
 
     let default_used = quote! { $crate::#default_impl };
 
-    let ensure_default = (default_required.unwrap_or_default() || default.is_none()).then(|| {
+    let ensure_default = (requires_default && default.is_none()).then(|| {
         let message = format!(
             "The contract trait `{trait_ident}` does not provide default implementation. \
 One should be passed, e.g. `#[contracttrait(default = MyAdmin)]"
@@ -178,7 +181,11 @@ One should be passed, e.g. `#[contracttrait(default = MyAdmin)]"
         .iter()
         .filter(|attr| attr.path().is_ident("doc"))
         .collect::<Vec<_>>();
-
+    let type_impl = (!no_impl).then(|| {
+        quote! {
+            type Impl = #default_used;
+        }
+    });
     let output = quote! {
 
     #trait_
@@ -194,6 +201,16 @@ One should be passed, e.g. `#[contracttrait(default = MyAdmin)]"
             impl $contract_name {
                 #(#generated_methods)*
             }
+        };
+        (
+            impl $trait:ident for $type:ty {
+                    $($body:tt)*
+                }
+        ) => {
+                impl #macro_rules_name for $type {
+                    #type_impl
+                    $($body)*
+                }
         };
         () => {
             $crate::#default_impl
@@ -227,22 +244,20 @@ pub fn derive_trait_impl_external(mut impl_: ItemImpl, args: &ImplArgs) -> Token
         };
     }
 
-    let (default, macro_) =
-        if let Some(default) = args.default.as_ref().map(ToTokens::to_token_stream) {
-            (default, quote! {#trait_!(#strukt_ident, #strukt_ident);})
-        } else {
-            (quote! {#trait_!()}, quote! {#trait_!(#strukt_ident);})
-        };
-    impl_.items.insert(
-        0,
-        syn::parse_quote! {
-          type Impl = #default;
-        },
-    );
+    if let Some(default) = args.default.as_ref().map(ToTokens::to_token_stream) {
+        impl_
+            .items
+            .insert(0, parse_quote! { type Impl = #default; });
+        quote! {
+            #impl_
+            #trait_!(#strukt_ident, #strukt_ident);
+        }
+    } else {
+        quote! {
+                #trait_!(#impl_);
+                #trait_!(#strukt_ident);
 
-    quote! {
-        #impl_
-        #macro_
+        }
     }
 }
 
@@ -307,7 +322,16 @@ mod tests {
                     }
                 }
             };
-
+            (
+                impl $_:ident for $type:ty {
+                        $($body:tt)*
+                    }
+            ) => {
+                    impl Administratable for $type {
+                        type Impl = $crate::Admin;
+                        $($body)*
+                    }
+            };
             () => {
                 $crate::Admin
             };

@@ -8,22 +8,14 @@ use soroban_sdk::{contract, contractimpl, contracttrait, Env};
 pub struct Contract;
 
 #[contracttrait]
-impl Administratable for Contract {
-    // type Impl = Administratable!();
-}
+impl Administratable for Contract {}
 
 #[contracttrait]
-impl Upgradable for Contract {
-    type Impl = Upgradable!();
-    // type Impl = Administratable!();
-}
-
-// type admin = Administratable!();
-// Administratable!(Contract, Contract, crate::Contract);
+impl Upgradable for Contract {}
 
 #[contractimpl]
 impl Contract {
     fn __constructor(env: &Env, admin: soroban_sdk::Address) {
-        Self::init(env, &admin);
+        Self::set_admin(env, admin);
     }
 }

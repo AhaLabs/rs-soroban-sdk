@@ -22,4 +22,3 @@ test_contracttrait_lib = { path = "../contracttrait_lib" }
 soroban-sdk = { path = "../../soroban-sdk", features = ["testutils"] }
 test_contracttrait_lib = { path = "../contracttrait_lib" }
 trybuild = "1.0"
-
