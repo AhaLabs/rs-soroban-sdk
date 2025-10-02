@@ -891,6 +891,8 @@ pub use soroban_sdk_macros::contractspecfn;
 /// without generating a client for it.
 pub use soroban_sdk_macros::contractfile;
 
+pub use soroban_sdk_macros::contracttrait;
+
 /// Panic with the given error.
 ///
 /// The first argument in the list must be a reference to an [Env].

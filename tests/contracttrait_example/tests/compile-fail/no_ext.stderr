@@ -1,0 +1,10 @@
+error: The contract trait `Upgradable` requires an extension for authentication but none were provided.E.g. #[derive_contract(Administratable, Upgradable(ext = AdministratableExt))]
+  --> tests/compile-fail/no_ext.rs:7:1
+   |
+7  | / #[derive_contract(
+8  | |     Administratable,
+9  | |     Upgradable
+10 | | )]
+   | |__^
+   |
+   = note: this error originates in the macro `Upgradable` which comes from the expansion of the attribute macro `derive_contract` (in Nightly builds, run with -Z macro-backtrace for more info)
