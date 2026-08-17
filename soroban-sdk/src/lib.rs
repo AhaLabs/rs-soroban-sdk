@@ -9,6 +9,28 @@
 //! [Stellar]: https://stellar.org
 //! [Soroban]: https://stellar.org/soroban
 //!
+//! ### Support
+//!
+//! The two most recent soroban-sdk major releases are supported with critical security fixes.
+//! Critical security issues may be backported to earlier versions if practical, but not guaranteed.
+//! General bugs are only fixed on, and new features are only added to, the latest major release.
+//!
+//! ### Build Target
+//!
+//! Contracts must be built for the `wasm32v1-none` target, available with Rust 1.84+. It is the
+//! only wasm target supported by the Soroban runtime on Stellar.
+//!
+//! Build contracts with `stellar contract build` from [stellar-cli], which targets `wasm32v1-none`
+//! and applies the build settings the Soroban runtime requires. Do not build contracts with
+//! `cargo build`. As of soroban-sdk v28, [stellar-cli] v25.2.0 or newer is required.
+//!
+//! The `wasm32-unknown-unknown` target is not supported when building with Rust 1.82 or newer,
+//! because on those versions the target enables wasm features (reference-types, multi-value) that
+//! the Soroban environment does not support and that cannot be easily disabled. Building for
+//! `wasm32-unknown-unknown` on Rust 1.82+ produces a build error.
+//!
+//! [stellar-cli]: https://github.com/stellar/stellar-cli
+//!
 //! ### Features
 //!
 //! See [_features] for a list of all Cargo features and what they do.
@@ -20,15 +42,29 @@
 //! ### Examples
 //!
 //! ```rust
-//! use soroban_sdk::{contract, contractimpl, vec, symbol_short, BytesN, Env, Symbol, Vec};
+//! use soroban_sdk::{contract, contractevent, contractimpl, symbol_short, Address, Env};
 //!
 //! #[contract]
 //! pub struct Contract;
 //!
+//! #[contractevent]
+//! pub struct Hello {
+//!     #[topic]
+//!     pub to: Address,
+//! }
+//!
 //! #[contractimpl]
 //! impl Contract {
-//!     pub fn hello(env: Env, to: Symbol) -> Vec<Symbol> {
-//!         vec![&env, symbol_short!("Hello"), to]
+//!     pub fn __constructor(env: Env, admin: Address) {
+//!         env.storage().instance().set(&symbol_short!("admin"), &admin);
+//!     }
+//!
+//!     pub fn hello(env: Env, to: Address) {
+//!         let admin: Address = env.storage().instance()
+//!             .get(&symbol_short!("admin"))
+//!             .unwrap();
+//!         admin.require_auth();
+//!         Hello { to }.publish(&env);
 //!     }
 //! }
 //!
@@ -37,13 +73,33 @@
 //! # }
 //! # #[cfg(feature = "testutils")]
 //! # fn main() {
+//!     use soroban_sdk::{
+//!         testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation, Events as _},
+//!         Event as _, IntoVal,
+//!     };
+//!
 //!     let env = Env::default();
-//!     let contract_id = env.register(Contract, ());
+//!     let admin = Address::generate(&env);
+//!     let contract_id = env.register(Contract, (&admin,));
 //!     let client = ContractClient::new(&env, &contract_id);
 //!
-//!     let words = client.hello(&symbol_short!("Dev"));
+//!     let to = Address::generate(&env);
 //!
-//!     assert_eq!(words, vec![&env, symbol_short!("Hello"), symbol_short!("Dev"),]);
+//!     client.mock_all_auths().hello(&to);
+//!
+//!     assert_eq!(
+//!         env.auths(),
+//!         [
+//!             (admin, AuthorizedInvocation { function: AuthorizedFunction::Contract((contract_id.clone(), symbol_short!("hello"), (&to,).into_val(&env))), sub_invocations: [].into() }),
+//!         ],
+//!     );
+//!
+//!     assert_eq!(
+//!         env.events().all(),
+//!         [
+//!             Hello { to }.to_xdr(&env, &contract_id),
+//!         ],
+//!     );
 //! }
 //! # #[cfg(not(feature = "testutils"))]
 //! # fn main() { }
@@ -118,11 +174,10 @@ const _: () = {
         val = concat!(env!("CARGO_PKG_VERSION"), "#", env!("GIT_REVISION")),
     );
 
-    // An indicator of the spec shaking version in use. Signals to the post-build system that the .wasm
+    // An indicator of the spec shaking version in use. Signals to the stellar-cli that the .wasm
     // needs to have its spec shaken. See soroban_spec::shaking for constants and version detection.
     // The contractmeta! macro requires string literals, so we assert the literals match the
     // constants defined in soroban_spec::shaking.
-    #[cfg(spec_shaking_v2)]
     contractmeta!(key = "rssdk_spec_shaking", val = "2");
 };
 
@@ -198,16 +253,7 @@ pub use soroban_sdk_macros::symbol_short;
 /// - Enum variants must have a value convertible to u32.
 ///
 /// Includes the type in the contract spec so that clients can generate bindings
-/// for the type. By default, spec entries are only generated for `pub` types
-/// (or when `export = true` is explicitly set).
-///
-/// ### `experimental_spec_shaking_v2`
-///
-/// When the [`experimental_spec_shaking_v2`][_features#experimental_spec_shaking_v2]
-/// feature is enabled, spec entries are generated for all types regardless of
-/// visibility, and markers are embedded that allow post-build tools to strip
-/// entries for types that are not used at a contract boundary. See
-/// [`_features`] for details.
+/// for the type.
 ///
 /// ### Examples
 ///
@@ -313,16 +359,6 @@ pub use soroban_sdk_macros::contracterror;
 /// - A `ContractClient` struct that has functions for each function in the
 /// contract.
 /// - Types for all contract types defined in the contract.
-///
-/// ### `experimental_spec_shaking_v2`
-///
-/// When the [`experimental_spec_shaking_v2`][_features#experimental_spec_shaking_v2]
-/// feature is enabled, imported types are generated with `export = true` so
-/// they produce spec entries and markers in the importing contract. Post-build
-/// tools strip entries for imported types that are not used at the importing
-/// contract's boundary. Without this feature, imported types use
-/// `export = false` and do not produce spec entries. See [`_features`] for
-/// details.
 ///
 /// ### SHA-256 Verification
 ///
@@ -498,6 +534,14 @@ pub use soroban_sdk_macros::contractimpl;
 /// default functions will not be exported by contracts that implement the
 /// trait.
 ///
+/// `cfg` and `cfg_attr` attributes are not supported on `#[contracttrait]`
+/// default functions. Direct `cfg` attributes are supported on overriding
+/// methods in `#[contractimpl(contracttrait)]` impls, but `cfg_attr` is not.
+/// Default-function metadata is captured when the trait is defined, but wrappers
+/// for non-overridden defaults are generated later where the trait is
+/// implemented, so carrying cfgs through that handoff could evaluate them in a
+/// different crate's cfg context.
+///
 /// ### Macro Arguments
 ///
 /// - `crate_path` - The path to the soroban-sdk crate. Defaults to `soroban_sdk`.
@@ -612,16 +656,7 @@ pub use soroban_sdk_macros::contractmeta;
 /// less in length.
 ///
 /// Includes the type in the contract spec so that clients can generate bindings
-/// for the type. By default, spec entries are only generated for `pub` types
-/// (or when `export = true` is explicitly set).
-///
-/// ### `experimental_spec_shaking_v2`
-///
-/// When the [`experimental_spec_shaking_v2`][_features#experimental_spec_shaking_v2]
-/// feature is enabled, spec entries are generated for all types regardless of
-/// visibility, and markers are embedded that allow post-build tools to strip
-/// entries for types that are not used at a contract boundary. See
-/// [`_features`] for details.
+/// for the type.
 ///
 /// ### Examples
 ///
@@ -769,13 +804,6 @@ pub use soroban_sdk_macros::contracttype;
 ///
 /// Includes the event in the contract spec so that clients can generate bindings
 /// for the type and downstream systems can understand the meaning of the event.
-///
-/// ### `experimental_spec_shaking_v2`
-///
-/// When the [`experimental_spec_shaking_v2`][_features#experimental_spec_shaking_v2]
-/// feature is enabled, markers are embedded that allow post-build tools to strip
-/// spec entries for events that are never published at a contract boundary. See
-/// [`_features`] for details.
 ///
 /// ### Examples
 ///
@@ -1195,9 +1223,7 @@ mod into_val_for_contract_fn;
 #[allow(deprecated)]
 pub use into_val_for_contract_fn::IntoValForContractFn;
 
-#[cfg(spec_shaking_v2)]
 mod spec_shaking;
-#[cfg(spec_shaking_v2)]
 #[doc(hidden)]
 pub use spec_shaking::SpecShakingMarker;
 
@@ -1212,6 +1238,7 @@ pub mod auth;
 #[macro_use]
 mod bytes;
 pub mod crypto;
+pub mod custom_account;
 pub mod deploy;
 mod error;
 pub use error::InvokeError;

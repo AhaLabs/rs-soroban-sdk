@@ -1,4 +1,8 @@
-use syn::{punctuated::Punctuated, Attribute, Data, Fields, FieldsNamed, FieldsUnnamed};
+use quote::ToTokens;
+use syn::{
+    ext::IdentExt as _, punctuated::Punctuated, Attribute, Data, Error, Fields, FieldsNamed,
+    FieldsUnnamed, Result,
+};
 
 /// Returns true if the attribute is a doc attribute.
 pub fn is_attr_doc(attr: &Attribute) -> bool {
@@ -12,6 +16,33 @@ pub fn pass_through_attr_to_gen_code(attr: &Attribute) -> bool {
         || attr.path().is_ident("cfg")
         || attr.path().is_ident("allow")
         || attr.path().is_ident("deny")
+}
+
+/// Returns true if the attribute is a cfg attribute.
+pub fn is_attr_cfg(attr: &Attribute) -> bool {
+    attr.path().is_ident("cfg")
+}
+
+/// Returns true if the attribute is a cfg_attr attribute.
+pub fn is_attr_cfg_attr(attr: &Attribute) -> bool {
+    attr.path().is_ident("cfg_attr")
+}
+
+/// Combines an error spanned on each item with the given message into a single
+/// `Result`, returning `Ok(())` if the iterator is empty.
+pub fn reject_items<I>(items: I, message: &str) -> Result<()>
+where
+    I: IntoIterator,
+    I::Item: ToTokens,
+{
+    let mut error: Option<Error> = None;
+    for item in items {
+        match &mut error {
+            Some(error) => error.combine(Error::new_spanned(item, message)),
+            None => error = Some(Error::new_spanned(item, message)),
+        }
+    }
+    error.map_or(Ok(()), Err)
 }
 
 /// Modifies the input, removing any attributes on struct fields that match the attrs name list.
@@ -31,7 +62,7 @@ pub fn remove_attributes_from_item(data: &mut Data, attrs: &[&str]) {
             !attr
                 .path()
                 .get_ident()
-                .is_some_and(|ident| attrs.contains(&ident.to_string().as_str()))
+                .is_some_and(|ident| attrs.contains(&ident.unraw().to_string().as_str()))
         });
     }
 }
@@ -39,9 +70,31 @@ pub fn remove_attributes_from_item(data: &mut Data, attrs: &[&str]) {
 #[cfg(test)]
 mod test {
     use quote::{quote, ToTokens};
-    use syn::DeriveInput;
+    use syn::{parse_quote, Attribute, DeriveInput};
 
-    use super::remove_attributes_from_item;
+    use super::{pass_through_attr_to_gen_code, remove_attributes_from_item};
+
+    /// External verification tools register rustc tool namespaces and attach
+    /// tool attributes to user fns — e.g. Flux's `#[flux_tool::sig(...)]`
+    /// (what `#[flux_rs::sig]` expands to under its driver). Those attributes
+    /// must NOT be copied onto macro-generated fns (dispatch, client, spec):
+    /// a duplicated spec on a generated wrapper breaks the tool run. This
+    /// pins the allowlist so generated code only ever inherits
+    /// doc/cfg/allow/deny.
+    #[test]
+    fn tool_attrs_are_not_passed_through_to_gen_code() {
+        let tool: Attribute = parse_quote!(#[flux_tool::sig(fn(x: i32) -> i32)]);
+        assert!(!pass_through_attr_to_gen_code(&tool));
+
+        let doc: Attribute = parse_quote!(#[doc = "kept"]);
+        let cfg: Attribute = parse_quote!(#[cfg(test)]);
+        let allow: Attribute = parse_quote!(#[allow(unused)]);
+        let deny: Attribute = parse_quote!(#[deny(unused)]);
+        assert!(pass_through_attr_to_gen_code(&doc));
+        assert!(pass_through_attr_to_gen_code(&cfg));
+        assert!(pass_through_attr_to_gen_code(&allow));
+        assert!(pass_through_attr_to_gen_code(&deny));
+    }
 
     #[test]
     fn test_remove_attributes_from_item_struct_named() {

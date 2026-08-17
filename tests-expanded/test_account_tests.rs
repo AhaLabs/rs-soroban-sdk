@@ -56,6 +56,11 @@ impl Error {
         *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x05Error\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x04Fail\0\0\0\x01"
     }
 }
+impl soroban_sdk::SpecShakingMarker for Error {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl TryFrom<soroban_sdk::Error> for Error {
     type Error = soroban_sdk::Error;
     #[inline(always)]
@@ -323,6 +328,7 @@ impl Contract {
 }
 impl<'a> ContractClient<'a> {}
 impl ContractArgs {
+    #[allow(non_snake_case)]
     #[inline(always)]
     #[allow(clippy::unused_unit)]
     pub fn __check_auth<'i>(

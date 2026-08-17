@@ -163,6 +163,11 @@ impl Flag {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x04Flag\0\0\0\x05\0\0\0\0\0\0\0\x01A\0\0\0\0\0\0\0\0\0\0\0\0\0\0\x01B\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01C\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x01D\0\0\0\0\0\0\x03\0\0\0\0\0\0\0\x01E\0\0\0\0\0\0\x04"
     }
 }
+impl soroban_sdk::SpecShakingMarker for Flag {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for Flag {
     type Error = soroban_sdk::ConversionError;
     #[inline(always)]
@@ -504,6 +509,11 @@ impl Error {
     pub const fn spec_xdr() -> [u8; 48usize] {
         *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x05Error\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x07AnError\0\0\0\0\x01"
     }
+}
+impl soroban_sdk::SpecShakingMarker for Error {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
 }
 impl TryFrom<soroban_sdk::Error> for Error {
     type Error = soroban_sdk::Error;
@@ -945,7 +955,7 @@ pub extern "C" fn __Contract__persisted__invoke_raw_extern() -> soroban_sdk::Val
 #[doc(hidden)]
 #[allow(non_snake_case)]
 #[allow(unused)]
-fn __Contract____dc66cfa30fdb08b17ba29ed3da0a0be599deef8db57bfb9cd9b3dcbf8c3be498_ctor() {
+fn __Contract____b481f6d1fd8aa0f1b56842fe01d653d0b6d56ec834399a7bbdfa018e7845c9bb_ctor() {
     #[allow(unsafe_code)]
     {
         #[link_section = ".init_array"]
@@ -957,7 +967,7 @@ fn __Contract____dc66cfa30fdb08b17ba29ed3da0a0be599deef8db57bfb9cd9b3dcbf8c3be49
             #[allow(non_snake_case)]
             extern "C" fn f() -> ::ctor::__support::CtorRetType {
                 unsafe {
-                    __Contract____dc66cfa30fdb08b17ba29ed3da0a0be599deef8db57bfb9cd9b3dcbf8c3be498_ctor();
+                    __Contract____b481f6d1fd8aa0f1b56842fe01d653d0b6d56ec834399a7bbdfa018e7845c9bb_ctor();
                 };
                 core::default::Default::default()
             }

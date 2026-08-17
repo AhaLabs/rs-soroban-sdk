@@ -1,6 +1,5 @@
 use crate as soroban_sdk;
 use soroban_sdk::contractmeta;
-use stellar_xdr::curr as stellar_xdr;
 use stellar_xdr::{Limits, ReadXdr, ScMetaEntry, ScMetaV0};
 
 #[test]
@@ -24,6 +23,30 @@ fn test_meta_env_macro_support() {
     let expect = ScMetaEntry::ScMetaV0(ScMetaV0 {
         key: "binver".try_into().unwrap(),
         val: env!("CARGO_PKG_VERSION").try_into().unwrap(),
+    });
+
+    assert_eq!(entry, expect);
+}
+
+#[test]
+fn test_meta_include_str_macro_support() {
+    contractmeta!(
+        key = "inc",
+        val = include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/src/tests/contract_meta_include.txt"
+        ))
+    );
+
+    let entry = ScMetaEntry::from_xdr(__CONTRACT_KEY_696e63, Limits::none()).unwrap();
+    let expect = ScMetaEntry::ScMetaV0(ScMetaV0 {
+        key: "inc".try_into().unwrap(),
+        val: include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/src/tests/contract_meta_include.txt"
+        ))
+        .try_into()
+        .unwrap(),
     });
 
     assert_eq!(entry, expect);

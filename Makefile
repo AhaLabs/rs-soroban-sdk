@@ -19,32 +19,21 @@ test: fmt build-test-wasms test-only
 # hazmat granular features are excluded because all hazmat features are tested
 # together with the umbrella hazmat feature.
 test-only:
-	cargo hack --feature-powerset --ignore-unknown-features --features testutils \
-		--exclude-features docs \
-		--exclude-features hazmat-crypto \
-		--exclude-features hazmat-address \
-		test
+	SOROBAN_SDK_BUILD_SYSTEM_SUPPORTS_SPEC_SHAKING_V2=1 \
+		cargo hack --feature-powerset --ignore-unknown-features --features testutils \
+			--exclude-features docs \
+			--exclude-features hazmat-crypto \
+			--exclude-features hazmat-address \
+			test
 
 build: build-libs build-test-wasms
 
 build-libs: fmt
 	cargo hack build --release $(foreach c,$(LIB_CRATES),--package $(c))
 
-# First, build crate used as WASM deps to other test crates.
-# Then, build `test_spec_shaking_v2` without the spec shaking v2 env var to verify
-# that it falls back to spec_shaking_v1 behaviour.
-# Then, build the test wasms with MSRV by default, with some meta disabled for
-# binary stability for tests.
 build-test-wasms: fmt
-	SOROBAN_SDK_BUILD_SYSTEM_SUPPORTS_SPEC_SHAKING_V2=1 \
-	RUSTUP_TOOLCHAIN=$(TEST_CRATES_RUSTUP_TOOLCHAIN) \
-	RUSTFLAGS='--cfg soroban_sdk_internal_no_rssdkver_meta' \
-		cargo build --release --target wasm32v1-none --package test_spec_import
-	RUSTUP_TOOLCHAIN=$(TEST_CRATES_RUSTUP_TOOLCHAIN) \
-	RUSTFLAGS='--cfg soroban_sdk_internal_no_rssdkver_meta' \
-		cargo build --release --target wasm32v1-none --package test_spec_shaking_v2
-	cp target/wasm32v1-none/release/test_spec_shaking_v2.wasm \
-		target/wasm32v1-none/release/test_spec_shaking_v2_no_env.wasm
+	# Build the test wasms with MSRV by default, with some meta disabled for
+	# binary stability for tests.
 	SOROBAN_SDK_BUILD_SYSTEM_SUPPORTS_SPEC_SHAKING_V2=1 \
 	RUSTUP_TOOLCHAIN=$(TEST_CRATES_RUSTUP_TOOLCHAIN) \
 	RUSTFLAGS='--cfg soroban_sdk_internal_no_rssdkver_meta' \

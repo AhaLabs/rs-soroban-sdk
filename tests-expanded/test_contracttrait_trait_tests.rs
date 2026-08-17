@@ -55,6 +55,14 @@ impl MyStruct {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x08MyStruct\0\0\0\x02\0\0\0\0\0\0\0\x01a\0\0\0\0\0\0\x07\0\0\0\0\0\0\0\x01b\0\0\0\0\0\0\x07"
     }
 }
+impl soroban_sdk::SpecShakingMarker for MyStruct {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for MyStruct {
     type Error = soroban_sdk::ConversionError;
     fn try_from_val(
@@ -465,6 +473,11 @@ impl MyEnumUnit {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\nMyEnumUnit\0\0\0\0\0\x02\0\0\0\0\0\0\0\x01A\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01B\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for MyEnumUnit {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for MyEnumUnit {
     type Error = soroban_sdk::ConversionError;
     #[inline(always)]
@@ -808,6 +821,14 @@ pub static __SPEC_XDR_TYPE_MYENUMVARIANTS: [u8; 128usize] = MyEnumVariants::spec
 impl MyEnumVariants {
     pub const fn spec_xdr() -> [u8; 128usize] {
         *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x0eMyEnumVariants\0\0\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x04VarA\0\0\0\x01\0\0\0\0\0\0\0\x04VarB\0\0\0\x01\0\0\x07\xd0\0\0\0\x08MyStruct\0\0\0\x01\0\0\0\0\0\0\0\x04VarC\0\0\0\x01\0\0\x07\xd0\0\0\0\nMyEnumUnit\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for MyEnumVariants {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <MyStruct as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <MyEnumUnit as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for MyEnumVariants {
@@ -3197,11 +3218,14 @@ impl<'a> AllTypesClient<'a> {
 ///AllTypesArgs is a type for building arg lists for functions defined in "AllTypes".
 pub struct AllTypesArgs;
 impl AllTypesArgs {
+    /// Test u32 values.
+    /// Returns the input unchanged.
     #[inline(always)]
     #[allow(clippy::unused_unit)]
     pub fn test_u32<'i>(v: &'i u32) -> (&'i u32,) {
         (v,)
     }
+    /// Test i32 values.
     #[inline(always)]
     #[allow(clippy::unused_unit)]
     pub fn test_i32<'i>(v: &'i i32) -> (&'i i32,) {
@@ -6714,11 +6738,14 @@ mod test {
         }
     }
     impl ContractArgs {
+        /// Test u32 values.
+        /// Returns the input unchanged.
         #[inline(always)]
         #[allow(clippy::unused_unit)]
         pub fn test_u32<'i>(v: &'i u32) -> (&'i u32,) {
             (v,)
         }
+        /// Test i32 values.
         #[inline(always)]
         #[allow(clippy::unused_unit)]
         pub fn test_i32<'i>(v: &'i i32) -> (&'i i32,) {
@@ -7341,7 +7368,6 @@ mod test {
         ),
     };
     fn test_spec_docs() {
-        use stellar_xdr::curr as stellar_xdr;
         use stellar_xdr::{Limits, ReadXdr, ScSpecEntry};
         let entry = ScSpecEntry::from_xdr(Contract::spec_xdr_test_u32(), Limits::none()).unwrap();
         let ScSpecEntry::FunctionV0(func) = entry else {

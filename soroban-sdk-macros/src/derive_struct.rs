@@ -1,17 +1,13 @@
 use itertools::Itertools;
 use proc_macro2::{Literal, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
-use syn::{Attribute, DataStruct, Error, Ident, Path, Visibility};
+use syn::{ext::IdentExt as _, Attribute, DataStruct, Error, Ident, Path, Visibility};
 
-use stellar_xdr::curr as stellar_xdr;
 use stellar_xdr::{
     ScSpecEntry, ScSpecTypeDef, ScSpecUdtStructFieldV0, ScSpecUdtStructV0, StringM, WriteXdr,
 };
 
-use crate::{
-    doc::docs_from_attrs, map_type::map_type, shaking, spec_shaking_v2_enabled,
-    DEFAULT_XDR_RW_LIMITS,
-};
+use crate::{doc::docs_from_attrs, map_type::map_type, shaking, DEFAULT_XDR_RW_LIMITS};
 
 // TODO: Add field attribute for including/excluding fields in types.
 // TODO: Better handling of partial types and types without all their fields and
@@ -23,7 +19,6 @@ pub fn derive_type_struct(
     ident: &Ident,
     attrs: &[Attribute],
     data: &DataStruct,
-    spec: bool,
     lib: &Option<String>,
 ) -> TokenStream2 {
     // Collect errors as they are encountered and emit them at the end.
@@ -32,11 +27,11 @@ pub fn derive_type_struct(
     let field_count_usize: usize = fields.len();
     let (spec_fields, field_idents, field_names, field_idx_lits, field_types, try_from_xdrs, try_into_xdrs): (Vec<_>, Vec<_>, Vec<_>, Vec<_>, Vec<_>, Vec<_>, Vec<_>) = fields
         .iter()
-        .sorted_by_key(|field| field.ident.as_ref().unwrap().to_string())
+        .sorted_by_key(|field| field.ident.as_ref().unwrap().unraw().to_string())
         .enumerate()
         .map(|(field_num, field)| {
             let field_ident = field.ident.as_ref().unwrap();
-            let field_name = field_ident.to_string();
+            let field_name = field_ident.unraw().to_string();
             let field_idx_lit = Literal::usize_unsuffixed(field_num);
             let field_type = &field.ty;
             let spec_field = ScSpecUdtStructFieldV0 {
@@ -78,25 +73,24 @@ pub fn derive_type_struct(
         return quote! { #(#compile_errors)* };
     }
 
-    // Compute spec XDR once if spec is enabled.
-    let spec_xdr = if spec {
-        let spec_entry = ScSpecEntry::UdtStructV0(ScSpecUdtStructV0 {
-            doc: docs_from_attrs(attrs),
-            lib: lib.as_deref().unwrap_or_default().try_into().unwrap(),
-            name: ident.to_string().try_into().unwrap(),
-            fields: spec_fields.try_into().unwrap(),
-        });
-        Some(spec_entry.to_xdr(DEFAULT_XDR_RW_LIMITS).unwrap())
-    } else {
-        None
-    };
+    // Compute spec XDR once.
+    let spec_entry = ScSpecEntry::UdtStructV0(ScSpecUdtStructV0 {
+        doc: docs_from_attrs(attrs),
+        lib: lib.as_deref().unwrap_or_default().try_into().unwrap(),
+        name: ident.unraw().to_string().try_into().unwrap(),
+        fields: spec_fields.try_into().unwrap(),
+    });
+    let spec_xdr = spec_entry.to_xdr(DEFAULT_XDR_RW_LIMITS).unwrap();
 
     // Generated code spec.
-    let spec_gen = if let Some(ref spec_xdr) = spec_xdr {
+    let spec_gen = {
         let spec_xdr_lit = proc_macro2::Literal::byte_string(spec_xdr.as_slice());
         let spec_xdr_len = spec_xdr.len();
-        let spec_ident = format_ident!("__SPEC_XDR_TYPE_{}", ident.to_string().to_uppercase());
-        Some(quote! {
+        let spec_ident = format_ident!(
+            "__SPEC_XDR_TYPE_{}",
+            ident.unraw().to_string().to_uppercase()
+        );
+        quote! {
             #[cfg_attr(target_family = "wasm", link_section = "contractspecv0")]
             pub static #spec_ident: [u8; #spec_xdr_len] = #ident::spec_xdr();
 
@@ -105,28 +99,19 @@ pub fn derive_type_struct(
                     *#spec_xdr_lit
                 }
             }
-        })
-    } else {
-        None
+        }
     };
 
-    // SpecShakingMarker impl - only generated when spec is true and
-    // spec shaking v2 is enabled.
-    let spec_shaking_impl = if spec_shaking_v2_enabled() {
-        spec_xdr.as_ref().map(|spec_xdr| {
-            shaking::generate_marker_impl(
-                path,
-                quote!(#ident),
-                spec_xdr,
-                field_types.iter().cloned(),
-                None,
-                None,
-                None,
-            )
-        })
-    } else {
-        None
-    };
+    // SpecShakingMarker impl.
+    let spec_shaking_impl = shaking::generate_marker_impl(
+        path,
+        quote!(#ident),
+        &spec_xdr,
+        field_types.iter().cloned(),
+        None,
+        None,
+        None,
+    );
 
     // Output.
     let mut output = quote! {

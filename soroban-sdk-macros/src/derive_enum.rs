@@ -1,18 +1,17 @@
 use itertools::MultiUnzip;
 use proc_macro2::{Literal, TokenStream as TokenStream2};
 use quote::{format_ident, quote, ToTokens};
-use syn::{spanned::Spanned, Attribute, DataEnum, Error, Fields, Ident, Path, Visibility};
+use syn::{
+    ext::IdentExt as _, spanned::Spanned, Attribute, DataEnum, Error, Fields, Ident, Path,
+    Visibility,
+};
 
-use stellar_xdr::curr as stellar_xdr;
 use stellar_xdr::{
     Error as XdrError, ScSpecEntry, ScSpecTypeDef, ScSpecUdtUnionCaseTupleV0, ScSpecUdtUnionCaseV0,
     ScSpecUdtUnionCaseVoidV0, ScSpecUdtUnionV0, StringM, VecM, WriteXdr, SCSYMBOL_LIMIT,
 };
 
-use crate::{
-    doc::docs_from_attrs, map_type::map_type, shaking, spec_shaking_v2_enabled,
-    DEFAULT_XDR_RW_LIMITS,
-};
+use crate::{doc::docs_from_attrs, map_type::map_type, shaking, DEFAULT_XDR_RW_LIMITS};
 
 pub fn derive_type_enum(
     path: &Path,
@@ -20,7 +19,6 @@ pub fn derive_type_enum(
     enum_ident: &Ident,
     attrs: &[Attribute],
     data: &DataEnum,
-    spec: bool,
     lib: &Option<String>,
 ) -> TokenStream2 {
     // Collect errors as they are encountered and emit them at the end.
@@ -48,7 +46,7 @@ pub fn derive_type_enum(
             // TODO: Choose discriminant type based on repr type of enum.
             // TODO: Use attributes tagged on variant to control whether field is included.
             let case_ident = &variant.ident;
-            let case_name = &case_ident.to_string();
+            let case_name = &case_ident.unraw().to_string();
             let case_name_str_lit = Literal::string(case_name);
             let case_num_lit = Literal::usize_unsuffixed(case_num);
             if case_name.len() > SCSYMBOL_LIMIT as usize {
@@ -146,25 +144,24 @@ pub fn derive_type_enum(
         return quote! { #(#compile_errors)* };
     }
 
-    // Compute spec XDR once if spec is enabled.
-    let spec_xdr = if spec {
-        let spec_entry = ScSpecEntry::UdtUnionV0(ScSpecUdtUnionV0 {
-            doc: docs_from_attrs(attrs),
-            lib: lib.as_deref().unwrap_or_default().try_into().unwrap(),
-            name: enum_ident.to_string().try_into().unwrap(),
-            cases: spec_cases.try_into().unwrap(),
-        });
-        Some(spec_entry.to_xdr(DEFAULT_XDR_RW_LIMITS).unwrap())
-    } else {
-        None
-    };
+    // Compute spec XDR once.
+    let spec_entry = ScSpecEntry::UdtUnionV0(ScSpecUdtUnionV0 {
+        doc: docs_from_attrs(attrs),
+        lib: lib.as_deref().unwrap_or_default().try_into().unwrap(),
+        name: enum_ident.unraw().to_string().try_into().unwrap(),
+        cases: spec_cases.try_into().unwrap(),
+    });
+    let spec_xdr = spec_entry.to_xdr(DEFAULT_XDR_RW_LIMITS).unwrap();
 
     // Generated code spec.
-    let spec_gen = if let Some(ref spec_xdr) = spec_xdr {
+    let spec_gen = {
         let spec_xdr_lit = proc_macro2::Literal::byte_string(spec_xdr.as_slice());
         let spec_xdr_len = spec_xdr.len();
-        let spec_ident = format_ident!("__SPEC_XDR_TYPE_{}", enum_ident.to_string().to_uppercase());
-        Some(quote! {
+        let spec_ident = format_ident!(
+            "__SPEC_XDR_TYPE_{}",
+            enum_ident.unraw().to_string().to_uppercase()
+        );
+        quote! {
             #[cfg_attr(target_family = "wasm", link_section = "contractspecv0")]
             pub static #spec_ident: [u8; #spec_xdr_len] = #enum_ident::spec_xdr();
 
@@ -173,33 +170,26 @@ pub fn derive_type_enum(
                     *#spec_xdr_lit
                 }
             }
-        })
-    } else {
-        None
+        }
     };
 
-    // SpecShakingMarker impl - only generated when spec is true and
-    // spec shaking v2 is enabled.
-    let spec_shaking_impl = if spec_shaking_v2_enabled() {
-        spec_xdr.as_ref().map(|spec_xdr| {
-            // Flatten all variant field types for shaking calls, deduplicating
-            // to avoid redundant calls for types that appear in multiple variants.
-            let all_field_types =
-                itertools::Itertools::unique_by(variant_field_types.iter().flatten(), |t| {
-                    t.to_token_stream().to_string()
-                });
-            shaking::generate_marker_impl(
-                path,
-                quote!(#enum_ident),
-                spec_xdr,
-                all_field_types.cloned(),
-                None,
-                None,
-                None,
-            )
-        })
-    } else {
-        None
+    // SpecShakingMarker impl.
+    let spec_shaking_impl = {
+        // Flatten all variant field types for shaking calls, deduplicating
+        // to avoid redundant calls for types that appear in multiple variants.
+        let all_field_types =
+            itertools::Itertools::unique_by(variant_field_types.iter().flatten(), |t| {
+                t.to_token_stream().to_string()
+            });
+        shaking::generate_marker_impl(
+            path,
+            quote!(#enum_ident),
+            &spec_xdr,
+            all_field_types.cloned(),
+            None,
+            None,
+            None,
+        )
     };
 
     // Output.

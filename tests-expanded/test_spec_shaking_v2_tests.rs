@@ -5,7 +5,8 @@ extern crate core;
 #[prelude_import]
 use core::prelude::rust_2021::*;
 use soroban_sdk::{
-    contract, contracterror, contractevent, contractimpl, contracttype, Env, Map, Symbol, Vec,
+    assert_with_error, contract, contracterror, contractevent, contractimpl, contracttype,
+    panic_with_error, Env, Map, Symbol, Vec,
 };
 pub struct Contract;
 ///ContractArgs is a type for building arg lists for functions defined in "Contract".
@@ -189,6 +190,14 @@ pub static __SPEC_XDR_TYPE_USEDPARAMSTRUCT: [u8; 96usize] = UsedParamStruct::spe
 impl UsedParamStruct {
     pub const fn spec_xdr() -> [u8; 96usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0fUsedParamStruct\0\0\0\0\x02\0\0\0\0\0\0\0\x01a\0\0\0\0\0\0\x04\0\0\0\0\0\0\0\x06nested\0\0\0\0\x07\xd0\0\0\0\x12UsedNestedInStruct\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedParamStruct {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <UsedNestedInStruct as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedParamStruct {
@@ -616,6 +625,14 @@ pub static __SPEC_XDR_TYPE_USEDRETURNENUM: [u8; 84usize] = UsedReturnEnum::spec_
 impl UsedReturnEnum {
     pub const fn spec_xdr() -> [u8; 84usize] {
         *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x0eUsedReturnEnum\0\0\0\0\0\x02\0\0\0\x01\0\0\0\0\0\0\0\x01A\0\0\0\0\0\0\x01\0\0\0\x04\0\0\0\x01\0\0\0\0\0\0\0\x01B\0\0\0\0\0\0\x01\0\0\0\x07"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedReturnEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedReturnEnum {
@@ -1126,6 +1143,11 @@ impl UsedParamIntEnum {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x10UsedParamIntEnum\0\0\0\x02\0\0\0\0\0\0\0\x01X\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01Y\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedParamIntEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedParamIntEnum {
     type Error = soroban_sdk::ConversionError;
     #[inline(always)]
@@ -1452,6 +1474,11 @@ impl UsedErrorEnum {
         *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\rUsedErrorEnum\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x08NotFound\0\0\0\x01\0\0\0\0\0\0\0\x07Invalid\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedErrorEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl TryFrom<soroban_sdk::Error> for UsedErrorEnum {
     type Error = soroban_sdk::Error;
     #[inline(always)]
@@ -1559,6 +1586,308 @@ impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedErrorEnum> for soroban_sdk::
         <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedErrorEnum>>::try_from_val(env, *val)
     }
 }
+pub enum UsedPanicErrorEnum {
+    Boom = 1,
+}
+#[automatically_derived]
+impl ::core::marker::Copy for UsedPanicErrorEnum {}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedPanicErrorEnum {
+    #[inline]
+    fn clone(&self) -> UsedPanicErrorEnum {
+        *self
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedPanicErrorEnum {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::write_str(f, "Boom")
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedPanicErrorEnum {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {}
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedPanicErrorEnum {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedPanicErrorEnum {
+    #[inline]
+    fn eq(&self, other: &UsedPanicErrorEnum) -> bool {
+        true
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDPANICERRORENUM: [u8; 56usize] = UsedPanicErrorEnum::spec_xdr();
+impl UsedPanicErrorEnum {
+    pub const fn spec_xdr() -> [u8; 56usize] {
+        *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x12UsedPanicErrorEnum\0\0\0\0\0\x01\0\0\0\0\0\0\0\x04Boom\0\0\0\x01"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedPanicErrorEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
+impl TryFrom<soroban_sdk::Error> for UsedPanicErrorEnum {
+    type Error = soroban_sdk::Error;
+    #[inline(always)]
+    fn try_from(error: soroban_sdk::Error) -> Result<Self, soroban_sdk::Error> {
+        if error.is_type(soroban_sdk::xdr::ScErrorType::Contract) {
+            let discriminant = error.get_code();
+            Ok(match discriminant {
+                1u32 => Self::Boom,
+                _ => return Err(error),
+            })
+        } else {
+            Err(error)
+        }
+    }
+}
+impl TryFrom<&soroban_sdk::Error> for UsedPanicErrorEnum {
+    type Error = soroban_sdk::Error;
+    #[inline(always)]
+    fn try_from(error: &soroban_sdk::Error) -> Result<Self, soroban_sdk::Error> {
+        <_ as TryFrom<soroban_sdk::Error>>::try_from(*error)
+    }
+}
+impl From<UsedPanicErrorEnum> for soroban_sdk::Error {
+    #[inline(always)]
+    fn from(val: UsedPanicErrorEnum) -> soroban_sdk::Error {
+        <_ as From<&UsedPanicErrorEnum>>::from(&val)
+    }
+}
+impl From<&UsedPanicErrorEnum> for soroban_sdk::Error {
+    #[inline(always)]
+    fn from(val: &UsedPanicErrorEnum) -> soroban_sdk::Error {
+        match val {
+            UsedPanicErrorEnum::Boom => soroban_sdk::Error::from_contract_error(1u32),
+        }
+    }
+}
+impl TryFrom<soroban_sdk::InvokeError> for UsedPanicErrorEnum {
+    type Error = soroban_sdk::InvokeError;
+    #[inline(always)]
+    fn try_from(error: soroban_sdk::InvokeError) -> Result<Self, soroban_sdk::InvokeError> {
+        match error {
+            soroban_sdk::InvokeError::Abort => Err(error),
+            soroban_sdk::InvokeError::Contract(code) => Ok(match code {
+                1u32 => Self::Boom,
+                _ => return Err(error),
+            }),
+        }
+    }
+}
+impl TryFrom<&soroban_sdk::InvokeError> for UsedPanicErrorEnum {
+    type Error = soroban_sdk::InvokeError;
+    #[inline(always)]
+    fn try_from(error: &soroban_sdk::InvokeError) -> Result<Self, soroban_sdk::InvokeError> {
+        <_ as TryFrom<soroban_sdk::InvokeError>>::try_from(*error)
+    }
+}
+impl From<UsedPanicErrorEnum> for soroban_sdk::InvokeError {
+    #[inline(always)]
+    fn from(val: UsedPanicErrorEnum) -> soroban_sdk::InvokeError {
+        <_ as From<&UsedPanicErrorEnum>>::from(&val)
+    }
+}
+impl From<&UsedPanicErrorEnum> for soroban_sdk::InvokeError {
+    #[inline(always)]
+    fn from(val: &UsedPanicErrorEnum) -> soroban_sdk::InvokeError {
+        match val {
+            UsedPanicErrorEnum::Boom => soroban_sdk::InvokeError::Contract(1u32),
+        }
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedPanicErrorEnum {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::TryIntoVal;
+        let error: soroban_sdk::Error = val.try_into_val(env)?;
+        error.try_into().map_err(|_| soroban_sdk::ConversionError)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedPanicErrorEnum> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedPanicErrorEnum,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        let error: soroban_sdk::Error = val.into();
+        Ok(error.into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedPanicErrorEnum> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedPanicErrorEnum,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedPanicErrorEnum>>::try_from_val(
+            env, *val,
+        )
+    }
+}
+pub enum UsedAssertErrorEnum {
+    Bad = 1,
+}
+#[automatically_derived]
+impl ::core::marker::Copy for UsedAssertErrorEnum {}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedAssertErrorEnum {
+    #[inline]
+    fn clone(&self) -> UsedAssertErrorEnum {
+        *self
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedAssertErrorEnum {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::write_str(f, "Bad")
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedAssertErrorEnum {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {}
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedAssertErrorEnum {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedAssertErrorEnum {
+    #[inline]
+    fn eq(&self, other: &UsedAssertErrorEnum) -> bool {
+        true
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDASSERTERRORENUM: [u8; 56usize] = UsedAssertErrorEnum::spec_xdr();
+impl UsedAssertErrorEnum {
+    pub const fn spec_xdr() -> [u8; 56usize] {
+        *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x13UsedAssertErrorEnum\0\0\0\0\x01\0\0\0\0\0\0\0\x03Bad\0\0\0\0\x01"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedAssertErrorEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
+impl TryFrom<soroban_sdk::Error> for UsedAssertErrorEnum {
+    type Error = soroban_sdk::Error;
+    #[inline(always)]
+    fn try_from(error: soroban_sdk::Error) -> Result<Self, soroban_sdk::Error> {
+        if error.is_type(soroban_sdk::xdr::ScErrorType::Contract) {
+            let discriminant = error.get_code();
+            Ok(match discriminant {
+                1u32 => Self::Bad,
+                _ => return Err(error),
+            })
+        } else {
+            Err(error)
+        }
+    }
+}
+impl TryFrom<&soroban_sdk::Error> for UsedAssertErrorEnum {
+    type Error = soroban_sdk::Error;
+    #[inline(always)]
+    fn try_from(error: &soroban_sdk::Error) -> Result<Self, soroban_sdk::Error> {
+        <_ as TryFrom<soroban_sdk::Error>>::try_from(*error)
+    }
+}
+impl From<UsedAssertErrorEnum> for soroban_sdk::Error {
+    #[inline(always)]
+    fn from(val: UsedAssertErrorEnum) -> soroban_sdk::Error {
+        <_ as From<&UsedAssertErrorEnum>>::from(&val)
+    }
+}
+impl From<&UsedAssertErrorEnum> for soroban_sdk::Error {
+    #[inline(always)]
+    fn from(val: &UsedAssertErrorEnum) -> soroban_sdk::Error {
+        match val {
+            UsedAssertErrorEnum::Bad => soroban_sdk::Error::from_contract_error(1u32),
+        }
+    }
+}
+impl TryFrom<soroban_sdk::InvokeError> for UsedAssertErrorEnum {
+    type Error = soroban_sdk::InvokeError;
+    #[inline(always)]
+    fn try_from(error: soroban_sdk::InvokeError) -> Result<Self, soroban_sdk::InvokeError> {
+        match error {
+            soroban_sdk::InvokeError::Abort => Err(error),
+            soroban_sdk::InvokeError::Contract(code) => Ok(match code {
+                1u32 => Self::Bad,
+                _ => return Err(error),
+            }),
+        }
+    }
+}
+impl TryFrom<&soroban_sdk::InvokeError> for UsedAssertErrorEnum {
+    type Error = soroban_sdk::InvokeError;
+    #[inline(always)]
+    fn try_from(error: &soroban_sdk::InvokeError) -> Result<Self, soroban_sdk::InvokeError> {
+        <_ as TryFrom<soroban_sdk::InvokeError>>::try_from(*error)
+    }
+}
+impl From<UsedAssertErrorEnum> for soroban_sdk::InvokeError {
+    #[inline(always)]
+    fn from(val: UsedAssertErrorEnum) -> soroban_sdk::InvokeError {
+        <_ as From<&UsedAssertErrorEnum>>::from(&val)
+    }
+}
+impl From<&UsedAssertErrorEnum> for soroban_sdk::InvokeError {
+    #[inline(always)]
+    fn from(val: &UsedAssertErrorEnum) -> soroban_sdk::InvokeError {
+        match val {
+            UsedAssertErrorEnum::Bad => soroban_sdk::InvokeError::Contract(1u32),
+        }
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedAssertErrorEnum {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::TryIntoVal;
+        let error: soroban_sdk::Error = val.try_into_val(env)?;
+        error.try_into().map_err(|_| soroban_sdk::ConversionError)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedAssertErrorEnum> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedAssertErrorEnum,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        let error: soroban_sdk::Error = val.into();
+        Ok(error.into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedAssertErrorEnum> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedAssertErrorEnum,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedAssertErrorEnum>>::try_from_val(
+            env, *val,
+        )
+    }
+}
 pub struct UsedNestedInStruct {
     pub val: i64,
 }
@@ -1605,6 +1934,13 @@ pub static __SPEC_XDR_TYPE_USEDNESTEDINSTRUCT: [u8; 56usize] = UsedNestedInStruc
 impl UsedNestedInStruct {
     pub const fn spec_xdr() -> [u8; 56usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x12UsedNestedInStruct\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x07"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedNestedInStruct {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedNestedInStruct {
@@ -1962,6 +2298,13 @@ pub static __SPEC_XDR_TYPE_USEDVECELEMENT: [u8; 52usize] = UsedVecElement::spec_
 impl UsedVecElement {
     pub const fn spec_xdr() -> [u8; 52usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0eUsedVecElement\0\0\0\0\0\x01\0\0\0\0\0\0\0\x04data\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedVecElement {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedVecElement {
@@ -2326,6 +2669,11 @@ impl UsedMapKey {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\nUsedMapKey\0\0\0\0\0\x02\0\0\0\0\0\0\0\x02K1\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02K2\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedMapKey {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedMapKey {
     type Error = soroban_sdk::ConversionError;
     #[inline(always)]
@@ -2641,6 +2989,13 @@ pub static __SPEC_XDR_TYPE_USEDMAPVAL: [u8; 48usize] = UsedMapVal::spec_xdr();
 impl UsedMapVal {
     pub const fn spec_xdr() -> [u8; 48usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\nUsedMapVal\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01v\0\0\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedMapVal {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedMapVal {
@@ -2999,6 +3354,13 @@ impl UsedOptionElement {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x11UsedOptionElement\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x04data\0\0\0\x04"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedOptionElement {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedOptionElement {
     type Error = soroban_sdk::ConversionError;
     fn try_from_val(
@@ -3352,6 +3714,13 @@ pub static __SPEC_XDR_TYPE_USEDRESULTOK: [u8; 48usize] = UsedResultOk::spec_xdr(
 impl UsedResultOk {
     pub const fn spec_xdr() -> [u8; 48usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0cUsedResultOk\0\0\0\x01\0\0\0\0\0\0\0\x04data\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedResultOk {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedResultOk {
@@ -3717,6 +4086,14 @@ impl UsedEventSimple {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x0fUsedEventSimple\0\0\0\0\x01\0\0\0\x11used_event_simple\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x04kind\0\0\0\x11\0\0\0\x01\0\0\0\0\0\0\0\x06amount\0\0\0\0\0\x0b\0\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedEventSimple {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <Symbol as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <i128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::Event for UsedEventSimple {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -3737,6 +4114,7 @@ impl soroban_sdk::Event for UsedEventSimple {
 }
 impl UsedEventSimple {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
     }
 }
@@ -3789,6 +4167,11 @@ impl UsedEventTopicType {
     pub const fn spec_xdr() -> [u8; 76usize] {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x12UsedEventTopicType\0\0\0\0\0\x02\0\0\0\0\0\0\0\x08Transfer\0\0\0\x01\0\0\0\0\0\0\0\x04Mint\0\0\0\x02"
     }
+}
+impl soroban_sdk::SpecShakingMarker for UsedEventTopicType {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedEventTopicType {
     type Error = soroban_sdk::ConversionError;
@@ -4122,6 +4505,14 @@ impl UsedEventWithTopicType {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x16UsedEventWithTopicType\0\0\0\0\0\x01\0\0\0\x1aused_event_with_topic_type\0\0\0\0\0\x02\0\0\0\0\0\0\0\x04kind\0\0\x07\xd0\0\0\0\x12UsedEventTopicType\0\0\0\0\0\x01\0\0\0\0\0\0\0\x06amount\0\0\0\0\0\x0b\0\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedEventWithTopicType {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedEventTopicType as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <i128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::Event for UsedEventWithTopicType {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -4145,6 +4536,7 @@ impl soroban_sdk::Event for UsedEventWithTopicType {
 }
 impl UsedEventWithTopicType {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
     }
 }
@@ -4198,6 +4590,14 @@ pub static __SPEC_XDR_TYPE_USEDEVENTDATATYPE: [u8; 72usize] = UsedEventDataType:
 impl UsedEventDataType {
     pub const fn spec_xdr() -> [u8; 72usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x11UsedEventDataType\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x01x\0\0\0\0\0\0\x04\0\0\0\0\0\0\0\x01y\0\0\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedEventDataType {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedEventDataType {
@@ -4616,6 +5016,14 @@ impl UsedEventWithDataType {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x15UsedEventWithDataType\0\0\0\0\0\0\x01\0\0\0\x19used_event_with_data_type\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x04kind\0\0\0\x11\0\0\0\x01\0\0\0\0\0\0\0\x07payload\0\0\0\x07\xd0\0\0\0\x11UsedEventDataType\0\0\0\0\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedEventWithDataType {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <Symbol as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <UsedEventDataType as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::Event for UsedEventWithDataType {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -4639,6 +5047,7 @@ impl soroban_sdk::Event for UsedEventWithDataType {
 }
 impl UsedEventWithDataType {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
     }
 }
@@ -4688,6 +5097,13 @@ pub static __SPEC_XDR_TYPE_USEDEVENTTOPICOUTER: [u8; 84usize] = UsedEventTopicOu
 impl UsedEventTopicOuter {
     pub const fn spec_xdr() -> [u8; 84usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x13UsedEventTopicOuter\0\0\0\0\x01\0\0\0\0\0\0\0\x05inner\0\0\0\0\0\x07\xd0\0\0\0\x13UsedEventTopicInner\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedEventTopicOuter {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedEventTopicInner as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedEventTopicOuter {
@@ -5055,6 +5471,13 @@ pub static __SPEC_XDR_TYPE_USEDEVENTTOPICINNER: [u8; 56usize] = UsedEventTopicIn
 impl UsedEventTopicInner {
     pub const fn spec_xdr() -> [u8; 56usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x13UsedEventTopicInner\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedEventTopicInner {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedEventTopicInner {
@@ -5427,6 +5850,14 @@ impl UsedEventWithNestedTopic {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x18UsedEventWithNestedTopic\0\0\0\x01\0\0\0\x1cused_event_with_nested_topic\0\0\0\x02\0\0\0\0\0\0\0\x04info\0\0\x07\xd0\0\0\0\x13UsedEventTopicOuter\0\0\0\0\x01\0\0\0\0\0\0\0\x06amount\0\0\0\0\0\x0b\0\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedEventWithNestedTopic {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedEventTopicOuter as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <i128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::Event for UsedEventWithNestedTopic {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -5450,6 +5881,7 @@ impl soroban_sdk::Event for UsedEventWithNestedTopic {
 }
 impl UsedEventWithNestedTopic {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
     }
 }
@@ -5499,6 +5931,13 @@ pub static __SPEC_XDR_TYPE_USEDEVENTDATAOUTER: [u8; 84usize] = UsedEventDataOute
 impl UsedEventDataOuter {
     pub const fn spec_xdr() -> [u8; 84usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x12UsedEventDataOuter\0\0\0\0\0\x01\0\0\0\0\0\0\0\x05inner\0\0\0\0\0\x07\xd0\0\0\0\x12UsedEventDataInner\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedEventDataOuter {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedEventDataInner as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedEventDataOuter {
@@ -5864,6 +6303,13 @@ pub static __SPEC_XDR_TYPE_USEDEVENTDATAINNER: [u8; 56usize] = UsedEventDataInne
 impl UsedEventDataInner {
     pub const fn spec_xdr() -> [u8; 56usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x12UsedEventDataInner\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedEventDataInner {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedEventDataInner {
@@ -6234,6 +6680,14 @@ impl UsedEventWithNestedData {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x17UsedEventWithNestedData\0\0\0\0\x01\0\0\0\x1bused_event_with_nested_data\0\0\0\0\x02\0\0\0\0\0\0\0\x04kind\0\0\0\x11\0\0\0\x01\0\0\0\0\0\0\0\x07payload\0\0\0\x07\xd0\0\0\0\x12UsedEventDataOuter\0\0\0\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedEventWithNestedData {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <Symbol as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <UsedEventDataOuter as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::Event for UsedEventWithNestedData {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -6257,6 +6711,7 @@ impl soroban_sdk::Event for UsedEventWithNestedData {
 }
 impl UsedEventWithNestedData {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
     }
 }
@@ -6309,6 +6764,11 @@ impl UsedRefTopicType {
     pub const fn spec_xdr() -> [u8; 68usize] {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x10UsedRefTopicType\0\0\0\x02\0\0\0\0\0\0\0\x04Send\0\0\0\x01\0\0\0\0\0\0\0\x04Recv\0\0\0\x02"
     }
+}
+impl soroban_sdk::SpecShakingMarker for UsedRefTopicType {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedRefTopicType {
     type Error = soroban_sdk::ConversionError;
@@ -6632,6 +7092,13 @@ pub static __SPEC_XDR_TYPE_USEDREFDATATYPE: [u8; 76usize] = UsedRefDataType::spe
 impl UsedRefDataType {
     pub const fn spec_xdr() -> [u8; 76usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0fUsedRefDataType\0\0\0\0\x01\0\0\0\0\0\0\0\x06nested\0\0\0\0\x07\xd0\0\0\0\x10UsedRefDataInner"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedRefDataType {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedRefDataInner as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedRefDataType {
@@ -6990,6 +7457,13 @@ pub static __SPEC_XDR_TYPE_USEDREFDATAINNER: [u8; 52usize] = UsedRefDataInner::s
 impl UsedRefDataInner {
     pub const fn spec_xdr() -> [u8; 52usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x10UsedRefDataInner\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedRefDataInner {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedRefDataInner {
@@ -7357,6 +7831,14 @@ impl<'a> UsedEventWithRefs<'a> {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x11UsedEventWithRefs\0\0\0\0\0\0\x01\0\0\0\x14used_event_with_refs\0\0\0\x02\0\0\0\0\0\0\0\x04kind\0\0\x07\xd0\0\0\0\x10UsedRefTopicType\0\0\0\x01\0\0\0\0\0\0\0\x07payload\0\0\0\x07\xd0\0\0\0\x0fUsedRefDataType\0\0\0\0\0\0\0\0\x02"
     }
 }
+impl<'a> soroban_sdk::SpecShakingMarker for UsedEventWithRefs<'a> {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <&'a UsedRefTopicType as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <&'a UsedRefDataType as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl<'a> soroban_sdk::Event for UsedEventWithRefs<'a> {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -7380,6 +7862,7 @@ impl<'a> soroban_sdk::Event for UsedEventWithRefs<'a> {
 }
 impl<'a> UsedEventWithRefs<'a> {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
     }
 }
@@ -7424,6 +7907,13 @@ pub static __SPEC_XDR_TYPE_USEDTUPLEELEMENT: [u8; 52usize] = UsedTupleElement::s
 impl UsedTupleElement {
     pub const fn spec_xdr() -> [u8; 52usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x10UsedTupleElement\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedTupleElement {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedTupleElement {
@@ -7787,6 +8277,13 @@ impl UsedTupleReturnElement {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x16UsedTupleReturnElement\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UsedTupleReturnElement {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedTupleReturnElement {
     type Error = soroban_sdk::ConversionError;
     fn try_from_val(
@@ -8103,6 +8600,1252 @@ const _: () = {
         }
     }
 };
+pub struct UsedVecInnerVecElement {
+    pub val: u32,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedVecInnerVecElement {
+    #[inline]
+    fn clone(&self) -> UsedVecInnerVecElement {
+        UsedVecInnerVecElement {
+            val: ::core::clone::Clone::clone(&self.val),
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedVecInnerVecElement {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::debug_struct_field1_finish(
+            f,
+            "UsedVecInnerVecElement",
+            "val",
+            &&self.val,
+        )
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedVecInnerVecElement {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<u32>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedVecInnerVecElement {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedVecInnerVecElement {
+    #[inline]
+    fn eq(&self, other: &UsedVecInnerVecElement) -> bool {
+        self.val == other.val
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDVECINNERVECELEMENT: [u8; 60usize] =
+    UsedVecInnerVecElement::spec_xdr();
+impl UsedVecInnerVecElement {
+    pub const fn spec_xdr() -> [u8; 60usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x16UsedVecInnerVecElement\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedVecInnerVecElement {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedVecInnerVecElement {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let mut vals: [Val; 1usize] = [Val::VOID.to_val(); 1usize];
+        let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+        env.map_unpack_to_slice(map, &KEYS, &mut vals)
+            .map_err(|_| ConversionError)?;
+        Ok(Self {
+            val: vals[0]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedVecInnerVecElement> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedVecInnerVecElement,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let vals: [Val; 1usize] = [(&val.val).try_into_val(env).map_err(|_| ConversionError)?];
+        Ok(env
+            .map_new_from_slices(&KEYS, &vals)
+            .map_err(|_| ConversionError)?
+            .into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedVecInnerVecElement> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedVecInnerVecElement,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedVecInnerVecElement>>::try_from_val(
+            env, *val,
+        )
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for UsedVecInnerVecElement {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScMap,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let map = val;
+        if map.len() != 1usize {
+            return Err(soroban_sdk::xdr::Error::Invalid);
+        }
+        map.validate()?;
+        Ok(Self {
+            val: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedVecInnerVecElement {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedVecInnerVecElement> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedVecInnerVecElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        use soroban_sdk::TryFromVal;
+        soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.val)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+        ])))
+    }
+}
+impl TryFrom<UsedVecInnerVecElement> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedVecInnerVecElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedVecInnerVecElement> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedVecInnerVecElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedVecInnerVecElement> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedVecInnerVecElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub struct ArbitraryUsedVecInnerVecElement {
+        val: <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedVecInnerVecElement {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(
+                f,
+                "ArbitraryUsedVecInnerVecElement",
+                "val",
+                &&self.val,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedVecInnerVecElement {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedVecInnerVecElement {
+            ArbitraryUsedVecInnerVecElement {
+                val: ::core::clone::Clone::clone(&self.val),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedVecInnerVecElement {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedVecInnerVecElement {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedVecInnerVecElement {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedVecInnerVecElement) -> bool {
+            self.val == other.val
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedVecInnerVecElement {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedVecInnerVecElement) -> ::core::cmp::Ordering {
+            ::core::cmp::Ord::cmp(&self.val, &other.val)
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedVecInnerVecElement {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedVecInnerVecElement,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            ::core::cmp::PartialOrd::partial_cmp(&self.val, &other.val)
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedVecInnerVecElement: ::std::thread::LocalKey<
+            std::cell::Cell<u32>,
+        > = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedVecInnerVecElement {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerVecElement.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedVecInnerVecElement {
+                        val: arbitrary::Arbitrary::arbitrary(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerVecElement.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerVecElement.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedVecInnerVecElement {
+                        val: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerVecElement.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::recursion_guard(depth, |depth| {
+                    arbitrary::size_hint::and_all(
+                        &[
+                            <<u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                        ],
+                    )
+                })
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedVecInnerVecElement {
+        type Prototype = ArbitraryUsedVecInnerVecElement;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedVecInnerVecElement>
+        for UsedVecInnerVecElement
+    {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedVecInnerVecElement,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(UsedVecInnerVecElement {
+                val: soroban_sdk::IntoVal::into_val(&v.val, env),
+            })
+        }
+    }
+};
+pub struct UsedVecInnerElement {
+    pub val: u32,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedVecInnerElement {
+    #[inline]
+    fn clone(&self) -> UsedVecInnerElement {
+        UsedVecInnerElement {
+            val: ::core::clone::Clone::clone(&self.val),
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedVecInnerElement {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::debug_struct_field1_finish(
+            f,
+            "UsedVecInnerElement",
+            "val",
+            &&self.val,
+        )
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedVecInnerElement {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<u32>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedVecInnerElement {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedVecInnerElement {
+    #[inline]
+    fn eq(&self, other: &UsedVecInnerElement) -> bool {
+        self.val == other.val
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDVECINNERELEMENT: [u8; 56usize] = UsedVecInnerElement::spec_xdr();
+impl UsedVecInnerElement {
+    pub const fn spec_xdr() -> [u8; 56usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x13UsedVecInnerElement\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedVecInnerElement {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedVecInnerElement {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let mut vals: [Val; 1usize] = [Val::VOID.to_val(); 1usize];
+        let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+        env.map_unpack_to_slice(map, &KEYS, &mut vals)
+            .map_err(|_| ConversionError)?;
+        Ok(Self {
+            val: vals[0]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedVecInnerElement> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedVecInnerElement,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let vals: [Val; 1usize] = [(&val.val).try_into_val(env).map_err(|_| ConversionError)?];
+        Ok(env
+            .map_new_from_slices(&KEYS, &vals)
+            .map_err(|_| ConversionError)?
+            .into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedVecInnerElement> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedVecInnerElement,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedVecInnerElement>>::try_from_val(
+            env, *val,
+        )
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for UsedVecInnerElement {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScMap,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let map = val;
+        if map.len() != 1usize {
+            return Err(soroban_sdk::xdr::Error::Invalid);
+        }
+        map.validate()?;
+        Ok(Self {
+            val: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedVecInnerElement {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedVecInnerElement> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedVecInnerElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        use soroban_sdk::TryFromVal;
+        soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.val)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+        ])))
+    }
+}
+impl TryFrom<UsedVecInnerElement> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedVecInnerElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedVecInnerElement> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedVecInnerElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedVecInnerElement> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedVecInnerElement) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub struct ArbitraryUsedVecInnerElement {
+        val: <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedVecInnerElement {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(
+                f,
+                "ArbitraryUsedVecInnerElement",
+                "val",
+                &&self.val,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedVecInnerElement {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedVecInnerElement {
+            ArbitraryUsedVecInnerElement {
+                val: ::core::clone::Clone::clone(&self.val),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedVecInnerElement {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedVecInnerElement {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedVecInnerElement {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedVecInnerElement) -> bool {
+            self.val == other.val
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedVecInnerElement {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedVecInnerElement) -> ::core::cmp::Ordering {
+            ::core::cmp::Ord::cmp(&self.val, &other.val)
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedVecInnerElement {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedVecInnerElement,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            ::core::cmp::PartialOrd::partial_cmp(&self.val, &other.val)
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedVecInnerElement: ::std::thread::LocalKey<
+            std::cell::Cell<u32>,
+        > = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedVecInnerElement {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerElement.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedVecInnerElement {
+                        val: arbitrary::Arbitrary::arbitrary(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerElement.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerElement.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedVecInnerElement {
+                        val: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecInnerElement.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::recursion_guard(depth, |depth| {
+                    arbitrary::size_hint::and_all(
+                        &[
+                            <<u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                        ],
+                    )
+                })
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedVecInnerElement {
+        type Prototype = ArbitraryUsedVecInnerElement;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedVecInnerElement>
+        for UsedVecInnerElement
+    {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedVecInnerElement,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(UsedVecInnerElement {
+                val: soroban_sdk::IntoVal::into_val(&v.val, env),
+            })
+        }
+    }
+};
+pub struct UsedVecElementNested {
+    pub val: u32,
+    pub inner: UsedVecInnerElement,
+    pub vec_inner: Vec<UsedVecInnerVecElement>,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedVecElementNested {
+    #[inline]
+    fn clone(&self) -> UsedVecElementNested {
+        UsedVecElementNested {
+            val: ::core::clone::Clone::clone(&self.val),
+            inner: ::core::clone::Clone::clone(&self.inner),
+            vec_inner: ::core::clone::Clone::clone(&self.vec_inner),
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedVecElementNested {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::debug_struct_field3_finish(
+            f,
+            "UsedVecElementNested",
+            "val",
+            &self.val,
+            "inner",
+            &self.inner,
+            "vec_inner",
+            &&self.vec_inner,
+        )
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedVecElementNested {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<u32>;
+        let _: ::core::cmp::AssertParamIsEq<UsedVecInnerElement>;
+        let _: ::core::cmp::AssertParamIsEq<Vec<UsedVecInnerVecElement>>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedVecElementNested {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedVecElementNested {
+    #[inline]
+    fn eq(&self, other: &UsedVecElementNested) -> bool {
+        self.val == other.val && self.inner == other.inner && self.vec_inner == other.vec_inner
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDVECELEMENTNESTED: [u8; 156usize] = UsedVecElementNested::spec_xdr();
+impl UsedVecElementNested {
+    pub const fn spec_xdr() -> [u8; 156usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x14UsedVecElementNested\0\0\0\x03\0\0\0\0\0\0\0\x05inner\0\0\0\0\0\x07\xd0\0\0\0\x13UsedVecInnerElement\0\0\0\0\0\0\0\0\x03val\0\0\0\0\x04\0\0\0\0\0\0\0\tvec_inner\0\0\0\0\0\x03\xea\0\0\x07\xd0\0\0\0\x16UsedVecInnerVecElement\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedVecElementNested {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedVecInnerElement as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <Vec<UsedVecInnerVecElement> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedVecElementNested {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+        const KEYS: [&'static str; 3usize] = ["inner", "val", "vec_inner"];
+        let mut vals: [Val; 3usize] = [Val::VOID.to_val(); 3usize];
+        let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+        env.map_unpack_to_slice(map, &KEYS, &mut vals)
+            .map_err(|_| ConversionError)?;
+        Ok(Self {
+            inner: vals[0]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+            val: vals[1]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+            vec_inner: vals[2]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedVecElementNested> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedVecElementNested,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+        const KEYS: [&'static str; 3usize] = ["inner", "val", "vec_inner"];
+        let vals: [Val; 3usize] = [
+            (&val.inner)
+                .try_into_val(env)
+                .map_err(|_| ConversionError)?,
+            (&val.val).try_into_val(env).map_err(|_| ConversionError)?,
+            (&val.vec_inner)
+                .try_into_val(env)
+                .map_err(|_| ConversionError)?,
+        ];
+        Ok(env
+            .map_new_from_slices(&KEYS, &vals)
+            .map_err(|_| ConversionError)?
+            .into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedVecElementNested> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedVecElementNested,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedVecElementNested>>::try_from_val(
+            env, *val,
+        )
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for UsedVecElementNested {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScMap,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let map = val;
+        if map.len() != 3usize {
+            return Err(soroban_sdk::xdr::Error::Invalid);
+        }
+        map.validate()?;
+        Ok(Self {
+            inner: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "inner"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+            val: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+            vec_inner: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "vec_inner"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedVecElementNested {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedVecElementNested> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedVecElementNested) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        use soroban_sdk::TryFromVal;
+        soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "inner"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.inner)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.val)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "vec_inner"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.vec_inner)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+        ])))
+    }
+}
+impl TryFrom<UsedVecElementNested> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedVecElementNested) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedVecElementNested> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedVecElementNested) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedVecElementNested> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedVecElementNested) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub struct ArbitraryUsedVecElementNested {
+        val: <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        inner: <UsedVecInnerElement as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        vec_inner: <Vec<
+            UsedVecInnerVecElement,
+        > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedVecElementNested {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field3_finish(
+                f,
+                "ArbitraryUsedVecElementNested",
+                "val",
+                &self.val,
+                "inner",
+                &self.inner,
+                "vec_inner",
+                &&self.vec_inner,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedVecElementNested {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedVecElementNested {
+            ArbitraryUsedVecElementNested {
+                val: ::core::clone::Clone::clone(&self.val),
+                inner: ::core::clone::Clone::clone(&self.inner),
+                vec_inner: ::core::clone::Clone::clone(&self.vec_inner),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedVecElementNested {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+            let _: ::core::cmp::AssertParamIsEq<
+                <UsedVecInnerElement as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+            let _: ::core::cmp::AssertParamIsEq<
+                <Vec<
+                    UsedVecInnerVecElement,
+                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedVecElementNested {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedVecElementNested {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedVecElementNested) -> bool {
+            self.val == other.val && self.inner == other.inner && self.vec_inner == other.vec_inner
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedVecElementNested {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedVecElementNested) -> ::core::cmp::Ordering {
+            match ::core::cmp::Ord::cmp(&self.val, &other.val) {
+                ::core::cmp::Ordering::Equal => {
+                    match ::core::cmp::Ord::cmp(&self.inner, &other.inner) {
+                        ::core::cmp::Ordering::Equal => {
+                            ::core::cmp::Ord::cmp(&self.vec_inner, &other.vec_inner)
+                        }
+                        cmp => cmp,
+                    }
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedVecElementNested {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedVecElementNested,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            match ::core::cmp::PartialOrd::partial_cmp(&self.val, &other.val) {
+                ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                    match ::core::cmp::PartialOrd::partial_cmp(&self.inner, &other.inner) {
+                        ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                            ::core::cmp::PartialOrd::partial_cmp(&self.vec_inner, &other.vec_inner)
+                        }
+                        cmp => cmp,
+                    }
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedVecElementNested: ::std::thread::LocalKey<
+            std::cell::Cell<u32>,
+        > = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedVecElementNested {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecElementNested.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedVecElementNested {
+                        val: arbitrary::Arbitrary::arbitrary(u)?,
+                        inner: arbitrary::Arbitrary::arbitrary(u)?,
+                        vec_inner: arbitrary::Arbitrary::arbitrary(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecElementNested.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecElementNested.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedVecElementNested {
+                        val: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                        inner: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                        vec_inner: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedVecElementNested.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::recursion_guard(depth, |depth| {
+                    arbitrary::size_hint::and_all(
+                        &[
+                            <<u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                            <<UsedVecInnerElement as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                            <<Vec<
+                                UsedVecInnerVecElement,
+                            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                        ],
+                    )
+                })
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedVecElementNested {
+        type Prototype = ArbitraryUsedVecElementNested;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedVecElementNested>
+        for UsedVecElementNested
+    {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedVecElementNested,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(UsedVecElementNested {
+                val: soroban_sdk::IntoVal::into_val(&v.val, env),
+                inner: soroban_sdk::IntoVal::into_val(&v.inner, env),
+                vec_inner: soroban_sdk::IntoVal::into_val(&v.vec_inner, env),
+            })
+        }
+    }
+};
 struct UsedNonPubStruct {
     pub val: u32,
 }
@@ -8138,6 +9881,19 @@ impl ::core::cmp::PartialEq for UsedNonPubStruct {
     #[inline]
     fn eq(&self, other: &UsedNonPubStruct) -> bool {
         self.val == other.val
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDNONPUBSTRUCT: [u8; 52usize] = UsedNonPubStruct::spec_xdr();
+impl UsedNonPubStruct {
+    pub const fn spec_xdr() -> [u8; 52usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x10UsedNonPubStruct\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedNonPubStruct {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedNonPubStruct {
@@ -8487,6 +10243,17 @@ impl ::core::cmp::PartialEq for UsedNonPubError {
         true
     }
 }
+pub static __SPEC_XDR_TYPE_USEDNONPUBERROR: [u8; 52usize] = UsedNonPubError::spec_xdr();
+impl UsedNonPubError {
+    pub const fn spec_xdr() -> [u8; 52usize] {
+        *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x0fUsedNonPubError\0\0\0\0\x01\0\0\0\0\0\0\0\x04Fail\0\0\0\x01"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedNonPubError {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl TryFrom<soroban_sdk::Error> for UsedNonPubError {
     type Error = soroban_sdk::Error;
     #[inline(always)]
@@ -8590,12 +10357,1659 @@ impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedNonPubError> for soroban_sdk
         <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedNonPubError>>::try_from_val(env, *val)
     }
 }
+pub struct UsedRecursiveRoot {
+    pub val: UsedRecursiveNode,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedRecursiveRoot {
+    #[inline]
+    fn clone(&self) -> UsedRecursiveRoot {
+        UsedRecursiveRoot {
+            val: ::core::clone::Clone::clone(&self.val),
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedRecursiveRoot {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::debug_struct_field1_finish(
+            f,
+            "UsedRecursiveRoot",
+            "val",
+            &&self.val,
+        )
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedRecursiveRoot {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<UsedRecursiveNode>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedRecursiveRoot {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedRecursiveRoot {
+    #[inline]
+    fn eq(&self, other: &UsedRecursiveRoot) -> bool {
+        self.val == other.val
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDRECURSIVEROOT: [u8; 80usize] = UsedRecursiveRoot::spec_xdr();
+impl UsedRecursiveRoot {
+    pub const fn spec_xdr() -> [u8; 80usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x11UsedRecursiveRoot\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\x07\xd0\0\0\0\x11UsedRecursiveNode\0\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedRecursiveRoot {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedRecursiveNode as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedRecursiveRoot {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let mut vals: [Val; 1usize] = [Val::VOID.to_val(); 1usize];
+        let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+        env.map_unpack_to_slice(map, &KEYS, &mut vals)
+            .map_err(|_| ConversionError)?;
+        Ok(Self {
+            val: vals[0]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedRecursiveRoot> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedRecursiveRoot,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let vals: [Val; 1usize] = [(&val.val).try_into_val(env).map_err(|_| ConversionError)?];
+        Ok(env
+            .map_new_from_slices(&KEYS, &vals)
+            .map_err(|_| ConversionError)?
+            .into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedRecursiveRoot> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedRecursiveRoot,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedRecursiveRoot>>::try_from_val(env, *val)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for UsedRecursiveRoot {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScMap,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let map = val;
+        if map.len() != 1usize {
+            return Err(soroban_sdk::xdr::Error::Invalid);
+        }
+        map.validate()?;
+        Ok(Self {
+            val: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedRecursiveRoot {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedRecursiveRoot> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedRecursiveRoot) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        use soroban_sdk::TryFromVal;
+        soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.val)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+        ])))
+    }
+}
+impl TryFrom<UsedRecursiveRoot> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedRecursiveRoot) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedRecursiveRoot> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedRecursiveRoot) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedRecursiveRoot> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedRecursiveRoot) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub struct ArbitraryUsedRecursiveRoot {
+        val: <UsedRecursiveNode as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedRecursiveRoot {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(
+                f,
+                "ArbitraryUsedRecursiveRoot",
+                "val",
+                &&self.val,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedRecursiveRoot {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedRecursiveRoot {
+            ArbitraryUsedRecursiveRoot {
+                val: ::core::clone::Clone::clone(&self.val),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedRecursiveRoot {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <UsedRecursiveNode as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedRecursiveRoot {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedRecursiveRoot {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedRecursiveRoot) -> bool {
+            self.val == other.val
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedRecursiveRoot {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedRecursiveRoot) -> ::core::cmp::Ordering {
+            ::core::cmp::Ord::cmp(&self.val, &other.val)
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedRecursiveRoot {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedRecursiveRoot,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            ::core::cmp::PartialOrd::partial_cmp(&self.val, &other.val)
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedRecursiveRoot: ::std::thread::LocalKey<
+            std::cell::Cell<u32>,
+        > = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedRecursiveRoot {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveRoot.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedRecursiveRoot {
+                        val: arbitrary::Arbitrary::arbitrary(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveRoot.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveRoot.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedRecursiveRoot {
+                        val: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveRoot.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::recursion_guard(depth, |depth| {
+                    arbitrary::size_hint::and_all(
+                        &[
+                            <<UsedRecursiveNode as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                        ],
+                    )
+                })
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedRecursiveRoot {
+        type Prototype = ArbitraryUsedRecursiveRoot;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedRecursiveRoot> for UsedRecursiveRoot {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedRecursiveRoot,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(UsedRecursiveRoot {
+                val: soroban_sdk::IntoVal::into_val(&v.val, env),
+            })
+        }
+    }
+};
+pub enum UsedRecursiveNode {
+    NotRecursive(UsedLeaf),
+    Recursive(UsedRecursiveLeaf),
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedRecursiveNode {
+    #[inline]
+    fn clone(&self) -> UsedRecursiveNode {
+        match self {
+            UsedRecursiveNode::NotRecursive(__self_0) => {
+                UsedRecursiveNode::NotRecursive(::core::clone::Clone::clone(__self_0))
+            }
+            UsedRecursiveNode::Recursive(__self_0) => {
+                UsedRecursiveNode::Recursive(::core::clone::Clone::clone(__self_0))
+            }
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedRecursiveNode {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        match self {
+            UsedRecursiveNode::NotRecursive(__self_0) => {
+                ::core::fmt::Formatter::debug_tuple_field1_finish(f, "NotRecursive", &__self_0)
+            }
+            UsedRecursiveNode::Recursive(__self_0) => {
+                ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Recursive", &__self_0)
+            }
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedRecursiveNode {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<UsedLeaf>;
+        let _: ::core::cmp::AssertParamIsEq<UsedRecursiveLeaf>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedRecursiveNode {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedRecursiveNode {
+    #[inline]
+    fn eq(&self, other: &UsedRecursiveNode) -> bool {
+        let __self_discr = ::core::intrinsics::discriminant_value(self);
+        let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+        __self_discr == __arg1_discr
+            && match (self, other) {
+                (
+                    UsedRecursiveNode::NotRecursive(__self_0),
+                    UsedRecursiveNode::NotRecursive(__arg1_0),
+                ) => __self_0 == __arg1_0,
+                (
+                    UsedRecursiveNode::Recursive(__self_0),
+                    UsedRecursiveNode::Recursive(__arg1_0),
+                ) => __self_0 == __arg1_0,
+                _ => unsafe { ::core::intrinsics::unreachable() },
+            }
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDRECURSIVENODE: [u8; 140usize] = UsedRecursiveNode::spec_xdr();
+impl UsedRecursiveNode {
+    pub const fn spec_xdr() -> [u8; 140usize] {
+        *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x11UsedRecursiveNode\0\0\0\0\0\0\x02\0\0\0\x01\0\0\0\0\0\0\0\x0cNotRecursive\0\0\0\x01\0\0\x07\xd0\0\0\0\x08UsedLeaf\0\0\0\x01\0\0\0\0\0\0\0\tRecursive\0\0\0\0\0\0\x01\0\0\x07\xd0\0\0\0\x11UsedRecursiveLeaf\0\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedRecursiveNode {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <UsedLeaf as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <UsedRecursiveLeaf as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedRecursiveNode {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{EnvBase, TryFromVal, TryIntoVal};
+        const CASES: &'static [&'static str] = &["NotRecursive", "Recursive"];
+        let vec: soroban_sdk::Vec<soroban_sdk::Val> = val.try_into_val(env)?;
+        let mut iter = vec.try_iter();
+        let discriminant: soroban_sdk::Symbol = iter
+            .next()
+            .ok_or(soroban_sdk::ConversionError)??
+            .try_into_val(env)
+            .map_err(|_| soroban_sdk::ConversionError)?;
+        Ok(
+            match u32::from(env.symbol_index_in_strs(discriminant.to_symbol_val(), CASES)?) as usize
+            {
+                0 => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::ConversionError);
+                    }
+                    Self::NotRecursive(
+                        iter.next()
+                            .ok_or(soroban_sdk::ConversionError)??
+                            .try_into_val(env)?,
+                    )
+                }
+                1 => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::ConversionError);
+                    }
+                    Self::Recursive(
+                        iter.next()
+                            .ok_or(soroban_sdk::ConversionError)??
+                            .try_into_val(env)?,
+                    )
+                }
+                _ => Err(soroban_sdk::ConversionError {})?,
+            },
+        )
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedRecursiveNode> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedRecursiveNode,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{TryFromVal, TryIntoVal};
+        match val {
+            UsedRecursiveNode::NotRecursive(ref value0) => {
+                let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                    soroban_sdk::Symbol::try_from_val(env, &"NotRecursive")?.to_val(),
+                    value0.try_into_val(env)?,
+                );
+                tup.try_into_val(env).map_err(Into::into)
+            }
+            UsedRecursiveNode::Recursive(ref value0) => {
+                let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                    soroban_sdk::Symbol::try_from_val(env, &"Recursive")?.to_val(),
+                    value0.try_into_val(env)?,
+                );
+                tup.try_into_val(env).map_err(Into::into)
+            }
+        }
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedRecursiveNode> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedRecursiveNode,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedRecursiveNode>>::try_from_val(env, *val)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVec> for UsedRecursiveNode {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVec,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let vec = val;
+        let mut iter = vec.iter();
+        let discriminant: soroban_sdk::xdr::ScSymbol = iter
+            .next()
+            .ok_or(soroban_sdk::xdr::Error::Invalid)?
+            .clone()
+            .try_into()
+            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+        let discriminant_name: &str = &discriminant.to_utf8_string()?;
+        Ok(match discriminant_name {
+            "NotRecursive" => {
+                if iter.len() > 1usize {
+                    return Err(soroban_sdk::xdr::Error::Invalid);
+                }
+                let rv0: soroban_sdk::Val = iter
+                    .next()
+                    .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                Self::NotRecursive(
+                    rv0.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+            }
+            "Recursive" => {
+                if iter.len() > 1usize {
+                    return Err(soroban_sdk::xdr::Error::Invalid);
+                }
+                let rv0: soroban_sdk::Val = iter
+                    .next()
+                    .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                Self::Recursive(
+                    rv0.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+            }
+            _ => Err(soroban_sdk::xdr::Error::Invalid)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedRecursiveNode {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Vec(Some(vec)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, vec)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedRecursiveNode> for soroban_sdk::xdr::ScVec {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedRecursiveNode) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        Ok(match val {
+            UsedRecursiveNode::NotRecursive(value0) => (
+                soroban_sdk::xdr::ScSymbol(
+                    "NotRecursive"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                ),
+                value0,
+            )
+                .try_into()
+                .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            UsedRecursiveNode::Recursive(value0) => (
+                soroban_sdk::xdr::ScSymbol(
+                    "Recursive"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                ),
+                value0,
+            )
+                .try_into()
+                .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+        })
+    }
+}
+impl TryFrom<UsedRecursiveNode> for soroban_sdk::xdr::ScVec {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedRecursiveNode) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedRecursiveNode> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedRecursiveNode) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Vec(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedRecursiveNode> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedRecursiveNode) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub enum ArbitraryUsedRecursiveNode {
+        NotRecursive(<UsedLeaf as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype),
+        Recursive(
+            <UsedRecursiveLeaf as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        ),
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedRecursiveNode {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            match self {
+                ArbitraryUsedRecursiveNode::NotRecursive(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(f, "NotRecursive", &__self_0)
+                }
+                ArbitraryUsedRecursiveNode::Recursive(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Recursive", &__self_0)
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedRecursiveNode {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedRecursiveNode {
+            match self {
+                ArbitraryUsedRecursiveNode::NotRecursive(__self_0) => {
+                    ArbitraryUsedRecursiveNode::NotRecursive(::core::clone::Clone::clone(__self_0))
+                }
+                ArbitraryUsedRecursiveNode::Recursive(__self_0) => {
+                    ArbitraryUsedRecursiveNode::Recursive(::core::clone::Clone::clone(__self_0))
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedRecursiveNode {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <UsedLeaf as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+            let _: ::core::cmp::AssertParamIsEq<
+                <UsedRecursiveLeaf as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedRecursiveNode {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedRecursiveNode {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedRecursiveNode) -> bool {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            __self_discr == __arg1_discr
+                && match (self, other) {
+                    (
+                        ArbitraryUsedRecursiveNode::NotRecursive(__self_0),
+                        ArbitraryUsedRecursiveNode::NotRecursive(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    (
+                        ArbitraryUsedRecursiveNode::Recursive(__self_0),
+                        ArbitraryUsedRecursiveNode::Recursive(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    _ => unsafe { ::core::intrinsics::unreachable() },
+                }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedRecursiveNode {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedRecursiveNode) -> ::core::cmp::Ordering {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                ::core::cmp::Ordering::Equal => match (self, other) {
+                    (
+                        ArbitraryUsedRecursiveNode::NotRecursive(__self_0),
+                        ArbitraryUsedRecursiveNode::NotRecursive(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    (
+                        ArbitraryUsedRecursiveNode::Recursive(__self_0),
+                        ArbitraryUsedRecursiveNode::Recursive(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    _ => unsafe { ::core::intrinsics::unreachable() },
+                },
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedRecursiveNode {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedRecursiveNode,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match (self, other) {
+                (
+                    ArbitraryUsedRecursiveNode::NotRecursive(__self_0),
+                    ArbitraryUsedRecursiveNode::NotRecursive(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                (
+                    ArbitraryUsedRecursiveNode::Recursive(__self_0),
+                    ArbitraryUsedRecursiveNode::Recursive(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+            }
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedRecursiveNode: ::std::thread::LocalKey<
+            std::cell::Cell<u32>,
+        > = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedRecursiveNode {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveNode.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(
+                        match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(u)?) * 2u64) >> 32
+                        {
+                            0u64 => ArbitraryUsedRecursiveNode::NotRecursive(
+                                arbitrary::Arbitrary::arbitrary(u)?,
+                            ),
+                            1u64 => ArbitraryUsedRecursiveNode::Recursive(
+                                arbitrary::Arbitrary::arbitrary(u)?,
+                            ),
+                            _ => {
+                                ::core::panicking::panic("internal error: entered unreachable code")
+                            }
+                        },
+                    )
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveNode.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveNode.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(
+                        match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(&mut u)?) * 2u64)
+                            >> 32
+                        {
+                            0u64 => ArbitraryUsedRecursiveNode::NotRecursive(
+                                arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                            ),
+                            1u64 => ArbitraryUsedRecursiveNode::Recursive(
+                                arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                            ),
+                            _ => {
+                                ::core::panicking::panic("internal error: entered unreachable code")
+                            }
+                        },
+                    )
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveNode.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::and(
+                    <u32 as arbitrary::Arbitrary>::size_hint(depth),
+                    arbitrary::size_hint::recursion_guard(depth, |depth| {
+                        arbitrary::size_hint::or_all(
+                                &[
+                                    arbitrary::size_hint::and_all(
+                                        &[
+                                            <<UsedLeaf as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                depth,
+                                            ),
+                                        ],
+                                    ),
+                                    arbitrary::size_hint::and_all(
+                                        &[
+                                            <<UsedRecursiveLeaf as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                depth,
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            )
+                    }),
+                )
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedRecursiveNode {
+        type Prototype = ArbitraryUsedRecursiveNode;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedRecursiveNode> for UsedRecursiveNode {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedRecursiveNode,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(match v {
+                ArbitraryUsedRecursiveNode::NotRecursive(field_0) => {
+                    UsedRecursiveNode::NotRecursive(soroban_sdk::IntoVal::into_val(field_0, env))
+                }
+                ArbitraryUsedRecursiveNode::Recursive(field_0) => {
+                    UsedRecursiveNode::Recursive(soroban_sdk::IntoVal::into_val(field_0, env))
+                }
+            })
+        }
+    }
+};
+pub struct UsedRecursiveLeaf {
+    pub val: Vec<UsedRecursiveRoot>,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedRecursiveLeaf {
+    #[inline]
+    fn clone(&self) -> UsedRecursiveLeaf {
+        UsedRecursiveLeaf {
+            val: ::core::clone::Clone::clone(&self.val),
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedRecursiveLeaf {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::debug_struct_field1_finish(
+            f,
+            "UsedRecursiveLeaf",
+            "val",
+            &&self.val,
+        )
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedRecursiveLeaf {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<Vec<UsedRecursiveRoot>>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedRecursiveLeaf {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedRecursiveLeaf {
+    #[inline]
+    fn eq(&self, other: &UsedRecursiveLeaf) -> bool {
+        self.val == other.val
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDRECURSIVELEAF: [u8; 84usize] = UsedRecursiveLeaf::spec_xdr();
+impl UsedRecursiveLeaf {
+    pub const fn spec_xdr() -> [u8; 84usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x11UsedRecursiveLeaf\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\x03\xea\0\0\x07\xd0\0\0\0\x11UsedRecursiveRoot\0\0\0"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedRecursiveLeaf {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <Vec<UsedRecursiveRoot> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedRecursiveLeaf {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let mut vals: [Val; 1usize] = [Val::VOID.to_val(); 1usize];
+        let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+        env.map_unpack_to_slice(map, &KEYS, &mut vals)
+            .map_err(|_| ConversionError)?;
+        Ok(Self {
+            val: vals[0]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedRecursiveLeaf> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedRecursiveLeaf,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let vals: [Val; 1usize] = [(&val.val).try_into_val(env).map_err(|_| ConversionError)?];
+        Ok(env
+            .map_new_from_slices(&KEYS, &vals)
+            .map_err(|_| ConversionError)?
+            .into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedRecursiveLeaf> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedRecursiveLeaf,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedRecursiveLeaf>>::try_from_val(env, *val)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for UsedRecursiveLeaf {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScMap,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let map = val;
+        if map.len() != 1usize {
+            return Err(soroban_sdk::xdr::Error::Invalid);
+        }
+        map.validate()?;
+        Ok(Self {
+            val: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedRecursiveLeaf {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedRecursiveLeaf> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedRecursiveLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        use soroban_sdk::TryFromVal;
+        soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.val)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+        ])))
+    }
+}
+impl TryFrom<UsedRecursiveLeaf> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedRecursiveLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedRecursiveLeaf> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedRecursiveLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedRecursiveLeaf> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedRecursiveLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub struct ArbitraryUsedRecursiveLeaf {
+        val: <Vec<
+            UsedRecursiveRoot,
+        > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedRecursiveLeaf {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(
+                f,
+                "ArbitraryUsedRecursiveLeaf",
+                "val",
+                &&self.val,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedRecursiveLeaf {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedRecursiveLeaf {
+            ArbitraryUsedRecursiveLeaf {
+                val: ::core::clone::Clone::clone(&self.val),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedRecursiveLeaf {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <Vec<
+                    UsedRecursiveRoot,
+                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedRecursiveLeaf {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedRecursiveLeaf {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedRecursiveLeaf) -> bool {
+            self.val == other.val
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedRecursiveLeaf {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedRecursiveLeaf) -> ::core::cmp::Ordering {
+            ::core::cmp::Ord::cmp(&self.val, &other.val)
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedRecursiveLeaf {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedRecursiveLeaf,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            ::core::cmp::PartialOrd::partial_cmp(&self.val, &other.val)
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedRecursiveLeaf: ::std::thread::LocalKey<
+            std::cell::Cell<u32>,
+        > = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedRecursiveLeaf {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveLeaf.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedRecursiveLeaf {
+                        val: arbitrary::Arbitrary::arbitrary(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveLeaf.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveLeaf.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedRecursiveLeaf {
+                        val: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedRecursiveLeaf.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::recursion_guard(depth, |depth| {
+                    arbitrary::size_hint::and_all(
+                        &[
+                            <<Vec<
+                                UsedRecursiveRoot,
+                            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                        ],
+                    )
+                })
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedRecursiveLeaf {
+        type Prototype = ArbitraryUsedRecursiveLeaf;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedRecursiveLeaf> for UsedRecursiveLeaf {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedRecursiveLeaf,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(UsedRecursiveLeaf {
+                val: soroban_sdk::IntoVal::into_val(&v.val, env),
+            })
+        }
+    }
+};
+pub struct UsedLeaf {
+    pub val: u32,
+}
+#[automatically_derived]
+impl ::core::clone::Clone for UsedLeaf {
+    #[inline]
+    fn clone(&self) -> UsedLeaf {
+        UsedLeaf {
+            val: ::core::clone::Clone::clone(&self.val),
+        }
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UsedLeaf {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::debug_struct_field1_finish(f, "UsedLeaf", "val", &&self.val)
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UsedLeaf {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {
+        let _: ::core::cmp::AssertParamIsEq<u32>;
+    }
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UsedLeaf {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UsedLeaf {
+    #[inline]
+    fn eq(&self, other: &UsedLeaf) -> bool {
+        self.val == other.val
+    }
+}
+pub static __SPEC_XDR_TYPE_USEDLEAF: [u8; 44usize] = UsedLeaf::spec_xdr();
+impl UsedLeaf {
+    pub const fn spec_xdr() -> [u8; 44usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x08UsedLeaf\0\0\0\x01\0\0\0\0\0\0\0\x03val\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UsedLeaf {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UsedLeaf {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let mut vals: [Val; 1usize] = [Val::VOID.to_val(); 1usize];
+        let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+        env.map_unpack_to_slice(map, &KEYS, &mut vals)
+            .map_err(|_| ConversionError)?;
+        Ok(Self {
+            val: vals[0]
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?,
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UsedLeaf> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UsedLeaf,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+        const KEYS: [&'static str; 1usize] = ["val"];
+        let vals: [Val; 1usize] = [(&val.val).try_into_val(env).map_err(|_| ConversionError)?];
+        Ok(env
+            .map_new_from_slices(&KEYS, &vals)
+            .map_err(|_| ConversionError)?
+            .into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UsedLeaf> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UsedLeaf,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UsedLeaf>>::try_from_val(env, *val)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for UsedLeaf {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScMap,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        use soroban_sdk::xdr::Validate;
+        use soroban_sdk::TryIntoVal;
+        let map = val;
+        if map.len() != 1usize {
+            return Err(soroban_sdk::xdr::Error::Invalid);
+        }
+        map.validate()?;
+        Ok(Self {
+            val: {
+                let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into();
+                let idx = map
+                    .binary_search_by_key(&key, |entry| entry.key.clone())
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                rv.try_into_val(env)
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+            },
+        })
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for UsedLeaf {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::xdr::ScVal,
+    ) -> Result<Self, soroban_sdk::xdr::Error> {
+        if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+            <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+        } else {
+            Err(soroban_sdk::xdr::Error::Invalid)
+        }
+    }
+}
+impl TryFrom<&UsedLeaf> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        extern crate alloc;
+        use soroban_sdk::TryFromVal;
+        soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+            soroban_sdk::xdr::ScMapEntry {
+                key: soroban_sdk::xdr::ScSymbol(
+                    "val"
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                )
+                .into(),
+                val: (&val.val)
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            },
+        ])))
+    }
+}
+impl TryFrom<UsedLeaf> for soroban_sdk::xdr::ScMap {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+impl TryFrom<&UsedLeaf> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: &UsedLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+    }
+}
+impl TryFrom<UsedLeaf> for soroban_sdk::xdr::ScVal {
+    type Error = soroban_sdk::xdr::Error;
+    #[inline(always)]
+    fn try_from(val: UsedLeaf) -> Result<Self, soroban_sdk::xdr::Error> {
+        (&val).try_into()
+    }
+}
+const _: () = {
+    use soroban_sdk::testutils::arbitrary::arbitrary;
+    use soroban_sdk::testutils::arbitrary::std;
+    pub struct ArbitraryUsedLeaf {
+        val: <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ArbitraryUsedLeaf {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field1_finish(
+                f,
+                "ArbitraryUsedLeaf",
+                "val",
+                &&self.val,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ArbitraryUsedLeaf {
+        #[inline]
+        fn clone(&self) -> ArbitraryUsedLeaf {
+            ArbitraryUsedLeaf {
+                val: ::core::clone::Clone::clone(&self.val),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ArbitraryUsedLeaf {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<
+                <u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            >;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ArbitraryUsedLeaf {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ArbitraryUsedLeaf {
+        #[inline]
+        fn eq(&self, other: &ArbitraryUsedLeaf) -> bool {
+            self.val == other.val
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ArbitraryUsedLeaf {
+        #[inline]
+        fn cmp(&self, other: &ArbitraryUsedLeaf) -> ::core::cmp::Ordering {
+            ::core::cmp::Ord::cmp(&self.val, &other.val)
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ArbitraryUsedLeaf {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ArbitraryUsedLeaf,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            ::core::cmp::PartialOrd::partial_cmp(&self.val, &other.val)
+        }
+    }
+    const _: () = {
+        #[allow(non_upper_case_globals)]
+        const RECURSIVE_COUNT_ArbitraryUsedLeaf: ::std::thread::LocalKey<std::cell::Cell<u32>> = {
+            #[inline]
+            fn __init() -> std::cell::Cell<u32> {
+                std::cell::Cell::new(0)
+            }
+            unsafe {
+                ::std::thread::LocalKey::new(
+                    const {
+                        if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    (),
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        } else {
+                            |init| {
+                                #[thread_local]
+                                static VAL: ::std::thread::local_impl::LazyStorage<
+                                    std::cell::Cell<u32>,
+                                    !,
+                                > = ::std::thread::local_impl::LazyStorage::new();
+                                VAL.get_or_init(init, __init)
+                            }
+                        }
+                    },
+                )
+            }
+        };
+        #[automatically_derived]
+        impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryUsedLeaf {
+            fn arbitrary(u: &mut arbitrary::Unstructured<'arbitrary>) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedLeaf.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedLeaf {
+                        val: arbitrary::Arbitrary::arbitrary(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedLeaf.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            fn arbitrary_take_rest(
+                mut u: arbitrary::Unstructured<'arbitrary>,
+            ) -> arbitrary::Result<Self> {
+                let guard_against_recursion = u.is_empty();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedLeaf.with(|count| {
+                        if count.get() > 0 {
+                            return Err(arbitrary::Error::NotEnoughData);
+                        }
+                        count.set(count.get() + 1);
+                        Ok(())
+                    })?;
+                }
+                let result = (|| {
+                    Ok(ArbitraryUsedLeaf {
+                        val: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                    })
+                })();
+                if guard_against_recursion {
+                    RECURSIVE_COUNT_ArbitraryUsedLeaf.with(|count| {
+                        count.set(count.get() - 1);
+                    });
+                }
+                result
+            }
+            #[inline]
+            fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                arbitrary::size_hint::recursion_guard(depth, |depth| {
+                    arbitrary::size_hint::and_all(
+                        &[
+                            <<u32 as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                depth,
+                            ),
+                        ],
+                    )
+                })
+            }
+        }
+    };
+    impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for UsedLeaf {
+        type Prototype = ArbitraryUsedLeaf;
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryUsedLeaf> for UsedLeaf {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            v: &ArbitraryUsedLeaf,
+        ) -> std::result::Result<Self, Self::Error> {
+            Ok(UsedLeaf {
+                val: soroban_sdk::IntoVal::into_val(&v.val, env),
+            })
+        }
+    }
+};
 mod wasm_imported {
-    pub const WASM: &[u8] = b"\x00asm\x01\x00\x00\x00\x01*\x07`\x02~~\x01~`\x03~~~\x01~`\x01~\x01~`\x00\x01~`\x02\x7f\x7f\x01~`\x04\x7f\x7f\x7f\x7f\x01~`\x02\x7f~\x00\x02%\x06\x01b\x01j\x00\x00\x01x\x011\x00\x00\x01v\x01g\x00\x00\x01m\x019\x00\x01\x01i\x012\x00\x02\x01i\x011\x00\x02\x03\x0b\n\x03\x04\x03\x02\x00\x05\x00\x00\x06\x06\x05\x03\x01\x00\x11\x06!\x04\x7f\x01A\x80\x80\xc0\x00\x0b\x7f\x00A\x82\x80\xc0\x00\x0b\x7f\x00A\xa0\x80\xc0\x00\x0b\x7f\x00A\xa0\x80\xc0\x00\x0b\x07\x81\x01\n\x06memory\x02\x00\tfn_enum_a\x00\x06\rfn_enum_int_a\x00\x08\nfn_error_a\x00\t\nfn_event_a\x00\n\x0bfn_struct_a\x00\x0c\x11fn_struct_tuple_a\x00\r\x01_\x03\x01\n__data_end\x03\x02\x0b__heap_base\x03\x03\n\xbd\x08\n\x8b\x02\x03\x01\x7f\x01~\x03\x7f#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00B\x00!\x01A~!\x02\x03~\x02@\x02@\x02@\x02@\x02@ \x02E\r\x00A\x01!\x03 \x02A\x82\x80\xc0\x80\x00j-\x00\x00\"\x04A\xdf\x00F\r\x04 \x04APjA\xff\x01qA\nI\r\x02 \x04A\xbf\x7fjA\xff\x01qA\x1aI\r\x03\x02@ \x04A\x9f\x7fjA\xff\x01qA\x1aO\r\x00 \x04AEj!\x03\x0c\x05\x0b \x00 \x04\xadB\x08\x86B\x01\x847\x03\x00A\x80\x80\xc0\x80\x00\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x80\x80\x80\x80\x00!\x01\x0c\x01\x0b \x00 \x01B\x08\x86B\x0e\x84\"\x017\x02\x04\x0b \x00 \x017\x03\x00 \x00A\x01\x10\x87\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0f\x0b \x04ARj!\x03\x0c\x01\x0b \x04AKj!\x03\x0b \x01B\x06\x86 \x03\xadB\xff\x01\x83\x84!\x01 \x02A\x01j!\x02\x0c\x00\x0b\x0b\x1a\x00 \x00\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x82\x80\x80\x80\x00\x0b\x08\x00B\x84\x80\x80\x800\x0b*\x00\x02@ \x00B\xff\x01\x83B\x04Q\r\x00\x00\x0bB\x83\x80\x80\x80  \x00B\x84\x80\x80\x80p\x83 \x00B\x80\x80\x80\x80\x10T\x1b\x0b\xdc\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00\x02@ \x00B\xff\x01\x83B\xcd\x00R\r\x00 \x01B\xff\x01\x83B\xc9\x00R\r\x00 \x02 \x007\x03\x08 \x02B\x8e\xcc\xc1\xfc\xac\xdd\xab\x017\x03\x00A\x00!\x03\x03@\x02@ \x03A\x10G\r\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x02A\x10j \x03j \x02 \x03j)\x03\x007\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x02A\x10jA\x02\x10\x87\x80\x80\x80\x00!\x00 \x02 \x017\x03\x10 \x00A\x98\x80\xc0\x80\x00A\x01 \x02A\x10jA\x01\x10\x8b\x80\x80\x80\x00\x10\x81\x80\x80\x80\x00\x1a \x02A j$\x80\x80\x80\x80\x00B\x02\x0f\x0b \x02A\x10j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b\x00\x0b.\x00\x02@ \x01 \x03F\r\x00\x00\x0b \x00\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x83\x80\x80\x80\x00\x0by\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x02$\x80\x80\x80\x80\x00\x02@ \x00B\xff\x01\x83B\x04R\r\x00A\x01A\x02A\x00 \x01\xa7A\xff\x01q\"\x03\x1b \x03A\x01F\x1b\"\x03A\x02F\r\x00 \x02 \x03\xad7\x03\x08 \x02 \x00B\x84\x80\x80\x80p\x837\x03\x00A\x88\x80\xc0\x80\x00A\x02 \x02A\x02\x10\x8b\x80\x80\x80\x00!\x00 \x02A\x10j$\x80\x80\x80\x80\x00 \x00\x0f\x0b\x00\x0b\xb2\x01\x01\x01\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00 \x02A\x10j \x00\x10\x8e\x80\x80\x80\x00\x02@ \x02(\x02\x10A\x01F\r\x00 \x02)\x03\x18!\x00 \x02A\x10j \x01\x10\x8e\x80\x80\x80\x00 \x02(\x02\x10A\x01F\r\x00 \x02)\x03\x18!\x01 \x02A\x10j \x00\x10\x8f\x80\x80\x80\x00 \x02(\x02\x10\r\x00 \x02)\x03\x18!\x00 \x02A\x10j \x01\x10\x8f\x80\x80\x80\x00 \x02(\x02\x10A\x01F\r\x00 \x02 \x02)\x03\x187\x03\x08 \x02 \x007\x03\x00 \x02A\x02\x10\x87\x80\x80\x80\x00!\x00 \x02A j$\x80\x80\x80\x80\x00 \x00\x0f\x0b\x00\x0b]\x02\x01\x7f\x01~\x02@\x02@ \x01\xa7A\xff\x01q\"\x02A\xc1\x00F\r\x00\x02@ \x02A\x07F\r\x00B\x01!\x03B\x83\x90\x80\x80\x80\x01!\x01\x0c\x02\x0b \x01B\x08\x87!\x01B\x00!\x03\x0c\x01\x0bB\x00!\x03 \x01\x10\x84\x80\x80\x80\x00!\x01\x0b \x00 \x037\x03\x00 \x00 \x017\x03\x08\x0bF\x00\x02@\x02@ \x01B\x80\x80\x80\x80\x80\x80\x80\xc0\x00|B\xff\xff\xff\xff\xff\xff\xff\xff\x00V\r\x00 \x01B\x08\x86B\x07\x84!\x01\x0c\x01\x0b \x01\x10\x85\x80\x80\x80\x00!\x01\x0b \x00B\x007\x03\x00 \x00 \x017\x03\x08\x0b\x0b)\x01\x00A\x80\x80\xc0\x00\x0b V2f1f2\x00\x00\x02\x00\x10\x00\x02\x00\x00\x00\x04\x00\x10\x00\x02\x00\x00\x00\x04\x00\x10\x00\x02\x00\x00\x00\x00\xbf\x0e\x0econtractspecv0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\tfn_enum_a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nfn_error_a\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05input\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nfn_event_a\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bfn_struct_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rfn_enum_int_a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x08EnumIntA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11fn_struct_tuple_a\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x1e\x11contractenvmetav0\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x00\x00+\x0econtractmetav0\x00\x00\x00\x00\x00\x00\x00\x05rsver\x00\x00\x00\x00\x00\x00\x061.91.0\x00\x00";
+    pub const WASM: &[u8] = b"\x00asm\x01\x00\x00\x00\x01*\x07`\x02~~\x01~`\x03~~~\x01~`\x01~\x01~`\x00\x01~`\x02\x7f\x7f\x01~`\x04\x7f\x7f\x7f\x7f\x01~`\x02\x7f~\x00\x02%\x06\x01b\x01j\x00\x00\x01x\x011\x00\x00\x01v\x01g\x00\x00\x01m\x019\x00\x01\x01i\x012\x00\x02\x01i\x011\x00\x02\x03\x0c\x0b\x03\x04\x03\x02\x00\x05\x03\x00\x00\x06\x06\x05\x03\x01\x00\x11\x06!\x04\x7f\x01A\x80\x80\xc0\x00\x0b\x7f\x00A\x82\x80\xc0\x00\x0b\x7f\x00A\x80\x81\xc0\x00\x0b\x7f\x00A\x80\x81\xc0\x00\x0b\x07\x8e\x01\x0b\x06memory\x02\x00\tfn_enum_a\x00\x06\rfn_enum_int_a\x00\x08\nfn_error_a\x00\t\nfn_event_a\x00\n\nfn_event_d\x00\x0c\x0bfn_struct_a\x00\r\x11fn_struct_tuple_a\x00\x0e\x01_\x03\x01\n__data_end\x03\x02\x0b__heap_base\x03\x03\n\x8d\n\x0b\x95\x02\x03\x01\x7f\x01~\x03\x7f#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x82\x80\xc0\x80\x00\x1aB\x00!\x01A~!\x02\x03~\x02@\x02@\x02@\x02@\x02@ \x02E\r\x00A\x01!\x03 \x02A\x82\x80\xc0\x80\x00j-\x00\x00\"\x04A\xdf\x00F\r\x04 \x04APjA\xff\x01qA\nI\r\x02 \x04A\xbf\x7fjA\xff\x01qA\x1aI\r\x03\x02@ \x04A\x9f\x7fjA\xff\x01qA\x1aO\r\x00 \x04AEj!\x03\x0c\x05\x0b \x00 \x04\xadB\x08\x86B\x01\x847\x03\x00A\x80\x80\xc0\x80\x00\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x80\x80\x80\x80\x00!\x01\x0c\x01\x0b \x00 \x01B\x08\x86B\x0e\x84\"\x017\x02\x04\x0b \x00 \x017\x03\x00 \x00A\x01\x10\x87\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0f\x0b \x04ARj!\x03\x0c\x01\x0b \x04AKj!\x03\x0b \x01B\x06\x86 \x03\xadB\xff\x01\x83\x84!\x01 \x02A\x01j!\x02\x0c\x00\x0b\x0b\x1a\x00 \x00\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x82\x80\x80\x80\x00\x0b\x12\x00A\x00-\x00\xc8\x80\xc0\x80\x00\x1aB\x84\x80\x80\x800\x0b4\x00\x02@ \x00B\xff\x01\x83B\x04Q\r\x00\x00\x0bA\x00-\x00\x90\x80\xc0\x80\x00\x1aB\x83\x80\x80\x80  \x00B\x84\x80\x80\x80p\x83 \x00B\x80\x80\x80\x80\x10T\x1b\x0b\xe6\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00\x02@ \x00B\xff\x01\x83B\xcd\x00R\r\x00 \x01B\xff\x01\x83B\xc9\x00R\r\x00A\x00!\x03A\x00-\x00\x9e\x80\xc0\x80\x00\x1a \x02 \x007\x03\x08 \x02B\x8e\xcc\xc1\xfc\xac\xdd\xab\x017\x03\x00\x03@\x02@ \x03A\x10G\r\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x02A\x10j \x03j \x02 \x03j)\x03\x007\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x02A\x10jA\x02\x10\x87\x80\x80\x80\x00!\x00 \x02 \x017\x03\x10 \x00A\xf8\x80\xc0\x80\x00A\x01 \x02A\x10jA\x01\x10\x8b\x80\x80\x80\x00\x10\x81\x80\x80\x80\x00\x1a \x02A j$\x80\x80\x80\x80\x00B\x02\x0f\x0b \x02A\x10j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b\x00\x0b.\x00\x02@ \x01 \x03F\r\x00\x00\x0b \x00\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x83\x80\x80\x80\x00\x0b\x91\x01\x03\x01\x7f\x01~\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\xac\x80\xc0\x80\x00\x1a \x00B\x8e\xd2\xc1\xfc\xac\xdd\xab\x017\x03\x00B\x02!\x01A\x01!\x02\x02@\x03@ \x02E\r\x01 \x02A\x7fj!\x02B\x8e\xd2\xc1\xfc\xac\xdd\xab\x01!\x01\x0c\x00\x0b\x0b \x00 \x017\x03\x08 \x00A\x08jA\x01\x10\x87\x80\x80\x80\x00A\x04A\x00 \x00A\x08jA\x00\x10\x8b\x80\x80\x80\x00\x10\x81\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x83\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x02$\x80\x80\x80\x80\x00\x02@ \x00B\xff\x01\x83B\x04R\r\x00A\x01A\x02A\x00 \x01\xa7A\xff\x01q\"\x03\x1b \x03A\x01F\x1b\"\x03A\x02F\r\x00A\x00-\x00\xba\x80\xc0\x80\x00\x1a \x02 \x03\xad7\x03\x08 \x02 \x00B\x84\x80\x80\x80p\x837\x03\x00A\xe8\x80\xc0\x80\x00A\x02 \x02A\x02\x10\x8b\x80\x80\x80\x00!\x00 \x02A\x10j$\x80\x80\x80\x80\x00 \x00\x0f\x0b\x00\x0b\xbc\x01\x01\x01\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00 \x02A\x10j \x00\x10\x8f\x80\x80\x80\x00\x02@ \x02(\x02\x10A\x01F\r\x00 \x02)\x03\x18!\x00 \x02A\x10j \x01\x10\x8f\x80\x80\x80\x00 \x02(\x02\x10A\x01F\r\x00 \x02)\x03\x18!\x01A\x00-\x00\xd6\x80\xc0\x80\x00\x1a \x02A\x10j \x00\x10\x90\x80\x80\x80\x00 \x02(\x02\x10\r\x00 \x02)\x03\x18!\x00 \x02A\x10j \x01\x10\x90\x80\x80\x80\x00 \x02(\x02\x10A\x01F\r\x00 \x02 \x02)\x03\x187\x03\x08 \x02 \x007\x03\x00 \x02A\x02\x10\x87\x80\x80\x80\x00!\x00 \x02A j$\x80\x80\x80\x80\x00 \x00\x0f\x0b\x00\x0b]\x02\x01\x7f\x01~\x02@\x02@ \x01\xa7A\xff\x01q\"\x02A\xc1\x00F\r\x00\x02@ \x02A\x07F\r\x00B\x01!\x03B\x83\x90\x80\x80\x80\x01!\x01\x0c\x02\x0b \x01B\x08\x87!\x01B\x00!\x03\x0c\x01\x0bB\x00!\x03 \x01\x10\x84\x80\x80\x80\x00!\x01\x0b \x00 \x037\x03\x00 \x00 \x017\x03\x08\x0bF\x00\x02@\x02@ \x01B\x80\x80\x80\x80\x80\x80\x80\xc0\x00|B\xff\xff\xff\xff\xff\xff\xff\xff\x00V\r\x00 \x01B\x08\x86B\x07\x84!\x01\x0c\x01\x0b \x01\x10\x85\x80\x80\x80\x00!\x01\x0b \x00B\x007\x03\x00 \x00 \x017\x03\x08\x0b\x0b\x8a\x01\x01\x00A\x80\x80\xc0\x00\x0b\x80\x01V2SpEcV1\xa2=N\xc1p\x95\x90\xb2SpEcV1\xe9R\xa7\xe8b\x99\xa2\xc3SpEcV1K\xe6\x8ej\x19\x9en\xbdSpEcV1\x15\xf0Wx\x15\x83\xc0:SpEcV1\xb6\x1c\xfd\xdfhY-dSpEcV1V]\x80\\~\x1a\x08/SpEcV1\xcf)\x97]S\xb2\xfd)f1f2d\x00\x10\x00\x02\x00\x00\x00f\x00\x10\x00\x02\x00\x00\x00f\x00\x10\x00\x02\x00\x00\x00\x00\xa3$\x0econtractspecv0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\tfn_enum_a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nfn_error_a\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05input\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nfn_event_a\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nfn_event_d\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bfn_struct_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rfn_enum_int_a\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x08EnumIntA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11fn_struct_tuple_a\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\xe3Context of a single authorized call performed by an address.\n\nCustom account contracts that implement `__check_auth` special function\nreceive a list of `Context` values corresponding to all the calls that\nneed to be authorized.\x00\x00\x00\x00\x00\x00\x00\x00\x07Context\x00\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x14Contract invocation.\x00\x00\x00\x08Contract\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x01\x00\x00\x00=Contract that has a constructor with no arguments is created.\x00\x00\x00\x00\x00\x00\x14CreateContractHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x01\x00\x00\x00DContract that has a constructor with 1 or more arguments is created.\x00\x00\x00\x1cCreateContractWithCtorHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x01\x00\x00\x00\xbdAuthorization context of a single contract call.\n\nThis struct corresponds to a `require_auth_for_args` call for an address\nfrom `contract` function with `fn_name` name and `args` arguments.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x04args\x00\x00\x03\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08contract\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x07fn_name\x00\x00\x00\x00\x11\x00\x00\x00\x02\x00\x00\x00_Contract executable used for creating a new contract and used in\n`CreateContractHostFnContext`.\x00\x00\x00\x00\x00\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Wasm\x00\x00\x00\x01\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x008Value of contract node in InvokerContractAuthEntry tree.\x00\x00\x00\x00\x00\x00\x00\x15SubContractInvocation\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x07context\x00\x00\x00\x07\xd0\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x00\x00\x00\x00\x0fsub_invocations\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x02\x00\x00\x01/A node in the tree of authorizations performed on behalf of the current\ncontract as invoker of the contracts deeper in the call stack.\n\nThis is used as an argument of `authorize_as_current_contract` host function.\n\nThis tree corresponds `require_auth[_for_args]` calls on behalf of the\ncurrent contract.\x00\x00\x00\x00\x00\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x12Invoke a contract.\x00\x00\x00\x00\x00\x08Contract\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x15SubContractInvocation\x00\x00\x00\x00\x00\x00\x01\x00\x00\x005Create a contract passing 0 arguments to constructor.\x00\x00\x00\x00\x00\x00\x14CreateContractHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x01\x00\x00\x00=Create a contract passing 0 or more arguments to constructor.\x00\x00\x00\x00\x00\x00\x1cCreateContractWithCtorHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x01\x00\x00\x00vAuthorization context for `create_contract` host function that creates a\nnew contract on behalf of authorizer address.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\nexecutable\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04salt\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x00\xd6Authorization context for `create_contract` host function that creates a\nnew contract on behalf of authorizer address.\nThis is the same as `CreateContractHostFnContext`, but also has\ncontract constructor arguments.\x00\x00\x00\x00\x00\x00\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x10constructor_args\x00\x00\x03\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nexecutable\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04salt\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nExecutable\x00\x00\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Wasm\x00\x00\x00\x01\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStellarAsset\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07Account\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventD\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_d\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x1e\x11contractenvmetav0\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00O\x0econtractmetav0\x00\x00\x00\x00\x00\x00\x00\x05rsver\x00\x00\x00\x00\x00\x00\x061.91.0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12rssdk_spec_shaking\x00\x00\x00\x00\x00\x012\x00\x00\x00";
     pub trait Contract {
         fn fn_enum_a(env: soroban_sdk::Env) -> EnumA;
         fn fn_error_a(env: soroban_sdk::Env, input: u32) -> Result<u32, ErrorA>;
         fn fn_event_a(env: soroban_sdk::Env, f1: soroban_sdk::Address, f2: soroban_sdk::String);
+        fn fn_event_d(env: soroban_sdk::Env);
         fn fn_struct_a(env: soroban_sdk::Env, f1: u32, f2: bool) -> StructA;
         fn fn_enum_int_a(env: soroban_sdk::Env) -> EnumIntA;
         fn fn_struct_tuple_a(env: soroban_sdk::Env, f1: i64, f2: i64) -> StructTupleA;
@@ -8930,6 +12344,77 @@ mod wasm_imported {
             }
             res
         }
+        pub fn fn_event_d(&self) -> () {
+            use core::ops::Not;
+            let old_auth_manager = self
+                .env
+                .in_contract()
+                .not()
+                .then(|| self.env.host().snapshot_auth_manager().unwrap());
+            {
+                if let Some(set_auths) = self.set_auths {
+                    self.env.set_auths(set_auths);
+                }
+                if let Some(mock_auths) = self.mock_auths {
+                    self.env.mock_auths(mock_auths);
+                }
+                if self.mock_all_auths {
+                    if self.allow_non_root_auth {
+                        self.env.mock_all_auths_allowing_non_root_auth();
+                    } else {
+                        self.env.mock_all_auths();
+                    }
+                }
+            }
+            use soroban_sdk::{FromVal, IntoVal};
+            let res = self.env.invoke_contract(
+                &self.address,
+                &{ soroban_sdk::Symbol::new(&self.env, "fn_event_d") },
+                ::soroban_sdk::Vec::new(&self.env),
+            );
+            if let Some(old_auth_manager) = old_auth_manager {
+                self.env.host().set_auth_manager(old_auth_manager).unwrap();
+            }
+            res
+        }
+        pub fn try_fn_event_d(
+            &self,
+        ) -> Result<
+            Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+            Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+        > {
+            use core::ops::Not;
+            let old_auth_manager = self
+                .env
+                .in_contract()
+                .not()
+                .then(|| self.env.host().snapshot_auth_manager().unwrap());
+            {
+                if let Some(set_auths) = self.set_auths {
+                    self.env.set_auths(set_auths);
+                }
+                if let Some(mock_auths) = self.mock_auths {
+                    self.env.mock_auths(mock_auths);
+                }
+                if self.mock_all_auths {
+                    if self.allow_non_root_auth {
+                        self.env.mock_all_auths_allowing_non_root_auth();
+                    } else {
+                        self.env.mock_all_auths();
+                    }
+                }
+            }
+            use soroban_sdk::{FromVal, IntoVal};
+            let res = self.env.try_invoke_contract(
+                &self.address,
+                &{ soroban_sdk::Symbol::new(&self.env, "fn_event_d") },
+                ::soroban_sdk::Vec::new(&self.env),
+            );
+            if let Some(old_auth_manager) = old_auth_manager {
+                self.env.host().set_auth_manager(old_auth_manager).unwrap();
+            }
+            res
+        }
         pub fn fn_struct_a(&self, f1: &u32, f2: &bool) -> StructA {
             use core::ops::Not;
             let old_auth_manager = self
@@ -9195,6 +12680,11 @@ mod wasm_imported {
         }
         #[inline(always)]
         #[allow(clippy::unused_unit)]
+        pub fn fn_event_d<'i>() -> () {
+            ()
+        }
+        #[inline(always)]
+        #[allow(clippy::unused_unit)]
         pub fn fn_struct_a<'i>(f1: &'i u32, f2: &'i bool) -> (&'i u32, &'i bool) {
             (f1, f2)
         }
@@ -9209,6 +12699,2107 @@ mod wasm_imported {
             (f1, f2)
         }
     }
+    pub struct ContractContext {
+        pub args: soroban_sdk::Vec<soroban_sdk::Val>,
+        pub contract: soroban_sdk::Address,
+        pub fn_name: soroban_sdk::Symbol,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ContractContext {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field3_finish(
+                f,
+                "ContractContext",
+                "args",
+                &self.args,
+                "contract",
+                &self.contract,
+                "fn_name",
+                &&self.fn_name,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ContractContext {
+        #[inline]
+        fn clone(&self) -> ContractContext {
+            ContractContext {
+                args: ::core::clone::Clone::clone(&self.args),
+                contract: ::core::clone::Clone::clone(&self.contract),
+                fn_name: ::core::clone::Clone::clone(&self.fn_name),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ContractContext {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::Vec<soroban_sdk::Val>>;
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::Address>;
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::Symbol>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ContractContext {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ContractContext {
+        #[inline]
+        fn eq(&self, other: &ContractContext) -> bool {
+            self.args == other.args
+                && self.contract == other.contract
+                && self.fn_name == other.fn_name
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ContractContext {
+        #[inline]
+        fn cmp(&self, other: &ContractContext) -> ::core::cmp::Ordering {
+            match ::core::cmp::Ord::cmp(&self.args, &other.args) {
+                ::core::cmp::Ordering::Equal => {
+                    match ::core::cmp::Ord::cmp(&self.contract, &other.contract) {
+                        ::core::cmp::Ordering::Equal => {
+                            ::core::cmp::Ord::cmp(&self.fn_name, &other.fn_name)
+                        }
+                        cmp => cmp,
+                    }
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ContractContext {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ContractContext,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            match ::core::cmp::PartialOrd::partial_cmp(&self.args, &other.args) {
+                ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                    match ::core::cmp::PartialOrd::partial_cmp(&self.contract, &other.contract) {
+                        ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                            ::core::cmp::PartialOrd::partial_cmp(&self.fn_name, &other.fn_name)
+                        }
+                        cmp => cmp,
+                    }
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_CONTRACTCONTEXT: [u8; 96usize] = ContractContext::spec_xdr();
+    impl ContractContext {
+        pub const fn spec_xdr() -> [u8; 96usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0fContractContext\0\0\0\0\x03\0\0\0\0\0\0\0\x04args\0\0\x03\xea\0\0\0\0\0\0\0\0\0\0\0\x08contract\0\0\0\x13\0\0\0\0\0\0\0\x07fn_name\0\0\0\0\x11"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for ContractContext {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Vec<
+                soroban_sdk::Val,
+            > as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::Address as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::Symbol as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for ContractContext {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+            const KEYS: [&'static str; 3usize] = ["args", "contract", "fn_name"];
+            let mut vals: [Val; 3usize] = [Val::VOID.to_val(); 3usize];
+            let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+            env.map_unpack_to_slice(map, &KEYS, &mut vals)
+                .map_err(|_| ConversionError)?;
+            Ok(Self {
+                args: vals[0]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+                contract: vals[1]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+                fn_name: vals[2]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ContractContext> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &ContractContext,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+            const KEYS: [&'static str; 3usize] = ["args", "contract", "fn_name"];
+            let vals: [Val; 3usize] = [
+                (&val.args).try_into_val(env).map_err(|_| ConversionError)?,
+                (&val.contract)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+                (&val.fn_name)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+            ];
+            Ok(env
+                .map_new_from_slices(&KEYS, &vals)
+                .map_err(|_| ConversionError)?
+                .into())
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &ContractContext> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&ContractContext,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, ContractContext>>::try_from_val(
+                env, *val,
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for ContractContext {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScMap,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let map = val;
+            if map.len() != 3usize {
+                return Err(soroban_sdk::xdr::Error::Invalid);
+            }
+            map.validate()?;
+            Ok(Self {
+                args: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "args"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+                contract: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "contract"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+                fn_name: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "fn_name"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for ContractContext {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&ContractContext> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &ContractContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            use soroban_sdk::TryFromVal;
+            soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "args"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.args)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "contract"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.contract)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "fn_name"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.fn_name)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+            ])))
+        }
+    }
+    impl TryFrom<ContractContext> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: ContractContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&ContractContext> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &ContractContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<ContractContext> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: ContractContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub struct ArbitraryContractContext {
+            args: <soroban_sdk::Vec<
+                soroban_sdk::Val,
+            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            contract: <soroban_sdk::Address as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            fn_name: <soroban_sdk::Symbol as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryContractContext {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                ::core::fmt::Formatter::debug_struct_field3_finish(
+                    f,
+                    "ArbitraryContractContext",
+                    "args",
+                    &self.args,
+                    "contract",
+                    &self.contract,
+                    "fn_name",
+                    &&self.fn_name,
+                )
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryContractContext {
+            #[inline]
+            fn clone(&self) -> ArbitraryContractContext {
+                ArbitraryContractContext {
+                    args: ::core::clone::Clone::clone(&self.args),
+                    contract: ::core::clone::Clone::clone(&self.contract),
+                    fn_name: ::core::clone::Clone::clone(&self.fn_name),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryContractContext {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::Vec<
+                        soroban_sdk::Val,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::Address as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::Symbol as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryContractContext {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryContractContext {
+            #[inline]
+            fn eq(&self, other: &ArbitraryContractContext) -> bool {
+                self.args == other.args
+                    && self.contract == other.contract
+                    && self.fn_name == other.fn_name
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryContractContext {
+            #[inline]
+            fn cmp(&self, other: &ArbitraryContractContext) -> ::core::cmp::Ordering {
+                match ::core::cmp::Ord::cmp(&self.args, &other.args) {
+                    ::core::cmp::Ordering::Equal => {
+                        match ::core::cmp::Ord::cmp(&self.contract, &other.contract) {
+                            ::core::cmp::Ordering::Equal => {
+                                ::core::cmp::Ord::cmp(&self.fn_name, &other.fn_name)
+                            }
+                            cmp => cmp,
+                        }
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryContractContext {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryContractContext,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                match ::core::cmp::PartialOrd::partial_cmp(&self.args, &other.args) {
+                    ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                        match ::core::cmp::PartialOrd::partial_cmp(&self.contract, &other.contract)
+                        {
+                            ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                                ::core::cmp::PartialOrd::partial_cmp(&self.fn_name, &other.fn_name)
+                            }
+                            cmp => cmp,
+                        }
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryContractContext: ::std::thread::LocalKey<
+                std::cell::Cell<u32>,
+            > = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryContractContext {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractContext.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitraryContractContext {
+                            args: arbitrary::Arbitrary::arbitrary(u)?,
+                            contract: arbitrary::Arbitrary::arbitrary(u)?,
+                            fn_name: arbitrary::Arbitrary::arbitrary(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractContext.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractContext.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitraryContractContext {
+                            args: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                            contract: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                            fn_name: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractContext.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::recursion_guard(depth, |depth| {
+                        arbitrary::size_hint::and_all(
+                            &[
+                                <<soroban_sdk::Vec<
+                                    soroban_sdk::Val,
+                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                                <<soroban_sdk::Address as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                                <<soroban_sdk::Symbol as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                            ],
+                        )
+                    })
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for ContractContext {
+            type Prototype = ArbitraryContractContext;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryContractContext> for ContractContext {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryContractContext,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(ContractContext {
+                    args: soroban_sdk::IntoVal::into_val(&v.args, env),
+                    contract: soroban_sdk::IntoVal::into_val(&v.contract, env),
+                    fn_name: soroban_sdk::IntoVal::into_val(&v.fn_name, env),
+                })
+            }
+        }
+    };
+    pub struct SubContractInvocation {
+        pub context: ContractContext,
+        pub sub_invocations: soroban_sdk::Vec<InvokerContractAuthEntry>,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for SubContractInvocation {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field2_finish(
+                f,
+                "SubContractInvocation",
+                "context",
+                &self.context,
+                "sub_invocations",
+                &&self.sub_invocations,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for SubContractInvocation {
+        #[inline]
+        fn clone(&self) -> SubContractInvocation {
+            SubContractInvocation {
+                context: ::core::clone::Clone::clone(&self.context),
+                sub_invocations: ::core::clone::Clone::clone(&self.sub_invocations),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for SubContractInvocation {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<ContractContext>;
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::Vec<InvokerContractAuthEntry>>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for SubContractInvocation {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for SubContractInvocation {
+        #[inline]
+        fn eq(&self, other: &SubContractInvocation) -> bool {
+            self.context == other.context && self.sub_invocations == other.sub_invocations
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for SubContractInvocation {
+        #[inline]
+        fn cmp(&self, other: &SubContractInvocation) -> ::core::cmp::Ordering {
+            match ::core::cmp::Ord::cmp(&self.context, &other.context) {
+                ::core::cmp::Ordering::Equal => {
+                    ::core::cmp::Ord::cmp(&self.sub_invocations, &other.sub_invocations)
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for SubContractInvocation {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &SubContractInvocation,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            match ::core::cmp::PartialOrd::partial_cmp(&self.context, &other.context) {
+                ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                    ::core::cmp::PartialOrd::partial_cmp(
+                        &self.sub_invocations,
+                        &other.sub_invocations,
+                    )
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_SUBCONTRACTINVOCATION: [u8; 144usize] =
+        SubContractInvocation::spec_xdr();
+    impl SubContractInvocation {
+        pub const fn spec_xdr() -> [u8; 144usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x15SubContractInvocation\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x07context\0\0\0\x07\xd0\0\0\0\x0fContractContext\0\0\0\0\0\0\0\0\x0fsub_invocations\0\0\0\x03\xea\0\0\x07\xd0\0\0\0\x18InvokerContractAuthEntry"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for SubContractInvocation {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <ContractContext as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::Vec<
+                InvokerContractAuthEntry,
+            > as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for SubContractInvocation {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+            const KEYS: [&'static str; 2usize] = ["context", "sub_invocations"];
+            let mut vals: [Val; 2usize] = [Val::VOID.to_val(); 2usize];
+            let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+            env.map_unpack_to_slice(map, &KEYS, &mut vals)
+                .map_err(|_| ConversionError)?;
+            Ok(Self {
+                context: vals[0]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+                sub_invocations: vals[1]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, SubContractInvocation> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &SubContractInvocation,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+            const KEYS: [&'static str; 2usize] = ["context", "sub_invocations"];
+            let vals: [Val; 2usize] = [
+                (&val.context)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+                (&val.sub_invocations)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+            ];
+            Ok(env
+                .map_new_from_slices(&KEYS, &vals)
+                .map_err(|_| ConversionError)?
+                .into())
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &SubContractInvocation> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&SubContractInvocation,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, SubContractInvocation>>::try_from_val(
+                env, *val,
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap> for SubContractInvocation {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScMap,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let map = val;
+            if map.len() != 2usize {
+                return Err(soroban_sdk::xdr::Error::Invalid);
+            }
+            map.validate()?;
+            Ok(Self {
+                context: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "context"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+                sub_invocations: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "sub_invocations"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for SubContractInvocation {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&SubContractInvocation> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &SubContractInvocation) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            use soroban_sdk::TryFromVal;
+            soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "context"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.context)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "sub_invocations"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.sub_invocations)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+            ])))
+        }
+    }
+    impl TryFrom<SubContractInvocation> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: SubContractInvocation) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&SubContractInvocation> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &SubContractInvocation) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<SubContractInvocation> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: SubContractInvocation) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub struct ArbitrarySubContractInvocation {
+            context: <ContractContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            sub_invocations: <soroban_sdk::Vec<
+                InvokerContractAuthEntry,
+            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitrarySubContractInvocation {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                ::core::fmt::Formatter::debug_struct_field2_finish(
+                    f,
+                    "ArbitrarySubContractInvocation",
+                    "context",
+                    &self.context,
+                    "sub_invocations",
+                    &&self.sub_invocations,
+                )
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitrarySubContractInvocation {
+            #[inline]
+            fn clone(&self) -> ArbitrarySubContractInvocation {
+                ArbitrarySubContractInvocation {
+                    context: ::core::clone::Clone::clone(&self.context),
+                    sub_invocations: ::core::clone::Clone::clone(&self.sub_invocations),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitrarySubContractInvocation {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <ContractContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::Vec<
+                        InvokerContractAuthEntry,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitrarySubContractInvocation {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitrarySubContractInvocation {
+            #[inline]
+            fn eq(&self, other: &ArbitrarySubContractInvocation) -> bool {
+                self.context == other.context && self.sub_invocations == other.sub_invocations
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitrarySubContractInvocation {
+            #[inline]
+            fn cmp(&self, other: &ArbitrarySubContractInvocation) -> ::core::cmp::Ordering {
+                match ::core::cmp::Ord::cmp(&self.context, &other.context) {
+                    ::core::cmp::Ordering::Equal => {
+                        ::core::cmp::Ord::cmp(&self.sub_invocations, &other.sub_invocations)
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitrarySubContractInvocation {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitrarySubContractInvocation,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                match ::core::cmp::PartialOrd::partial_cmp(&self.context, &other.context) {
+                    ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                        ::core::cmp::PartialOrd::partial_cmp(
+                            &self.sub_invocations,
+                            &other.sub_invocations,
+                        )
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitrarySubContractInvocation: ::std::thread::LocalKey<
+                std::cell::Cell<u32>,
+            > = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitrarySubContractInvocation {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitrarySubContractInvocation.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitrarySubContractInvocation {
+                            context: arbitrary::Arbitrary::arbitrary(u)?,
+                            sub_invocations: arbitrary::Arbitrary::arbitrary(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitrarySubContractInvocation.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitrarySubContractInvocation.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitrarySubContractInvocation {
+                            context: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                            sub_invocations: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitrarySubContractInvocation.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::recursion_guard(depth, |depth| {
+                        arbitrary::size_hint::and_all(
+                            &[
+                                <<ContractContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                                <<soroban_sdk::Vec<
+                                    InvokerContractAuthEntry,
+                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                            ],
+                        )
+                    })
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for SubContractInvocation {
+            type Prototype = ArbitrarySubContractInvocation;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitrarySubContractInvocation>
+            for SubContractInvocation
+        {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitrarySubContractInvocation,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(SubContractInvocation {
+                    context: soroban_sdk::IntoVal::into_val(&v.context, env),
+                    sub_invocations: soroban_sdk::IntoVal::into_val(&v.sub_invocations, env),
+                })
+            }
+        }
+    };
+    pub struct CreateContractHostFnContext {
+        pub executable: ContractExecutable,
+        pub salt: soroban_sdk::BytesN<32>,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for CreateContractHostFnContext {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field2_finish(
+                f,
+                "CreateContractHostFnContext",
+                "executable",
+                &self.executable,
+                "salt",
+                &&self.salt,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for CreateContractHostFnContext {
+        #[inline]
+        fn clone(&self) -> CreateContractHostFnContext {
+            CreateContractHostFnContext {
+                executable: ::core::clone::Clone::clone(&self.executable),
+                salt: ::core::clone::Clone::clone(&self.salt),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for CreateContractHostFnContext {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<ContractExecutable>;
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::BytesN<32>>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for CreateContractHostFnContext {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for CreateContractHostFnContext {
+        #[inline]
+        fn eq(&self, other: &CreateContractHostFnContext) -> bool {
+            self.executable == other.executable && self.salt == other.salt
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for CreateContractHostFnContext {
+        #[inline]
+        fn cmp(&self, other: &CreateContractHostFnContext) -> ::core::cmp::Ordering {
+            match ::core::cmp::Ord::cmp(&self.executable, &other.executable) {
+                ::core::cmp::Ordering::Equal => ::core::cmp::Ord::cmp(&self.salt, &other.salt),
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for CreateContractHostFnContext {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &CreateContractHostFnContext,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            match ::core::cmp::PartialOrd::partial_cmp(&self.executable, &other.executable) {
+                ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                    ::core::cmp::PartialOrd::partial_cmp(&self.salt, &other.salt)
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_CREATECONTRACTHOSTFNCONTEXT: [u8; 116usize] =
+        CreateContractHostFnContext::spec_xdr();
+    impl CreateContractHostFnContext {
+        pub const fn spec_xdr() -> [u8; 116usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x1bCreateContractHostFnContext\0\0\0\0\x02\0\0\0\0\0\0\0\nexecutable\0\0\0\0\x07\xd0\0\0\0\x12ContractExecutable\0\0\0\0\0\0\0\0\0\x04salt\0\0\x03\xee\0\0\0 "
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for CreateContractHostFnContext {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <ContractExecutable as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::BytesN<32> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for CreateContractHostFnContext {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+            const KEYS: [&'static str; 2usize] = ["executable", "salt"];
+            let mut vals: [Val; 2usize] = [Val::VOID.to_val(); 2usize];
+            let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+            env.map_unpack_to_slice(map, &KEYS, &mut vals)
+                .map_err(|_| ConversionError)?;
+            Ok(Self {
+                executable: vals[0]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+                salt: vals[1]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, CreateContractHostFnContext> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &CreateContractHostFnContext,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+            const KEYS: [&'static str; 2usize] = ["executable", "salt"];
+            let vals: [Val; 2usize] = [
+                (&val.executable)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+                (&val.salt).try_into_val(env).map_err(|_| ConversionError)?,
+            ];
+            Ok(env
+                .map_new_from_slices(&KEYS, &vals)
+                .map_err(|_| ConversionError)?
+                .into())
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &CreateContractHostFnContext> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&CreateContractHostFnContext,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<
+                soroban_sdk::Env,
+                CreateContractHostFnContext,
+            >>::try_from_val(env, *val)
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap>
+        for CreateContractHostFnContext
+    {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScMap,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let map = val;
+            if map.len() != 2usize {
+                return Err(soroban_sdk::xdr::Error::Invalid);
+            }
+            map.validate()?;
+            Ok(Self {
+                executable: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "executable"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+                salt: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "salt"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal>
+        for CreateContractHostFnContext
+    {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&CreateContractHostFnContext> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &CreateContractHostFnContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            use soroban_sdk::TryFromVal;
+            soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "executable"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.executable)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "salt"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.salt)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+            ])))
+        }
+    }
+    impl TryFrom<CreateContractHostFnContext> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: CreateContractHostFnContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&CreateContractHostFnContext> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &CreateContractHostFnContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<CreateContractHostFnContext> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: CreateContractHostFnContext) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub struct ArbitraryCreateContractHostFnContext {
+            executable: <ContractExecutable as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            salt: <soroban_sdk::BytesN<
+                32,
+            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryCreateContractHostFnContext {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                ::core::fmt::Formatter::debug_struct_field2_finish(
+                    f,
+                    "ArbitraryCreateContractHostFnContext",
+                    "executable",
+                    &self.executable,
+                    "salt",
+                    &&self.salt,
+                )
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryCreateContractHostFnContext {
+            #[inline]
+            fn clone(&self) -> ArbitraryCreateContractHostFnContext {
+                ArbitraryCreateContractHostFnContext {
+                    executable: ::core::clone::Clone::clone(&self.executable),
+                    salt: ::core::clone::Clone::clone(&self.salt),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryCreateContractHostFnContext {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <ContractExecutable as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::BytesN<
+                        32,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryCreateContractHostFnContext {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryCreateContractHostFnContext {
+            #[inline]
+            fn eq(&self, other: &ArbitraryCreateContractHostFnContext) -> bool {
+                self.executable == other.executable && self.salt == other.salt
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryCreateContractHostFnContext {
+            #[inline]
+            fn cmp(&self, other: &ArbitraryCreateContractHostFnContext) -> ::core::cmp::Ordering {
+                match ::core::cmp::Ord::cmp(&self.executable, &other.executable) {
+                    ::core::cmp::Ordering::Equal => ::core::cmp::Ord::cmp(&self.salt, &other.salt),
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryCreateContractHostFnContext {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryCreateContractHostFnContext,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                match ::core::cmp::PartialOrd::partial_cmp(&self.executable, &other.executable) {
+                    ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                        ::core::cmp::PartialOrd::partial_cmp(&self.salt, &other.salt)
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryCreateContractHostFnContext: ::std::thread::LocalKey<
+                std::cell::Cell<u32>,
+            > = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryCreateContractHostFnContext {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractHostFnContext.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitraryCreateContractHostFnContext {
+                            executable: arbitrary::Arbitrary::arbitrary(u)?,
+                            salt: arbitrary::Arbitrary::arbitrary(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractHostFnContext.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractHostFnContext.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitraryCreateContractHostFnContext {
+                            executable: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                            salt: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractHostFnContext.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::recursion_guard(depth, |depth| {
+                        arbitrary::size_hint::and_all(
+                            &[
+                                <<ContractExecutable as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                                <<soroban_sdk::BytesN<
+                                    32,
+                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                            ],
+                        )
+                    })
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for CreateContractHostFnContext {
+            type Prototype = ArbitraryCreateContractHostFnContext;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryCreateContractHostFnContext>
+            for CreateContractHostFnContext
+        {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryCreateContractHostFnContext,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(CreateContractHostFnContext {
+                    executable: soroban_sdk::IntoVal::into_val(&v.executable, env),
+                    salt: soroban_sdk::IntoVal::into_val(&v.salt, env),
+                })
+            }
+        }
+    };
+    pub struct CreateContractWithConstructorHostFnContext {
+        pub constructor_args: soroban_sdk::Vec<soroban_sdk::Val>,
+        pub executable: ContractExecutable,
+        pub salt: soroban_sdk::BytesN<32>,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for CreateContractWithConstructorHostFnContext {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::debug_struct_field3_finish(
+                f,
+                "CreateContractWithConstructorHostFnContext",
+                "constructor_args",
+                &self.constructor_args,
+                "executable",
+                &self.executable,
+                "salt",
+                &&self.salt,
+            )
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for CreateContractWithConstructorHostFnContext {
+        #[inline]
+        fn clone(&self) -> CreateContractWithConstructorHostFnContext {
+            CreateContractWithConstructorHostFnContext {
+                constructor_args: ::core::clone::Clone::clone(&self.constructor_args),
+                executable: ::core::clone::Clone::clone(&self.executable),
+                salt: ::core::clone::Clone::clone(&self.salt),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for CreateContractWithConstructorHostFnContext {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::Vec<soroban_sdk::Val>>;
+            let _: ::core::cmp::AssertParamIsEq<ContractExecutable>;
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::BytesN<32>>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for CreateContractWithConstructorHostFnContext {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for CreateContractWithConstructorHostFnContext {
+        #[inline]
+        fn eq(&self, other: &CreateContractWithConstructorHostFnContext) -> bool {
+            self.constructor_args == other.constructor_args
+                && self.executable == other.executable
+                && self.salt == other.salt
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for CreateContractWithConstructorHostFnContext {
+        #[inline]
+        fn cmp(&self, other: &CreateContractWithConstructorHostFnContext) -> ::core::cmp::Ordering {
+            match ::core::cmp::Ord::cmp(&self.constructor_args, &other.constructor_args) {
+                ::core::cmp::Ordering::Equal => {
+                    match ::core::cmp::Ord::cmp(&self.executable, &other.executable) {
+                        ::core::cmp::Ordering::Equal => {
+                            ::core::cmp::Ord::cmp(&self.salt, &other.salt)
+                        }
+                        cmp => cmp,
+                    }
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for CreateContractWithConstructorHostFnContext {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &CreateContractWithConstructorHostFnContext,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            match ::core::cmp::PartialOrd::partial_cmp(
+                &self.constructor_args,
+                &other.constructor_args,
+            ) {
+                ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                    match ::core::cmp::PartialOrd::partial_cmp(&self.executable, &other.executable)
+                    {
+                        ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                            ::core::cmp::PartialOrd::partial_cmp(&self.salt, &other.salt)
+                        }
+                        cmp => cmp,
+                    }
+                }
+                cmp => cmp,
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_CREATECONTRACTWITHCONSTRUCTORHOSTFNCONTEXT: [u8; 164usize] =
+        CreateContractWithConstructorHostFnContext::spec_xdr();
+    impl CreateContractWithConstructorHostFnContext {
+        pub const fn spec_xdr() -> [u8; 164usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0*CreateContractWithConstructorHostFnContext\0\0\0\0\0\x03\0\0\0\0\0\0\0\x10constructor_args\0\0\x03\xea\0\0\0\0\0\0\0\0\0\0\0\nexecutable\0\0\0\0\x07\xd0\0\0\0\x12ContractExecutable\0\0\0\0\0\0\0\0\0\x04salt\0\0\x03\xee\0\0\0 "
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for CreateContractWithConstructorHostFnContext {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Vec<
+                soroban_sdk::Val,
+            > as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <ContractExecutable as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::BytesN<32> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>
+        for CreateContractWithConstructorHostFnContext
+    {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, MapObject, TryIntoVal, Val};
+            const KEYS: [&'static str; 3usize] = ["constructor_args", "executable", "salt"];
+            let mut vals: [Val; 3usize] = [Val::VOID.to_val(); 3usize];
+            let map: MapObject = val.try_into().map_err(|_| ConversionError)?;
+            env.map_unpack_to_slice(map, &KEYS, &mut vals)
+                .map_err(|_| ConversionError)?;
+            Ok(Self {
+                constructor_args: vals[0]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+                executable: vals[1]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+                salt: vals[2]
+                    .try_into_val(env)
+                    .map_err(|_| soroban_sdk::ConversionError)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, CreateContractWithConstructorHostFnContext>
+        for soroban_sdk::Val
+    {
+        type Error = soroban_sdk::ConversionError;
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &CreateContractWithConstructorHostFnContext,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{ConversionError, EnvBase, TryIntoVal, Val};
+            const KEYS: [&'static str; 3usize] = ["constructor_args", "executable", "salt"];
+            let vals: [Val; 3usize] = [
+                (&val.constructor_args)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+                (&val.executable)
+                    .try_into_val(env)
+                    .map_err(|_| ConversionError)?,
+                (&val.salt).try_into_val(env).map_err(|_| ConversionError)?,
+            ];
+            Ok(env
+                .map_new_from_slices(&KEYS, &vals)
+                .map_err(|_| ConversionError)?
+                .into())
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &CreateContractWithConstructorHostFnContext>
+        for soroban_sdk::Val
+    {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&CreateContractWithConstructorHostFnContext,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<
+                soroban_sdk::Env,
+                CreateContractWithConstructorHostFnContext,
+            >>::try_from_val(env, *val)
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScMap>
+        for CreateContractWithConstructorHostFnContext
+    {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScMap,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let map = val;
+            if map.len() != 3usize {
+                return Err(soroban_sdk::xdr::Error::Invalid);
+            }
+            map.validate()?;
+            Ok(Self {
+                constructor_args: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "constructor_args"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+                executable: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "executable"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+                salt: {
+                    let key: soroban_sdk::xdr::ScVal = soroban_sdk::xdr::ScSymbol(
+                        "salt"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into();
+                    let idx = map
+                        .binary_search_by_key(&key, |entry| entry.key.clone())
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    let rv: soroban_sdk::Val = (&map[idx].val.clone())
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    rv.try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                },
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal>
+        for CreateContractWithConstructorHostFnContext
+    {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Map(Some(map)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, map)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&CreateContractWithConstructorHostFnContext> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(
+            val: &CreateContractWithConstructorHostFnContext,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            use soroban_sdk::TryFromVal;
+            soroban_sdk::xdr::ScMap::sorted_from(<[_]>::into_vec(::alloc::boxed::box_new([
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "constructor_args"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.constructor_args)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "executable"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.executable)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+                soroban_sdk::xdr::ScMapEntry {
+                    key: soroban_sdk::xdr::ScSymbol(
+                        "salt"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                    .into(),
+                    val: (&val.salt)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                },
+            ])))
+        }
+    }
+    impl TryFrom<CreateContractWithConstructorHostFnContext> for soroban_sdk::xdr::ScMap {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(
+            val: CreateContractWithConstructorHostFnContext,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&CreateContractWithConstructorHostFnContext> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(
+            val: &CreateContractWithConstructorHostFnContext,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Map(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<CreateContractWithConstructorHostFnContext> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(
+            val: CreateContractWithConstructorHostFnContext,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub struct ArbitraryCreateContractWithConstructorHostFnContext {
+            constructor_args: <soroban_sdk::Vec<
+                soroban_sdk::Val,
+            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            executable: <ContractExecutable as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            salt: <soroban_sdk::BytesN<
+                32,
+            > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryCreateContractWithConstructorHostFnContext {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                ::core::fmt::Formatter::debug_struct_field3_finish(
+                    f,
+                    "ArbitraryCreateContractWithConstructorHostFnContext",
+                    "constructor_args",
+                    &self.constructor_args,
+                    "executable",
+                    &self.executable,
+                    "salt",
+                    &&self.salt,
+                )
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryCreateContractWithConstructorHostFnContext {
+            #[inline]
+            fn clone(&self) -> ArbitraryCreateContractWithConstructorHostFnContext {
+                ArbitraryCreateContractWithConstructorHostFnContext {
+                    constructor_args: ::core::clone::Clone::clone(&self.constructor_args),
+                    executable: ::core::clone::Clone::clone(&self.executable),
+                    salt: ::core::clone::Clone::clone(&self.salt),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryCreateContractWithConstructorHostFnContext {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::Vec<
+                        soroban_sdk::Val,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <ContractExecutable as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::BytesN<
+                        32,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryCreateContractWithConstructorHostFnContext {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryCreateContractWithConstructorHostFnContext {
+            #[inline]
+            fn eq(&self, other: &ArbitraryCreateContractWithConstructorHostFnContext) -> bool {
+                self.constructor_args == other.constructor_args
+                    && self.executable == other.executable
+                    && self.salt == other.salt
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryCreateContractWithConstructorHostFnContext {
+            #[inline]
+            fn cmp(
+                &self,
+                other: &ArbitraryCreateContractWithConstructorHostFnContext,
+            ) -> ::core::cmp::Ordering {
+                match ::core::cmp::Ord::cmp(&self.constructor_args, &other.constructor_args) {
+                    ::core::cmp::Ordering::Equal => {
+                        match ::core::cmp::Ord::cmp(&self.executable, &other.executable) {
+                            ::core::cmp::Ordering::Equal => {
+                                ::core::cmp::Ord::cmp(&self.salt, &other.salt)
+                            }
+                            cmp => cmp,
+                        }
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryCreateContractWithConstructorHostFnContext {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryCreateContractWithConstructorHostFnContext,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                match ::core::cmp::PartialOrd::partial_cmp(
+                    &self.constructor_args,
+                    &other.constructor_args,
+                ) {
+                    ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                        match ::core::cmp::PartialOrd::partial_cmp(
+                            &self.executable,
+                            &other.executable,
+                        ) {
+                            ::core::option::Option::Some(::core::cmp::Ordering::Equal) => {
+                                ::core::cmp::PartialOrd::partial_cmp(&self.salt, &other.salt)
+                            }
+                            cmp => cmp,
+                        }
+                    }
+                    cmp => cmp,
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryCreateContractWithConstructorHostFnContext:
+                ::std::thread::LocalKey<std::cell::Cell<u32>> = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary>
+                for ArbitraryCreateContractWithConstructorHostFnContext
+            {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractWithConstructorHostFnContext.with(
+                            |count| {
+                                if count.get() > 0 {
+                                    return Err(arbitrary::Error::NotEnoughData);
+                                }
+                                count.set(count.get() + 1);
+                                Ok(())
+                            },
+                        )?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitraryCreateContractWithConstructorHostFnContext {
+                            constructor_args: arbitrary::Arbitrary::arbitrary(u)?,
+                            executable: arbitrary::Arbitrary::arbitrary(u)?,
+                            salt: arbitrary::Arbitrary::arbitrary(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractWithConstructorHostFnContext.with(
+                            |count| {
+                                count.set(count.get() - 1);
+                            },
+                        );
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractWithConstructorHostFnContext.with(
+                            |count| {
+                                if count.get() > 0 {
+                                    return Err(arbitrary::Error::NotEnoughData);
+                                }
+                                count.set(count.get() + 1);
+                                Ok(())
+                            },
+                        )?;
+                    }
+                    let result = (|| {
+                        Ok(ArbitraryCreateContractWithConstructorHostFnContext {
+                            constructor_args: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                            executable: arbitrary::Arbitrary::arbitrary(&mut u)?,
+                            salt: arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                        })
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryCreateContractWithConstructorHostFnContext.with(
+                            |count| {
+                                count.set(count.get() - 1);
+                            },
+                        );
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::recursion_guard(depth, |depth| {
+                        arbitrary::size_hint::and_all(
+                            &[
+                                <<soroban_sdk::Vec<
+                                    soroban_sdk::Val,
+                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                                <<ContractExecutable as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                                <<soroban_sdk::BytesN<
+                                    32,
+                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                    depth,
+                                ),
+                            ],
+                        )
+                    })
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary
+            for CreateContractWithConstructorHostFnContext
+        {
+            type Prototype = ArbitraryCreateContractWithConstructorHostFnContext;
+        }
+        impl
+            soroban_sdk::TryFromVal<
+                soroban_sdk::Env,
+                ArbitraryCreateContractWithConstructorHostFnContext,
+            > for CreateContractWithConstructorHostFnContext
+        {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryCreateContractWithConstructorHostFnContext,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(CreateContractWithConstructorHostFnContext {
+                    constructor_args: soroban_sdk::IntoVal::into_val(&v.constructor_args, env),
+                    executable: soroban_sdk::IntoVal::into_val(&v.executable, env),
+                    salt: soroban_sdk::IntoVal::into_val(&v.salt, env),
+                })
+            }
+        }
+    };
     pub struct StructA {
         pub f1: u32,
         pub f2: bool,
@@ -9271,6 +14862,20 @@ mod wasm_imported {
                 }
                 cmp => cmp,
             }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_STRUCTA: [u8; 60usize] = StructA::spec_xdr();
+    impl StructA {
+        pub const fn spec_xdr() -> [u8; 60usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x07StructA\0\0\0\0\x02\0\0\0\0\0\0\0\x02f1\0\0\0\0\0\x04\0\0\0\0\0\0\0\x02f2\0\0\0\0\0\x01"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for StructA {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <bool as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         }
     }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for StructA {
@@ -9699,6 +15304,20 @@ mod wasm_imported {
             }
         }
     }
+    pub static __SPEC_XDR_TYPE_STRUCTB: [u8; 60usize] = StructB::spec_xdr();
+    impl StructB {
+        pub const fn spec_xdr() -> [u8; 60usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x07StructB\0\0\0\0\x02\0\0\0\0\0\0\0\x02f1\0\0\0\0\0\x07\0\0\0\0\0\0\0\x02f2\0\0\0\0\0\x10"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for StructB {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::String as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for StructB {
         type Error = soroban_sdk::ConversionError;
         fn try_from_val(
@@ -10123,6 +15742,20 @@ mod wasm_imported {
                 }
                 cmp => cmp,
             }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_STRUCTC: [u8; 64usize] = StructC::spec_xdr();
+    impl StructC {
+        pub const fn spec_xdr() -> [u8; 64usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x07StructC\0\0\0\0\x02\0\0\0\0\0\0\0\x02f1\0\0\0\0\x03\xea\0\0\0\x04\0\0\0\0\0\0\0\x02f2\0\0\0\0\0\x13"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for StructC {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Vec<u32> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::Address as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         }
     }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for StructC {
@@ -10554,6 +16187,20 @@ mod wasm_imported {
             }
         }
     }
+    pub static __SPEC_XDR_TYPE_STRUCTTUPLEA: [u8; 64usize] = StructTupleA::spec_xdr();
+    impl StructTupleA {
+        pub const fn spec_xdr() -> [u8; 64usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0cStructTupleA\0\0\0\x02\0\0\0\0\0\0\0\x010\0\0\0\0\0\0\x07\0\0\0\0\0\0\0\x011\0\0\0\0\0\0\x07"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for StructTupleA {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for StructTupleA {
         type Error = soroban_sdk::ConversionError;
         #[inline(always)]
@@ -10943,6 +16590,20 @@ mod wasm_imported {
                 }
                 cmp => cmp,
             }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_STRUCTTUPLEB: [u8; 64usize] = StructTupleB::spec_xdr();
+    impl StructTupleB {
+        pub const fn spec_xdr() -> [u8; 64usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0cStructTupleB\0\0\0\x02\0\0\0\0\0\0\0\x010\0\0\0\0\0\0\n\0\0\0\0\0\0\0\x011\0\0\0\0\0\0\n"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for StructTupleB {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <u128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <u128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         }
     }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for StructTupleB {
@@ -11337,6 +16998,20 @@ mod wasm_imported {
             }
         }
     }
+    pub static __SPEC_XDR_TYPE_STRUCTTUPLEC: [u8; 64usize] = StructTupleC::spec_xdr();
+    impl StructTupleC {
+        pub const fn spec_xdr() -> [u8; 64usize] {
+            *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0cStructTupleC\0\0\0\x02\0\0\0\0\0\0\0\x010\0\0\0\0\0\0\x13\0\0\0\0\0\0\0\x011\0\0\0\0\0\0\x0b"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for StructTupleC {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Address as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <i128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for StructTupleC {
         type Error = soroban_sdk::ConversionError;
         #[inline(always)]
@@ -11667,6 +17342,2527 @@ mod wasm_imported {
             }
         }
     };
+    pub enum Context {
+        Contract(ContractContext),
+        CreateContractHostFn(CreateContractHostFnContext),
+        CreateContractWithCtorHostFn(CreateContractWithConstructorHostFnContext),
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for Context {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            match self {
+                Context::Contract(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Contract", &__self_0)
+                }
+                Context::CreateContractHostFn(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(
+                        f,
+                        "CreateContractHostFn",
+                        &__self_0,
+                    )
+                }
+                Context::CreateContractWithCtorHostFn(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(
+                        f,
+                        "CreateContractWithCtorHostFn",
+                        &__self_0,
+                    )
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for Context {
+        #[inline]
+        fn clone(&self) -> Context {
+            match self {
+                Context::Contract(__self_0) => {
+                    Context::Contract(::core::clone::Clone::clone(__self_0))
+                }
+                Context::CreateContractHostFn(__self_0) => {
+                    Context::CreateContractHostFn(::core::clone::Clone::clone(__self_0))
+                }
+                Context::CreateContractWithCtorHostFn(__self_0) => {
+                    Context::CreateContractWithCtorHostFn(::core::clone::Clone::clone(__self_0))
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for Context {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<ContractContext>;
+            let _: ::core::cmp::AssertParamIsEq<CreateContractHostFnContext>;
+            let _: ::core::cmp::AssertParamIsEq<CreateContractWithConstructorHostFnContext>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for Context {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for Context {
+        #[inline]
+        fn eq(&self, other: &Context) -> bool {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            __self_discr == __arg1_discr
+                && match (self, other) {
+                    (Context::Contract(__self_0), Context::Contract(__arg1_0)) => {
+                        __self_0 == __arg1_0
+                    }
+                    (
+                        Context::CreateContractHostFn(__self_0),
+                        Context::CreateContractHostFn(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    (
+                        Context::CreateContractWithCtorHostFn(__self_0),
+                        Context::CreateContractWithCtorHostFn(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    _ => unsafe { ::core::intrinsics::unreachable() },
+                }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for Context {
+        #[inline]
+        fn cmp(&self, other: &Context) -> ::core::cmp::Ordering {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                ::core::cmp::Ordering::Equal => match (self, other) {
+                    (Context::Contract(__self_0), Context::Contract(__arg1_0)) => {
+                        ::core::cmp::Ord::cmp(__self_0, __arg1_0)
+                    }
+                    (
+                        Context::CreateContractHostFn(__self_0),
+                        Context::CreateContractHostFn(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    (
+                        Context::CreateContractWithCtorHostFn(__self_0),
+                        Context::CreateContractWithCtorHostFn(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    _ => unsafe { ::core::intrinsics::unreachable() },
+                },
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for Context {
+        #[inline]
+        fn partial_cmp(&self, other: &Context) -> ::core::option::Option<::core::cmp::Ordering> {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match (self, other) {
+                (Context::Contract(__self_0), Context::Contract(__arg1_0)) => {
+                    ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0)
+                }
+                (
+                    Context::CreateContractHostFn(__self_0),
+                    Context::CreateContractHostFn(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                (
+                    Context::CreateContractWithCtorHostFn(__self_0),
+                    Context::CreateContractWithCtorHostFn(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_CONTEXT: [u8; 244usize] = Context::spec_xdr();
+    impl Context {
+        pub const fn spec_xdr() -> [u8; 244usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x07Context\0\0\0\0\x03\0\0\0\x01\0\0\0\0\0\0\0\x08Contract\0\0\0\x01\0\0\x07\xd0\0\0\0\x0fContractContext\0\0\0\0\x01\0\0\0\0\0\0\0\x14CreateContractHostFn\0\0\0\x01\0\0\x07\xd0\0\0\0\x1bCreateContractHostFnContext\0\0\0\0\x01\0\0\0\0\0\0\0\x1cCreateContractWithCtorHostFn\0\0\0\x01\0\0\x07\xd0\0\0\0*CreateContractWithConstructorHostFnContext\0\0"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for Context {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <ContractContext as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <CreateContractHostFnContext as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <CreateContractWithConstructorHostFnContext as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for Context {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{EnvBase, TryFromVal, TryIntoVal};
+            const CASES: &'static [&'static str] = &[
+                "Contract",
+                "CreateContractHostFn",
+                "CreateContractWithCtorHostFn",
+            ];
+            let vec: soroban_sdk::Vec<soroban_sdk::Val> = val.try_into_val(env)?;
+            let mut iter = vec.try_iter();
+            let discriminant: soroban_sdk::Symbol = iter
+                .next()
+                .ok_or(soroban_sdk::ConversionError)??
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?;
+            Ok(
+                match u32::from(env.symbol_index_in_strs(discriminant.to_symbol_val(), CASES)?)
+                    as usize
+                {
+                    0 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::Contract(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    1 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::CreateContractHostFn(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    2 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::CreateContractWithCtorHostFn(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    _ => Err(soroban_sdk::ConversionError {})?,
+                },
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, Context> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &Context,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{TryFromVal, TryIntoVal};
+            match val {
+                Context::Contract(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"Contract")?.to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+                Context::CreateContractHostFn(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"CreateContractHostFn")?.to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+                Context::CreateContractWithCtorHostFn(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"CreateContractWithCtorHostFn")?
+                            .to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+            }
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &Context> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&Context,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, Context>>::try_from_val(env, *val)
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVec> for Context {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVec,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let vec = val;
+            let mut iter = vec.iter();
+            let discriminant: soroban_sdk::xdr::ScSymbol = iter
+                .next()
+                .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                .clone()
+                .try_into()
+                .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+            let discriminant_name: &str = &discriminant.to_utf8_string()?;
+            Ok(match discriminant_name {
+                "Contract" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::Contract(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                "CreateContractHostFn" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::CreateContractHostFn(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                "CreateContractWithCtorHostFn" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::CreateContractWithCtorHostFn(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                _ => Err(soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for Context {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Vec(Some(vec)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, vec)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&Context> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &Context) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            Ok(match val {
+                Context::Contract(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "Contract"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                Context::CreateContractHostFn(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "CreateContractHostFn"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                Context::CreateContractWithCtorHostFn(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "CreateContractWithCtorHostFn"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl TryFrom<Context> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: Context) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&Context> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &Context) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Vec(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<Context> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: Context) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub enum ArbitraryContext {
+            Contract(
+                <ContractContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+            CreateContractHostFn(
+                <CreateContractHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+            CreateContractWithCtorHostFn(
+                <CreateContractWithConstructorHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryContext {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    ArbitraryContext::Contract(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Contract", &__self_0)
+                    }
+                    ArbitraryContext::CreateContractHostFn(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(
+                            f,
+                            "CreateContractHostFn",
+                            &__self_0,
+                        )
+                    }
+                    ArbitraryContext::CreateContractWithCtorHostFn(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(
+                            f,
+                            "CreateContractWithCtorHostFn",
+                            &__self_0,
+                        )
+                    }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryContext {
+            #[inline]
+            fn clone(&self) -> ArbitraryContext {
+                match self {
+                    ArbitraryContext::Contract(__self_0) => {
+                        ArbitraryContext::Contract(::core::clone::Clone::clone(__self_0))
+                    }
+                    ArbitraryContext::CreateContractHostFn(__self_0) => {
+                        ArbitraryContext::CreateContractHostFn(::core::clone::Clone::clone(
+                            __self_0,
+                        ))
+                    }
+                    ArbitraryContext::CreateContractWithCtorHostFn(__self_0) => {
+                        ArbitraryContext::CreateContractWithCtorHostFn(::core::clone::Clone::clone(
+                            __self_0,
+                        ))
+                    }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryContext {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <ContractContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <CreateContractHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <CreateContractWithConstructorHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryContext {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryContext {
+            #[inline]
+            fn eq(&self, other: &ArbitraryContext) -> bool {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                __self_discr == __arg1_discr
+                    && match (self, other) {
+                        (
+                            ArbitraryContext::Contract(__self_0),
+                            ArbitraryContext::Contract(__arg1_0),
+                        ) => __self_0 == __arg1_0,
+                        (
+                            ArbitraryContext::CreateContractHostFn(__self_0),
+                            ArbitraryContext::CreateContractHostFn(__arg1_0),
+                        ) => __self_0 == __arg1_0,
+                        (
+                            ArbitraryContext::CreateContractWithCtorHostFn(__self_0),
+                            ArbitraryContext::CreateContractWithCtorHostFn(__arg1_0),
+                        ) => __self_0 == __arg1_0,
+                        _ => unsafe { ::core::intrinsics::unreachable() },
+                    }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryContext {
+            #[inline]
+            fn cmp(&self, other: &ArbitraryContext) -> ::core::cmp::Ordering {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                    ::core::cmp::Ordering::Equal => match (self, other) {
+                        (
+                            ArbitraryContext::Contract(__self_0),
+                            ArbitraryContext::Contract(__arg1_0),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        (
+                            ArbitraryContext::CreateContractHostFn(__self_0),
+                            ArbitraryContext::CreateContractHostFn(__arg1_0),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        (
+                            ArbitraryContext::CreateContractWithCtorHostFn(__self_0),
+                            ArbitraryContext::CreateContractWithCtorHostFn(__arg1_0),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        _ => unsafe { ::core::intrinsics::unreachable() },
+                    },
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryContext {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryContext,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                match (self, other) {
+                    (
+                        ArbitraryContext::Contract(__self_0),
+                        ArbitraryContext::Contract(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                    (
+                        ArbitraryContext::CreateContractHostFn(__self_0),
+                        ArbitraryContext::CreateContractHostFn(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                    (
+                        ArbitraryContext::CreateContractWithCtorHostFn(__self_0),
+                        ArbitraryContext::CreateContractWithCtorHostFn(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                    _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryContext: ::std::thread::LocalKey<std::cell::Cell<u32>> = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryContext {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContext.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(u)?) * 3u64)
+                                >> 32
+                            {
+                                0u64 => {
+                                    ArbitraryContext::Contract(arbitrary::Arbitrary::arbitrary(u)?)
+                                }
+                                1u64 => ArbitraryContext::CreateContractHostFn(
+                                    arbitrary::Arbitrary::arbitrary(u)?,
+                                ),
+                                2u64 => ArbitraryContext::CreateContractWithCtorHostFn(
+                                    arbitrary::Arbitrary::arbitrary(u)?,
+                                ),
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContext.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContext.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(&mut u)?)
+                                * 3u64)
+                                >> 32
+                            {
+                                0u64 => ArbitraryContext::Contract(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                1u64 => ArbitraryContext::CreateContractHostFn(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                2u64 => ArbitraryContext::CreateContractWithCtorHostFn(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContext.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::and(
+                        <u32 as arbitrary::Arbitrary>::size_hint(depth),
+                        arbitrary::size_hint::recursion_guard(depth, |depth| {
+                            arbitrary::size_hint::or_all(
+                                    &[
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<ContractContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<CreateContractHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<CreateContractWithConstructorHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                )
+                        }),
+                    )
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for Context {
+            type Prototype = ArbitraryContext;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryContext> for Context {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryContext,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(match v {
+                    ArbitraryContext::Contract(field_0) => {
+                        Context::Contract(soroban_sdk::IntoVal::into_val(field_0, env))
+                    }
+                    ArbitraryContext::CreateContractHostFn(field_0) => {
+                        Context::CreateContractHostFn(soroban_sdk::IntoVal::into_val(field_0, env))
+                    }
+                    ArbitraryContext::CreateContractWithCtorHostFn(field_0) => {
+                        Context::CreateContractWithCtorHostFn(soroban_sdk::IntoVal::into_val(
+                            field_0, env,
+                        ))
+                    }
+                })
+            }
+        }
+    };
+    pub enum ContractExecutable {
+        Wasm(soroban_sdk::BytesN<32>),
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for ContractExecutable {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            match self {
+                ContractExecutable::Wasm(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Wasm", &__self_0)
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for ContractExecutable {
+        #[inline]
+        fn clone(&self) -> ContractExecutable {
+            match self {
+                ContractExecutable::Wasm(__self_0) => {
+                    ContractExecutable::Wasm(::core::clone::Clone::clone(__self_0))
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for ContractExecutable {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::BytesN<32>>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for ContractExecutable {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for ContractExecutable {
+        #[inline]
+        fn eq(&self, other: &ContractExecutable) -> bool {
+            match (self, other) {
+                (ContractExecutable::Wasm(__self_0), ContractExecutable::Wasm(__arg1_0)) => {
+                    __self_0 == __arg1_0
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for ContractExecutable {
+        #[inline]
+        fn cmp(&self, other: &ContractExecutable) -> ::core::cmp::Ordering {
+            match (self, other) {
+                (ContractExecutable::Wasm(__self_0), ContractExecutable::Wasm(__arg1_0)) => {
+                    ::core::cmp::Ord::cmp(__self_0, __arg1_0)
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for ContractExecutable {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &ContractExecutable,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            match (self, other) {
+                (ContractExecutable::Wasm(__self_0), ContractExecutable::Wasm(__arg1_0)) => {
+                    ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0)
+                }
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_CONTRACTEXECUTABLE: [u8; 68usize] = ContractExecutable::spec_xdr();
+    impl ContractExecutable {
+        pub const fn spec_xdr() -> [u8; 68usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x12ContractExecutable\0\0\0\0\0\x01\0\0\0\x01\0\0\0\0\0\0\0\x04Wasm\0\0\0\x01\0\0\x03\xee\0\0\0 "
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for ContractExecutable {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::BytesN<32> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for ContractExecutable {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{EnvBase, TryFromVal, TryIntoVal};
+            const CASES: &'static [&'static str] = &["Wasm"];
+            let vec: soroban_sdk::Vec<soroban_sdk::Val> = val.try_into_val(env)?;
+            let mut iter = vec.try_iter();
+            let discriminant: soroban_sdk::Symbol = iter
+                .next()
+                .ok_or(soroban_sdk::ConversionError)??
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?;
+            Ok(
+                match u32::from(env.symbol_index_in_strs(discriminant.to_symbol_val(), CASES)?)
+                    as usize
+                {
+                    0 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::Wasm(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    _ => Err(soroban_sdk::ConversionError {})?,
+                },
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, ContractExecutable> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &ContractExecutable,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{TryFromVal, TryIntoVal};
+            match val {
+                ContractExecutable::Wasm(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"Wasm")?.to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+            }
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &ContractExecutable> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&ContractExecutable,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, ContractExecutable>>::try_from_val(
+                env, *val,
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVec> for ContractExecutable {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVec,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let vec = val;
+            let mut iter = vec.iter();
+            let discriminant: soroban_sdk::xdr::ScSymbol = iter
+                .next()
+                .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                .clone()
+                .try_into()
+                .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+            let discriminant_name: &str = &discriminant.to_utf8_string()?;
+            Ok(match discriminant_name {
+                "Wasm" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::Wasm(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                _ => Err(soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for ContractExecutable {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Vec(Some(vec)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, vec)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&ContractExecutable> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &ContractExecutable) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            Ok(match val {
+                ContractExecutable::Wasm(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "Wasm"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl TryFrom<ContractExecutable> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: ContractExecutable) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&ContractExecutable> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &ContractExecutable) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Vec(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<ContractExecutable> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: ContractExecutable) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub enum ArbitraryContractExecutable {
+            Wasm(
+                <soroban_sdk::BytesN<
+                    32,
+                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryContractExecutable {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    ArbitraryContractExecutable::Wasm(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Wasm", &__self_0)
+                    }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryContractExecutable {
+            #[inline]
+            fn clone(&self) -> ArbitraryContractExecutable {
+                match self {
+                    ArbitraryContractExecutable::Wasm(__self_0) => {
+                        ArbitraryContractExecutable::Wasm(::core::clone::Clone::clone(__self_0))
+                    }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryContractExecutable {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::BytesN<
+                        32,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryContractExecutable {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryContractExecutable {
+            #[inline]
+            fn eq(&self, other: &ArbitraryContractExecutable) -> bool {
+                match (self, other) {
+                    (
+                        ArbitraryContractExecutable::Wasm(__self_0),
+                        ArbitraryContractExecutable::Wasm(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryContractExecutable {
+            #[inline]
+            fn cmp(&self, other: &ArbitraryContractExecutable) -> ::core::cmp::Ordering {
+                match (self, other) {
+                    (
+                        ArbitraryContractExecutable::Wasm(__self_0),
+                        ArbitraryContractExecutable::Wasm(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryContractExecutable {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryContractExecutable,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                match (self, other) {
+                    (
+                        ArbitraryContractExecutable::Wasm(__self_0),
+                        ArbitraryContractExecutable::Wasm(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryContractExecutable: ::std::thread::LocalKey<
+                std::cell::Cell<u32>,
+            > = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryContractExecutable {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractExecutable.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(u)?) * 1u64)
+                                >> 32
+                            {
+                                0u64 => ArbitraryContractExecutable::Wasm(
+                                    arbitrary::Arbitrary::arbitrary(u)?,
+                                ),
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractExecutable.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractExecutable.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(&mut u)?)
+                                * 1u64)
+                                >> 32
+                            {
+                                0u64 => ArbitraryContractExecutable::Wasm(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryContractExecutable.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::and(
+                        <u32 as arbitrary::Arbitrary>::size_hint(depth),
+                        arbitrary::size_hint::recursion_guard(depth, |depth| {
+                            arbitrary::size_hint::or_all(
+                                    &[
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<soroban_sdk::BytesN<
+                                                    32,
+                                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                )
+                        }),
+                    )
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for ContractExecutable {
+            type Prototype = ArbitraryContractExecutable;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryContractExecutable> for ContractExecutable {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryContractExecutable,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(match v {
+                    ArbitraryContractExecutable::Wasm(field_0) => {
+                        ContractExecutable::Wasm(soroban_sdk::IntoVal::into_val(field_0, env))
+                    }
+                })
+            }
+        }
+    };
+    pub enum InvokerContractAuthEntry {
+        Contract(SubContractInvocation),
+        CreateContractHostFn(CreateContractHostFnContext),
+        CreateContractWithCtorHostFn(CreateContractWithConstructorHostFnContext),
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for InvokerContractAuthEntry {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            match self {
+                InvokerContractAuthEntry::Contract(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Contract", &__self_0)
+                }
+                InvokerContractAuthEntry::CreateContractHostFn(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(
+                        f,
+                        "CreateContractHostFn",
+                        &__self_0,
+                    )
+                }
+                InvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(
+                        f,
+                        "CreateContractWithCtorHostFn",
+                        &__self_0,
+                    )
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for InvokerContractAuthEntry {
+        #[inline]
+        fn clone(&self) -> InvokerContractAuthEntry {
+            match self {
+                InvokerContractAuthEntry::Contract(__self_0) => {
+                    InvokerContractAuthEntry::Contract(::core::clone::Clone::clone(__self_0))
+                }
+                InvokerContractAuthEntry::CreateContractHostFn(__self_0) => {
+                    InvokerContractAuthEntry::CreateContractHostFn(::core::clone::Clone::clone(
+                        __self_0,
+                    ))
+                }
+                InvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0) => {
+                    InvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                        ::core::clone::Clone::clone(__self_0),
+                    )
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for InvokerContractAuthEntry {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<SubContractInvocation>;
+            let _: ::core::cmp::AssertParamIsEq<CreateContractHostFnContext>;
+            let _: ::core::cmp::AssertParamIsEq<CreateContractWithConstructorHostFnContext>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for InvokerContractAuthEntry {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for InvokerContractAuthEntry {
+        #[inline]
+        fn eq(&self, other: &InvokerContractAuthEntry) -> bool {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            __self_discr == __arg1_discr
+                && match (self, other) {
+                    (
+                        InvokerContractAuthEntry::Contract(__self_0),
+                        InvokerContractAuthEntry::Contract(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    (
+                        InvokerContractAuthEntry::CreateContractHostFn(__self_0),
+                        InvokerContractAuthEntry::CreateContractHostFn(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    (
+                        InvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0),
+                        InvokerContractAuthEntry::CreateContractWithCtorHostFn(__arg1_0),
+                    ) => __self_0 == __arg1_0,
+                    _ => unsafe { ::core::intrinsics::unreachable() },
+                }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for InvokerContractAuthEntry {
+        #[inline]
+        fn cmp(&self, other: &InvokerContractAuthEntry) -> ::core::cmp::Ordering {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                ::core::cmp::Ordering::Equal => match (self, other) {
+                    (
+                        InvokerContractAuthEntry::Contract(__self_0),
+                        InvokerContractAuthEntry::Contract(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    (
+                        InvokerContractAuthEntry::CreateContractHostFn(__self_0),
+                        InvokerContractAuthEntry::CreateContractHostFn(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    (
+                        InvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0),
+                        InvokerContractAuthEntry::CreateContractWithCtorHostFn(__arg1_0),
+                    ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                    _ => unsafe { ::core::intrinsics::unreachable() },
+                },
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for InvokerContractAuthEntry {
+        #[inline]
+        fn partial_cmp(
+            &self,
+            other: &InvokerContractAuthEntry,
+        ) -> ::core::option::Option<::core::cmp::Ordering> {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match (self, other) {
+                (
+                    InvokerContractAuthEntry::Contract(__self_0),
+                    InvokerContractAuthEntry::Contract(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                (
+                    InvokerContractAuthEntry::CreateContractHostFn(__self_0),
+                    InvokerContractAuthEntry::CreateContractHostFn(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                (
+                    InvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0),
+                    InvokerContractAuthEntry::CreateContractWithCtorHostFn(__arg1_0),
+                ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_INVOKERCONTRACTAUTHENTRY: [u8; 268usize] =
+        InvokerContractAuthEntry::spec_xdr();
+    impl InvokerContractAuthEntry {
+        pub const fn spec_xdr() -> [u8; 268usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x18InvokerContractAuthEntry\0\0\0\x03\0\0\0\x01\0\0\0\0\0\0\0\x08Contract\0\0\0\x01\0\0\x07\xd0\0\0\0\x15SubContractInvocation\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x14CreateContractHostFn\0\0\0\x01\0\0\x07\xd0\0\0\0\x1bCreateContractHostFnContext\0\0\0\0\x01\0\0\0\0\0\0\0\x1cCreateContractWithCtorHostFn\0\0\0\x01\0\0\x07\xd0\0\0\0*CreateContractWithConstructorHostFnContext\0\0"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for InvokerContractAuthEntry {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <SubContractInvocation as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <CreateContractHostFnContext as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <CreateContractWithConstructorHostFnContext as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for InvokerContractAuthEntry {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{EnvBase, TryFromVal, TryIntoVal};
+            const CASES: &'static [&'static str] = &[
+                "Contract",
+                "CreateContractHostFn",
+                "CreateContractWithCtorHostFn",
+            ];
+            let vec: soroban_sdk::Vec<soroban_sdk::Val> = val.try_into_val(env)?;
+            let mut iter = vec.try_iter();
+            let discriminant: soroban_sdk::Symbol = iter
+                .next()
+                .ok_or(soroban_sdk::ConversionError)??
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?;
+            Ok(
+                match u32::from(env.symbol_index_in_strs(discriminant.to_symbol_val(), CASES)?)
+                    as usize
+                {
+                    0 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::Contract(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    1 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::CreateContractHostFn(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    2 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::CreateContractWithCtorHostFn(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    _ => Err(soroban_sdk::ConversionError {})?,
+                },
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, InvokerContractAuthEntry> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &InvokerContractAuthEntry,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{TryFromVal, TryIntoVal};
+            match val {
+                InvokerContractAuthEntry::Contract(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"Contract")?.to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+                InvokerContractAuthEntry::CreateContractHostFn(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"CreateContractHostFn")?.to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+                InvokerContractAuthEntry::CreateContractWithCtorHostFn(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"CreateContractWithCtorHostFn")?
+                            .to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+            }
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &InvokerContractAuthEntry> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&InvokerContractAuthEntry,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, InvokerContractAuthEntry>>::try_from_val(
+                env, *val,
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVec>
+        for InvokerContractAuthEntry
+    {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVec,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let vec = val;
+            let mut iter = vec.iter();
+            let discriminant: soroban_sdk::xdr::ScSymbol = iter
+                .next()
+                .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                .clone()
+                .try_into()
+                .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+            let discriminant_name: &str = &discriminant.to_utf8_string()?;
+            Ok(match discriminant_name {
+                "Contract" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::Contract(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                "CreateContractHostFn" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::CreateContractHostFn(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                "CreateContractWithCtorHostFn" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::CreateContractWithCtorHostFn(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                _ => Err(soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal>
+        for InvokerContractAuthEntry
+    {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Vec(Some(vec)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, vec)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&InvokerContractAuthEntry> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &InvokerContractAuthEntry) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            Ok(match val {
+                InvokerContractAuthEntry::Contract(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "Contract"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                InvokerContractAuthEntry::CreateContractHostFn(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "CreateContractHostFn"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                InvokerContractAuthEntry::CreateContractWithCtorHostFn(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "CreateContractWithCtorHostFn"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl TryFrom<InvokerContractAuthEntry> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: InvokerContractAuthEntry) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&InvokerContractAuthEntry> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &InvokerContractAuthEntry) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Vec(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<InvokerContractAuthEntry> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: InvokerContractAuthEntry) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub enum ArbitraryInvokerContractAuthEntry {
+            Contract(
+                <SubContractInvocation as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+            CreateContractHostFn(
+                <CreateContractHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+            CreateContractWithCtorHostFn(
+                <CreateContractWithConstructorHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryInvokerContractAuthEntry {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    ArbitraryInvokerContractAuthEntry::Contract(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Contract", &__self_0)
+                    }
+                    ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(
+                            f,
+                            "CreateContractHostFn",
+                            &__self_0,
+                        )
+                    }
+                    ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(
+                            f,
+                            "CreateContractWithCtorHostFn",
+                            &__self_0,
+                        )
+                    }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryInvokerContractAuthEntry {
+            #[inline]
+            fn clone(&self) -> ArbitraryInvokerContractAuthEntry {
+                match self {
+                    ArbitraryInvokerContractAuthEntry::Contract(__self_0) => {
+                        ArbitraryInvokerContractAuthEntry::Contract(::core::clone::Clone::clone(
+                            __self_0,
+                        ))
+                    }
+                    ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__self_0) => {
+                        ArbitraryInvokerContractAuthEntry::CreateContractHostFn(
+                            ::core::clone::Clone::clone(__self_0),
+                        )
+                    }
+                    ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0) => {
+                        ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                            ::core::clone::Clone::clone(__self_0),
+                        )
+                    }
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryInvokerContractAuthEntry {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <SubContractInvocation as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <CreateContractHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+                let _: ::core::cmp::AssertParamIsEq<
+                    <CreateContractWithConstructorHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryInvokerContractAuthEntry {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryInvokerContractAuthEntry {
+            #[inline]
+            fn eq(&self, other: &ArbitraryInvokerContractAuthEntry) -> bool {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                __self_discr == __arg1_discr
+                    && match (self, other) {
+                        (
+                            ArbitraryInvokerContractAuthEntry::Contract(__self_0),
+                            ArbitraryInvokerContractAuthEntry::Contract(__arg1_0),
+                        ) => __self_0 == __arg1_0,
+                        (
+                            ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__self_0),
+                            ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__arg1_0),
+                        ) => __self_0 == __arg1_0,
+                        (
+                            ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                                __self_0,
+                            ),
+                            ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                                __arg1_0,
+                            ),
+                        ) => __self_0 == __arg1_0,
+                        _ => unsafe { ::core::intrinsics::unreachable() },
+                    }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryInvokerContractAuthEntry {
+            #[inline]
+            fn cmp(&self, other: &ArbitraryInvokerContractAuthEntry) -> ::core::cmp::Ordering {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                    ::core::cmp::Ordering::Equal => match (self, other) {
+                        (
+                            ArbitraryInvokerContractAuthEntry::Contract(__self_0),
+                            ArbitraryInvokerContractAuthEntry::Contract(__arg1_0),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        (
+                            ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__self_0),
+                            ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__arg1_0),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        (
+                            ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                                __self_0,
+                            ),
+                            ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                                __arg1_0,
+                            ),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        _ => unsafe { ::core::intrinsics::unreachable() },
+                    },
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryInvokerContractAuthEntry {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryInvokerContractAuthEntry,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                match (self, other) {
+                    (
+                        ArbitraryInvokerContractAuthEntry::Contract(__self_0),
+                        ArbitraryInvokerContractAuthEntry::Contract(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                    (
+                        ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__self_0),
+                        ArbitraryInvokerContractAuthEntry::CreateContractHostFn(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                    (
+                        ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(__self_0),
+                        ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(__arg1_0),
+                    ) => ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0),
+                    _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryInvokerContractAuthEntry: ::std::thread::LocalKey<
+                std::cell::Cell<u32>,
+            > = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryInvokerContractAuthEntry {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryInvokerContractAuthEntry.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(u)?) * 3u64)
+                                >> 32
+                            {
+                                0u64 => ArbitraryInvokerContractAuthEntry::Contract(
+                                    arbitrary::Arbitrary::arbitrary(u)?,
+                                ),
+                                1u64 => ArbitraryInvokerContractAuthEntry::CreateContractHostFn(
+                                    arbitrary::Arbitrary::arbitrary(u)?,
+                                ),
+                                2u64 => {
+                                    ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                                        arbitrary::Arbitrary::arbitrary(u)?,
+                                    )
+                                }
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryInvokerContractAuthEntry.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryInvokerContractAuthEntry.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(&mut u)?)
+                                * 3u64)
+                                >> 32
+                            {
+                                0u64 => ArbitraryInvokerContractAuthEntry::Contract(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                1u64 => ArbitraryInvokerContractAuthEntry::CreateContractHostFn(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                2u64 => {
+                                    ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                                        arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                    )
+                                }
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryInvokerContractAuthEntry.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::and(
+                        <u32 as arbitrary::Arbitrary>::size_hint(depth),
+                        arbitrary::size_hint::recursion_guard(depth, |depth| {
+                            arbitrary::size_hint::or_all(
+                                    &[
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<SubContractInvocation as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<CreateContractHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<CreateContractWithConstructorHostFnContext as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                    ],
+                                )
+                        }),
+                    )
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for InvokerContractAuthEntry {
+            type Prototype = ArbitraryInvokerContractAuthEntry;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryInvokerContractAuthEntry>
+            for InvokerContractAuthEntry
+        {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryInvokerContractAuthEntry,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(match v {
+                    ArbitraryInvokerContractAuthEntry::Contract(field_0) => {
+                        InvokerContractAuthEntry::Contract(soroban_sdk::IntoVal::into_val(
+                            field_0, env,
+                        ))
+                    }
+                    ArbitraryInvokerContractAuthEntry::CreateContractHostFn(field_0) => {
+                        InvokerContractAuthEntry::CreateContractHostFn(
+                            soroban_sdk::IntoVal::into_val(field_0, env),
+                        )
+                    }
+                    ArbitraryInvokerContractAuthEntry::CreateContractWithCtorHostFn(field_0) => {
+                        InvokerContractAuthEntry::CreateContractWithCtorHostFn(
+                            soroban_sdk::IntoVal::into_val(field_0, env),
+                        )
+                    }
+                })
+            }
+        }
+    };
+    pub enum Executable {
+        Wasm(soroban_sdk::BytesN<32>),
+        StellarAsset,
+        Account,
+    }
+    #[automatically_derived]
+    impl ::core::fmt::Debug for Executable {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            match self {
+                Executable::Wasm(__self_0) => {
+                    ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Wasm", &__self_0)
+                }
+                Executable::StellarAsset => ::core::fmt::Formatter::write_str(f, "StellarAsset"),
+                Executable::Account => ::core::fmt::Formatter::write_str(f, "Account"),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for Executable {
+        #[inline]
+        fn clone(&self) -> Executable {
+            match self {
+                Executable::Wasm(__self_0) => {
+                    Executable::Wasm(::core::clone::Clone::clone(__self_0))
+                }
+                Executable::StellarAsset => Executable::StellarAsset,
+                Executable::Account => Executable::Account,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for Executable {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {
+            let _: ::core::cmp::AssertParamIsEq<soroban_sdk::BytesN<32>>;
+        }
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for Executable {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for Executable {
+        #[inline]
+        fn eq(&self, other: &Executable) -> bool {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            __self_discr == __arg1_discr
+                && match (self, other) {
+                    (Executable::Wasm(__self_0), Executable::Wasm(__arg1_0)) => {
+                        __self_0 == __arg1_0
+                    }
+                    _ => true,
+                }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for Executable {
+        #[inline]
+        fn cmp(&self, other: &Executable) -> ::core::cmp::Ordering {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                ::core::cmp::Ordering::Equal => match (self, other) {
+                    (Executable::Wasm(__self_0), Executable::Wasm(__arg1_0)) => {
+                        ::core::cmp::Ord::cmp(__self_0, __arg1_0)
+                    }
+                    _ => ::core::cmp::Ordering::Equal,
+                },
+                cmp => cmp,
+            }
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for Executable {
+        #[inline]
+        fn partial_cmp(&self, other: &Executable) -> ::core::option::Option<::core::cmp::Ordering> {
+            let __self_discr = ::core::intrinsics::discriminant_value(self);
+            let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+            match (self, other) {
+                (Executable::Wasm(__self_0), Executable::Wasm(__arg1_0)) => {
+                    ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0)
+                }
+                _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+            }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_EXECUTABLE: [u8; 104usize] = Executable::spec_xdr();
+    impl Executable {
+        pub const fn spec_xdr() -> [u8; 104usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\nExecutable\0\0\0\0\0\x03\0\0\0\x01\0\0\0\0\0\0\0\x04Wasm\0\0\0\x01\0\0\x03\xee\0\0\0 \0\0\0\0\0\0\0\0\0\0\0\x0cStellarAsset\0\0\0\0\0\0\0\0\0\0\0\x07Account\0"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for Executable {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::BytesN<32> as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for Executable {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::Val,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{EnvBase, TryFromVal, TryIntoVal};
+            const CASES: &'static [&'static str] = &["Wasm", "StellarAsset", "Account"];
+            let vec: soroban_sdk::Vec<soroban_sdk::Val> = val.try_into_val(env)?;
+            let mut iter = vec.try_iter();
+            let discriminant: soroban_sdk::Symbol = iter
+                .next()
+                .ok_or(soroban_sdk::ConversionError)??
+                .try_into_val(env)
+                .map_err(|_| soroban_sdk::ConversionError)?;
+            Ok(
+                match u32::from(env.symbol_index_in_strs(discriminant.to_symbol_val(), CASES)?)
+                    as usize
+                {
+                    0 => {
+                        if iter.len() > 1usize {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::Wasm(
+                            iter.next()
+                                .ok_or(soroban_sdk::ConversionError)??
+                                .try_into_val(env)?,
+                        )
+                    }
+                    1 => {
+                        if iter.len() > 0 {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::StellarAsset
+                    }
+                    2 => {
+                        if iter.len() > 0 {
+                            return Err(soroban_sdk::ConversionError);
+                        }
+                        Self::Account
+                    }
+                    _ => Err(soroban_sdk::ConversionError {})?,
+                },
+            )
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, Executable> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &Executable,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            use soroban_sdk::{TryFromVal, TryIntoVal};
+            match val {
+                Executable::Wasm(ref value0) => {
+                    let tup: (soroban_sdk::Val, soroban_sdk::Val) = (
+                        soroban_sdk::Symbol::try_from_val(env, &"Wasm")?.to_val(),
+                        value0.try_into_val(env)?,
+                    );
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+                Executable::StellarAsset => {
+                    let tup: (soroban_sdk::Val,) =
+                        (soroban_sdk::Symbol::try_from_val(env, &"StellarAsset")?.to_val(),);
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+                Executable::Account => {
+                    let tup: (soroban_sdk::Val,) =
+                        (soroban_sdk::Symbol::try_from_val(env, &"Account")?.to_val(),);
+                    tup.try_into_val(env).map_err(Into::into)
+                }
+            }
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, &Executable> for soroban_sdk::Val {
+        type Error = soroban_sdk::ConversionError;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &&Executable,
+        ) -> Result<Self, soroban_sdk::ConversionError> {
+            <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, Executable>>::try_from_val(env, *val)
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVec> for Executable {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVec,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            use soroban_sdk::xdr::Validate;
+            use soroban_sdk::TryIntoVal;
+            let vec = val;
+            let mut iter = vec.iter();
+            let discriminant: soroban_sdk::xdr::ScSymbol = iter
+                .next()
+                .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                .clone()
+                .try_into()
+                .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+            let discriminant_name: &str = &discriminant.to_utf8_string()?;
+            Ok(match discriminant_name {
+                "Wasm" => {
+                    if iter.len() > 1usize {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    let rv0: soroban_sdk::Val = iter
+                        .next()
+                        .ok_or(soroban_sdk::xdr::Error::Invalid)?
+                        .try_into_val(env)
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?;
+                    Self::Wasm(
+                        rv0.try_into_val(env)
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    )
+                }
+                "StellarAsset" => {
+                    if iter.len() > 0 {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    Self::StellarAsset
+                }
+                "Account" => {
+                    if iter.len() > 0 {
+                        return Err(soroban_sdk::xdr::Error::Invalid);
+                    }
+                    Self::Account
+                }
+                _ => Err(soroban_sdk::xdr::Error::Invalid)?,
+            })
+        }
+    }
+    impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::xdr::ScVal> for Executable {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from_val(
+            env: &soroban_sdk::Env,
+            val: &soroban_sdk::xdr::ScVal,
+        ) -> Result<Self, soroban_sdk::xdr::Error> {
+            if let soroban_sdk::xdr::ScVal::Vec(Some(vec)) = val {
+                <_ as soroban_sdk::TryFromVal<_, _>>::try_from_val(env, vec)
+            } else {
+                Err(soroban_sdk::xdr::Error::Invalid)
+            }
+        }
+    }
+    impl TryFrom<&Executable> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &Executable) -> Result<Self, soroban_sdk::xdr::Error> {
+            extern crate alloc;
+            Ok(match val {
+                Executable::Wasm(value0) => (
+                    soroban_sdk::xdr::ScSymbol(
+                        "Wasm"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    ),
+                    value0,
+                )
+                    .try_into()
+                    .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                Executable::StellarAsset => {
+                    let symbol = soroban_sdk::xdr::ScSymbol(
+                        "StellarAsset"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    );
+                    let val = soroban_sdk::xdr::ScVal::Symbol(symbol);
+                    (val,)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                }
+                Executable::Account => {
+                    let symbol = soroban_sdk::xdr::ScSymbol(
+                        "Account"
+                            .try_into()
+                            .map_err(|_| soroban_sdk::xdr::Error::Invalid)?,
+                    );
+                    let val = soroban_sdk::xdr::ScVal::Symbol(symbol);
+                    (val,)
+                        .try_into()
+                        .map_err(|_| soroban_sdk::xdr::Error::Invalid)?
+                }
+            })
+        }
+    }
+    impl TryFrom<Executable> for soroban_sdk::xdr::ScVec {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: Executable) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    impl TryFrom<&Executable> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: &Executable) -> Result<Self, soroban_sdk::xdr::Error> {
+            Ok(soroban_sdk::xdr::ScVal::Vec(Some(val.try_into()?)))
+        }
+    }
+    impl TryFrom<Executable> for soroban_sdk::xdr::ScVal {
+        type Error = soroban_sdk::xdr::Error;
+        #[inline(always)]
+        fn try_from(val: Executable) -> Result<Self, soroban_sdk::xdr::Error> {
+            (&val).try_into()
+        }
+    }
+    const _: () = {
+        use soroban_sdk::testutils::arbitrary::arbitrary;
+        use soroban_sdk::testutils::arbitrary::std;
+        pub enum ArbitraryExecutable {
+            Wasm(
+                <soroban_sdk::BytesN<
+                    32,
+                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+            ),
+            StellarAsset,
+            Account,
+        }
+        #[automatically_derived]
+        impl ::core::fmt::Debug for ArbitraryExecutable {
+            #[inline]
+            fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+                match self {
+                    ArbitraryExecutable::Wasm(__self_0) => {
+                        ::core::fmt::Formatter::debug_tuple_field1_finish(f, "Wasm", &__self_0)
+                    }
+                    ArbitraryExecutable::StellarAsset => {
+                        ::core::fmt::Formatter::write_str(f, "StellarAsset")
+                    }
+                    ArbitraryExecutable::Account => ::core::fmt::Formatter::write_str(f, "Account"),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::clone::Clone for ArbitraryExecutable {
+            #[inline]
+            fn clone(&self) -> ArbitraryExecutable {
+                match self {
+                    ArbitraryExecutable::Wasm(__self_0) => {
+                        ArbitraryExecutable::Wasm(::core::clone::Clone::clone(__self_0))
+                    }
+                    ArbitraryExecutable::StellarAsset => ArbitraryExecutable::StellarAsset,
+                    ArbitraryExecutable::Account => ArbitraryExecutable::Account,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Eq for ArbitraryExecutable {
+            #[inline]
+            #[doc(hidden)]
+            #[coverage(off)]
+            fn assert_receiver_is_total_eq(&self) -> () {
+                let _: ::core::cmp::AssertParamIsEq<
+                    <soroban_sdk::BytesN<
+                        32,
+                    > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype,
+                >;
+            }
+        }
+        #[automatically_derived]
+        impl ::core::marker::StructuralPartialEq for ArbitraryExecutable {}
+        #[automatically_derived]
+        impl ::core::cmp::PartialEq for ArbitraryExecutable {
+            #[inline]
+            fn eq(&self, other: &ArbitraryExecutable) -> bool {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                __self_discr == __arg1_discr
+                    && match (self, other) {
+                        (
+                            ArbitraryExecutable::Wasm(__self_0),
+                            ArbitraryExecutable::Wasm(__arg1_0),
+                        ) => __self_0 == __arg1_0,
+                        _ => true,
+                    }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::Ord for ArbitraryExecutable {
+            #[inline]
+            fn cmp(&self, other: &ArbitraryExecutable) -> ::core::cmp::Ordering {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                match ::core::cmp::Ord::cmp(&__self_discr, &__arg1_discr) {
+                    ::core::cmp::Ordering::Equal => match (self, other) {
+                        (
+                            ArbitraryExecutable::Wasm(__self_0),
+                            ArbitraryExecutable::Wasm(__arg1_0),
+                        ) => ::core::cmp::Ord::cmp(__self_0, __arg1_0),
+                        _ => ::core::cmp::Ordering::Equal,
+                    },
+                    cmp => cmp,
+                }
+            }
+        }
+        #[automatically_derived]
+        impl ::core::cmp::PartialOrd for ArbitraryExecutable {
+            #[inline]
+            fn partial_cmp(
+                &self,
+                other: &ArbitraryExecutable,
+            ) -> ::core::option::Option<::core::cmp::Ordering> {
+                let __self_discr = ::core::intrinsics::discriminant_value(self);
+                let __arg1_discr = ::core::intrinsics::discriminant_value(other);
+                match (self, other) {
+                    (ArbitraryExecutable::Wasm(__self_0), ArbitraryExecutable::Wasm(__arg1_0)) => {
+                        ::core::cmp::PartialOrd::partial_cmp(__self_0, __arg1_0)
+                    }
+                    _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
+                }
+            }
+        }
+        const _: () = {
+            #[allow(non_upper_case_globals)]
+            const RECURSIVE_COUNT_ArbitraryExecutable: ::std::thread::LocalKey<
+                std::cell::Cell<u32>,
+            > = {
+                #[inline]
+                fn __init() -> std::cell::Cell<u32> {
+                    std::cell::Cell::new(0)
+                }
+                unsafe {
+                    ::std::thread::LocalKey::new(
+                        const {
+                            if ::std::mem::needs_drop::<std::cell::Cell<u32>>() {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        (),
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            } else {
+                                |init| {
+                                    #[thread_local]
+                                    static VAL: ::std::thread::local_impl::LazyStorage<
+                                        std::cell::Cell<u32>,
+                                        !,
+                                    > = ::std::thread::local_impl::LazyStorage::new();
+                                    VAL.get_or_init(init, __init)
+                                }
+                            }
+                        },
+                    )
+                }
+            };
+            #[automatically_derived]
+            impl<'arbitrary> arbitrary::Arbitrary<'arbitrary> for ArbitraryExecutable {
+                fn arbitrary(
+                    u: &mut arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryExecutable.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(u)?) * 3u64)
+                                >> 32
+                            {
+                                0u64 => {
+                                    ArbitraryExecutable::Wasm(arbitrary::Arbitrary::arbitrary(u)?)
+                                }
+                                1u64 => ArbitraryExecutable::StellarAsset,
+                                2u64 => ArbitraryExecutable::Account,
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryExecutable.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                fn arbitrary_take_rest(
+                    mut u: arbitrary::Unstructured<'arbitrary>,
+                ) -> arbitrary::Result<Self> {
+                    let guard_against_recursion = u.is_empty();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryExecutable.with(|count| {
+                            if count.get() > 0 {
+                                return Err(arbitrary::Error::NotEnoughData);
+                            }
+                            count.set(count.get() + 1);
+                            Ok(())
+                        })?;
+                    }
+                    let result = (|| {
+                        Ok(
+                            match (u64::from(<u32 as arbitrary::Arbitrary>::arbitrary(&mut u)?)
+                                * 3u64)
+                                >> 32
+                            {
+                                0u64 => ArbitraryExecutable::Wasm(
+                                    arbitrary::Arbitrary::arbitrary_take_rest(u)?,
+                                ),
+                                1u64 => ArbitraryExecutable::StellarAsset,
+                                2u64 => ArbitraryExecutable::Account,
+                                _ => ::core::panicking::panic(
+                                    "internal error: entered unreachable code",
+                                ),
+                            },
+                        )
+                    })();
+                    if guard_against_recursion {
+                        RECURSIVE_COUNT_ArbitraryExecutable.with(|count| {
+                            count.set(count.get() - 1);
+                        });
+                    }
+                    result
+                }
+                #[inline]
+                fn size_hint(depth: usize) -> (usize, Option<usize>) {
+                    arbitrary::size_hint::and(
+                        <u32 as arbitrary::Arbitrary>::size_hint(depth),
+                        arbitrary::size_hint::recursion_guard(depth, |depth| {
+                            arbitrary::size_hint::or_all(
+                                    &[
+                                        arbitrary::size_hint::and_all(
+                                            &[
+                                                <<soroban_sdk::BytesN<
+                                                    32,
+                                                > as soroban_sdk::testutils::arbitrary::SorobanArbitrary>::Prototype as arbitrary::Arbitrary>::size_hint(
+                                                    depth,
+                                                ),
+                                            ],
+                                        ),
+                                        arbitrary::size_hint::and_all(&[]),
+                                        arbitrary::size_hint::and_all(&[]),
+                                    ],
+                                )
+                        }),
+                    )
+                }
+            }
+        };
+        impl soroban_sdk::testutils::arbitrary::SorobanArbitrary for Executable {
+            type Prototype = ArbitraryExecutable;
+        }
+        impl soroban_sdk::TryFromVal<soroban_sdk::Env, ArbitraryExecutable> for Executable {
+            type Error = soroban_sdk::ConversionError;
+            fn try_from_val(
+                env: &soroban_sdk::Env,
+                v: &ArbitraryExecutable,
+            ) -> std::result::Result<Self, Self::Error> {
+                Ok(match v {
+                    ArbitraryExecutable::Wasm(field_0) => {
+                        Executable::Wasm(soroban_sdk::IntoVal::into_val(field_0, env))
+                    }
+                    ArbitraryExecutable::StellarAsset => Executable::StellarAsset,
+                    ArbitraryExecutable::Account => Executable::Account,
+                })
+            }
+        }
+    };
     pub enum EnumA {
         V1,
         V2,
@@ -11732,6 +19928,17 @@ mod wasm_imported {
             let __arg1_discr = ::core::intrinsics::discriminant_value(other);
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
+    }
+    pub static __SPEC_XDR_TYPE_ENUMA: [u8; 76usize] = EnumA::spec_xdr();
+    impl EnumA {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x05EnumA\0\0\0\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x02V1\0\0\0\0\0\0\0\0\0\0\0\0\0\x02V2\0\0\0\0\0\0\0\0\0\0\0\0\0\x02V3\0\0"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EnumA {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
     }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for EnumA {
         type Error = soroban_sdk::ConversionError;
@@ -12242,6 +20449,19 @@ mod wasm_imported {
                 }
                 _ => ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr),
             }
+        }
+    }
+    pub static __SPEC_XDR_TYPE_ENUMB: [u8; 96usize] = EnumB::spec_xdr();
+    impl EnumB {
+        pub const fn spec_xdr() -> [u8; 96usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x05EnumB\0\0\0\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x02V1\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02V2\0\0\0\0\0\x01\0\0\0\x07\0\0\0\x01\0\0\0\0\0\0\0\x02V3\0\0\0\0\0\x02\0\0\0\x07\0\0\0\x07"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EnumB {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         }
     }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for EnumB {
@@ -12871,6 +21091,20 @@ mod wasm_imported {
             }
         }
     }
+    pub static __SPEC_XDR_TYPE_ENUMC: [u8; 120usize] = EnumC::spec_xdr();
+    impl EnumC {
+        pub const fn spec_xdr() -> [u8; 120usize] {
+            *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x05EnumC\0\0\0\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x02V1\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02V2\0\0\0\0\0\x01\0\0\x07\xd0\0\0\0\x07StructA\0\0\0\0\x01\0\0\0\0\0\0\0\x02V3\0\0\0\0\0\x01\0\0\x07\xd0\0\0\0\x0cStructTupleA"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EnumC {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <StructA as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <StructTupleA as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for EnumC {
         type Error = soroban_sdk::ConversionError;
         #[inline(always)]
@@ -13426,6 +21660,17 @@ mod wasm_imported {
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
     }
+    pub static __SPEC_XDR_TYPE_ENUMINTA: [u8; 76usize] = EnumIntA::spec_xdr();
+    impl EnumIntA {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x08EnumIntA\0\0\0\x03\0\0\0\0\0\0\0\x02V1\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02V2\0\0\0\0\0\x02\0\0\0\0\0\0\0\x02V3\0\0\0\0\0\x03"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EnumIntA {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
+    }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for EnumIntA {
         type Error = soroban_sdk::ConversionError;
         #[inline(always)]
@@ -13779,6 +22024,17 @@ mod wasm_imported {
             let __arg1_discr = ::core::intrinsics::discriminant_value(other);
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
+    }
+    pub static __SPEC_XDR_TYPE_ENUMINTB: [u8; 76usize] = EnumIntB::spec_xdr();
+    impl EnumIntB {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x08EnumIntB\0\0\0\x03\0\0\0\0\0\0\0\x02V1\0\0\0\0\0\n\0\0\0\0\0\0\0\x02V2\0\0\0\0\0\x14\0\0\0\0\0\0\0\x02V3\0\0\0\0\0\x1e"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EnumIntB {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
     }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for EnumIntB {
         type Error = soroban_sdk::ConversionError;
@@ -14134,6 +22390,17 @@ mod wasm_imported {
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
     }
+    pub static __SPEC_XDR_TYPE_ENUMINTC: [u8; 76usize] = EnumIntC::spec_xdr();
+    impl EnumIntC {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\x08EnumIntC\0\0\0\x03\0\0\0\0\0\0\0\x02V1\0\0\0\0\0d\0\0\0\0\0\0\0\x02V2\0\0\0\0\0\xc8\0\0\0\0\0\0\0\x02V3\0\0\0\0\x01,"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EnumIntC {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
+    }
     impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for EnumIntC {
         type Error = soroban_sdk::ConversionError;
         #[inline(always)]
@@ -14488,6 +22755,17 @@ mod wasm_imported {
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
     }
+    pub static __SPEC_XDR_TYPE_ERRORA: [u8; 76usize] = ErrorA::spec_xdr();
+    impl ErrorA {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x06ErrorA\0\0\0\0\0\x03\0\0\0\0\0\0\0\x02E1\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02E2\0\0\0\0\0\x02\0\0\0\0\0\0\0\x02E3\0\0\0\0\0\x03"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for ErrorA {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
+    }
     impl TryFrom<soroban_sdk::Error> for ErrorA {
         type Error = soroban_sdk::Error;
         #[inline(always)]
@@ -14663,6 +22941,17 @@ mod wasm_imported {
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
     }
+    pub static __SPEC_XDR_TYPE_ERRORB: [u8; 76usize] = ErrorB::spec_xdr();
+    impl ErrorB {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x06ErrorB\0\0\0\0\0\x03\0\0\0\0\0\0\0\x02E1\0\0\0\0\0\n\0\0\0\0\0\0\0\x02E2\0\0\0\0\0\x0b\0\0\0\0\0\0\0\x02E3\0\0\0\0\0\x0c"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for ErrorB {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
+    }
     impl TryFrom<soroban_sdk::Error> for ErrorB {
         type Error = soroban_sdk::Error;
         #[inline(always)]
@@ -14837,6 +23126,17 @@ mod wasm_imported {
             let __arg1_discr = ::core::intrinsics::discriminant_value(other);
             ::core::cmp::PartialOrd::partial_cmp(&__self_discr, &__arg1_discr)
         }
+    }
+    pub static __SPEC_XDR_TYPE_ERRORC: [u8; 76usize] = ErrorC::spec_xdr();
+    impl ErrorC {
+        pub const fn spec_xdr() -> [u8; 76usize] {
+            *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x06ErrorC\0\0\0\0\0\x03\0\0\0\0\0\0\0\x02E1\0\0\0\0\0d\0\0\0\0\0\0\0\x02E2\0\0\0\0\0e\0\0\0\0\0\0\0\x02E3\0\0\0\0\0f"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for ErrorC {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
     }
     impl TryFrom<soroban_sdk::Error> for ErrorC {
         type Error = soroban_sdk::Error;
@@ -15019,6 +23319,14 @@ mod wasm_imported {
             *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x06EventA\0\0\0\0\0\x01\0\0\0\x07event_a\0\0\0\0\x02\0\0\0\0\0\0\0\x02f1\0\0\0\0\0\x13\0\0\0\x01\0\0\0\0\0\0\0\x02f2\0\0\0\0\0\x10\0\0\0\0\0\0\0\x02"
         }
     }
+    impl soroban_sdk::SpecShakingMarker for EventA {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Address as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::String as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::Event for EventA {
         fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
             use soroban_sdk::IntoVal;
@@ -15046,6 +23354,7 @@ mod wasm_imported {
     }
     impl EventA {
         pub fn publish(&self, env: &soroban_sdk::Env) {
+            <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
             <_ as soroban_sdk::Event>::publish(self, env);
         }
     }
@@ -15130,6 +23439,15 @@ mod wasm_imported {
             *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x06EventB\0\0\0\0\0\x01\0\0\0\x07event_b\0\0\0\0\x03\0\0\0\0\0\0\0\x02f1\0\0\0\0\0\x13\0\0\0\x01\0\0\0\0\0\0\0\x02f2\0\0\0\0\0\x13\0\0\0\x01\0\0\0\0\0\0\0\x02f3\0\0\0\0\0\x0b\0\0\0\0\0\0\0\x02"
         }
     }
+    impl soroban_sdk::SpecShakingMarker for EventB {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Address as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <soroban_sdk::Address as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <i128 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::Event for EventB {
         fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
             use soroban_sdk::IntoVal;
@@ -15161,6 +23479,7 @@ mod wasm_imported {
     }
     impl EventB {
         pub fn publish(&self, env: &soroban_sdk::Env) {
+            <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
             <_ as soroban_sdk::Event>::publish(self, env);
         }
     }
@@ -15244,6 +23563,15 @@ mod wasm_imported {
             *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x06EventC\0\0\0\0\0\x01\0\0\0\x07event_c\0\0\0\0\x03\0\0\0\0\0\0\0\x02f1\0\0\0\0\0\x11\0\0\0\x01\0\0\0\0\0\0\0\x02f2\0\0\0\0\0\x07\0\0\0\0\0\0\0\0\0\0\0\x02f3\0\0\0\0\0\x07\0\0\0\0\0\0\0\x02"
         }
     }
+    impl soroban_sdk::SpecShakingMarker for EventC {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {
+            <soroban_sdk::Symbol as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        }
+    }
     impl soroban_sdk::Event for EventC {
         fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
             use soroban_sdk::IntoVal;
@@ -15271,6 +23599,88 @@ mod wasm_imported {
     }
     impl EventC {
         pub fn publish(&self, env: &soroban_sdk::Env) {
+            <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+            <_ as soroban_sdk::Event>::publish(self, env);
+        }
+    }
+    pub struct EventD {}
+    #[automatically_derived]
+    impl ::core::fmt::Debug for EventD {
+        #[inline]
+        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+            ::core::fmt::Formatter::write_str(f, "EventD")
+        }
+    }
+    #[automatically_derived]
+    impl ::core::clone::Clone for EventD {
+        #[inline]
+        fn clone(&self) -> EventD {
+            EventD {}
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Eq for EventD {
+        #[inline]
+        #[doc(hidden)]
+        #[coverage(off)]
+        fn assert_receiver_is_total_eq(&self) -> () {}
+    }
+    #[automatically_derived]
+    impl ::core::marker::StructuralPartialEq for EventD {}
+    #[automatically_derived]
+    impl ::core::cmp::PartialEq for EventD {
+        #[inline]
+        fn eq(&self, other: &EventD) -> bool {
+            true
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::Ord for EventD {
+        #[inline]
+        fn cmp(&self, other: &EventD) -> ::core::cmp::Ordering {
+            ::core::cmp::Ordering::Equal
+        }
+    }
+    #[automatically_derived]
+    impl ::core::cmp::PartialOrd for EventD {
+        #[inline]
+        fn partial_cmp(&self, other: &EventD) -> ::core::option::Option<::core::cmp::Ordering> {
+            ::core::option::Option::Some(::core::cmp::Ordering::Equal)
+        }
+    }
+    pub static __SPEC_XDR_EVENT_EVENTD: [u8; 48usize] = EventD::spec_xdr();
+    impl EventD {
+        pub const fn spec_xdr() -> [u8; 48usize] {
+            *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x06EventD\0\0\0\0\0\x01\0\0\0\x07event_d\0\0\0\0\0\0\0\0\x02"
+        }
+    }
+    impl soroban_sdk::SpecShakingMarker for EventD {
+        #[doc(hidden)]
+        #[inline(always)]
+        fn spec_shaking_marker() {}
+    }
+    impl soroban_sdk::Event for EventD {
+        fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
+            use soroban_sdk::IntoVal;
+            (&{
+                #[allow(deprecated)]
+                const SYMBOL: soroban_sdk::Symbol = soroban_sdk::Symbol::short("event_d");
+                SYMBOL
+            },)
+                .into_val(env)
+        }
+        fn data(&self, env: &soroban_sdk::Env) -> soroban_sdk::Val {
+            use soroban_sdk::{unwrap::UnwrapInfallible, EnvBase, IntoVal};
+            const KEYS: [&'static str; 0usize] = [];
+            let vals: [soroban_sdk::Val; 0usize] = [];
+            env.map_new_from_slices(&KEYS, &vals)
+                .unwrap_infallible()
+                .into()
+        }
+    }
+    impl EventD {
+        pub fn publish(&self, env: &soroban_sdk::Env) {
+            <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
             <_ as soroban_sdk::Event>::publish(self, env);
         }
     }
@@ -15316,6 +23726,13 @@ pub static __SPEC_XDR_TYPE_UNUSEDSTRUCT: [u8; 48usize] = UnusedStruct::spec_xdr(
 impl UnusedStruct {
     pub const fn spec_xdr() -> [u8; 48usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x0cUnusedStruct\0\0\0\x01\0\0\0\0\0\0\0\x01x\0\0\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UnusedStruct {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedStruct {
@@ -15680,6 +24097,13 @@ pub static __SPEC_XDR_TYPE_UNUSEDENUM: [u8; 72usize] = UnusedEnum::spec_xdr();
 impl UnusedEnum {
     pub const fn spec_xdr() -> [u8; 72usize] {
         *b"\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\nUnusedEnum\0\0\0\0\0\x02\0\0\0\0\0\0\0\0\0\0\0\x01A\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01B\0\0\0\0\0\0\x01\0\0\0\x07"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UnusedEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <i64 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedEnum {
@@ -16145,6 +24569,11 @@ impl UnusedIntEnum {
         *b"\0\0\0\x03\0\0\0\0\0\0\0\0\0\0\0\rUnusedIntEnum\0\0\0\0\0\0\x02\0\0\0\0\0\0\0\x02U1\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02U2\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UnusedIntEnum {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedIntEnum {
     type Error = soroban_sdk::ConversionError;
     #[inline(always)]
@@ -16474,6 +24903,14 @@ impl UnusedEvent {
         *b"\0\0\0\x05\0\0\0\0\0\0\0\0\0\0\0\x0bUnusedEvent\0\0\0\0\x01\0\0\0\x0cunused_event\0\0\0\x02\0\0\0\0\0\0\0\x04kind\0\0\0\x11\0\0\0\x01\0\0\0\0\0\0\0\x04data\0\0\0\x04\0\0\0\0\0\0\0\x02"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UnusedEvent {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <Symbol as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::Event for UnusedEvent {
     fn topics(&self, env: &soroban_sdk::Env) -> soroban_sdk::Vec<soroban_sdk::Val> {
         use soroban_sdk::IntoVal;
@@ -16494,7 +24931,157 @@ impl soroban_sdk::Event for UnusedEvent {
 }
 impl UnusedEvent {
     pub fn publish(&self, env: &soroban_sdk::Env) {
+        <Self as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
         <_ as soroban_sdk::Event>::publish(self, env);
+    }
+}
+pub enum UnusedPubError {
+    Nope = 1,
+}
+#[automatically_derived]
+impl ::core::marker::Copy for UnusedPubError {}
+#[automatically_derived]
+impl ::core::clone::Clone for UnusedPubError {
+    #[inline]
+    fn clone(&self) -> UnusedPubError {
+        *self
+    }
+}
+#[automatically_derived]
+impl ::core::fmt::Debug for UnusedPubError {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::write_str(f, "Nope")
+    }
+}
+#[automatically_derived]
+impl ::core::cmp::Eq for UnusedPubError {
+    #[inline]
+    #[doc(hidden)]
+    #[coverage(off)]
+    fn assert_receiver_is_total_eq(&self) -> () {}
+}
+#[automatically_derived]
+impl ::core::marker::StructuralPartialEq for UnusedPubError {}
+#[automatically_derived]
+impl ::core::cmp::PartialEq for UnusedPubError {
+    #[inline]
+    fn eq(&self, other: &UnusedPubError) -> bool {
+        true
+    }
+}
+pub static __SPEC_XDR_TYPE_UNUSEDPUBERROR: [u8; 52usize] = UnusedPubError::spec_xdr();
+impl UnusedPubError {
+    pub const fn spec_xdr() -> [u8; 52usize] {
+        *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x0eUnusedPubError\0\0\0\0\0\x01\0\0\0\0\0\0\0\x04Nope\0\0\0\x01"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UnusedPubError {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
+impl TryFrom<soroban_sdk::Error> for UnusedPubError {
+    type Error = soroban_sdk::Error;
+    #[inline(always)]
+    fn try_from(error: soroban_sdk::Error) -> Result<Self, soroban_sdk::Error> {
+        if error.is_type(soroban_sdk::xdr::ScErrorType::Contract) {
+            let discriminant = error.get_code();
+            Ok(match discriminant {
+                1u32 => Self::Nope,
+                _ => return Err(error),
+            })
+        } else {
+            Err(error)
+        }
+    }
+}
+impl TryFrom<&soroban_sdk::Error> for UnusedPubError {
+    type Error = soroban_sdk::Error;
+    #[inline(always)]
+    fn try_from(error: &soroban_sdk::Error) -> Result<Self, soroban_sdk::Error> {
+        <_ as TryFrom<soroban_sdk::Error>>::try_from(*error)
+    }
+}
+impl From<UnusedPubError> for soroban_sdk::Error {
+    #[inline(always)]
+    fn from(val: UnusedPubError) -> soroban_sdk::Error {
+        <_ as From<&UnusedPubError>>::from(&val)
+    }
+}
+impl From<&UnusedPubError> for soroban_sdk::Error {
+    #[inline(always)]
+    fn from(val: &UnusedPubError) -> soroban_sdk::Error {
+        match val {
+            UnusedPubError::Nope => soroban_sdk::Error::from_contract_error(1u32),
+        }
+    }
+}
+impl TryFrom<soroban_sdk::InvokeError> for UnusedPubError {
+    type Error = soroban_sdk::InvokeError;
+    #[inline(always)]
+    fn try_from(error: soroban_sdk::InvokeError) -> Result<Self, soroban_sdk::InvokeError> {
+        match error {
+            soroban_sdk::InvokeError::Abort => Err(error),
+            soroban_sdk::InvokeError::Contract(code) => Ok(match code {
+                1u32 => Self::Nope,
+                _ => return Err(error),
+            }),
+        }
+    }
+}
+impl TryFrom<&soroban_sdk::InvokeError> for UnusedPubError {
+    type Error = soroban_sdk::InvokeError;
+    #[inline(always)]
+    fn try_from(error: &soroban_sdk::InvokeError) -> Result<Self, soroban_sdk::InvokeError> {
+        <_ as TryFrom<soroban_sdk::InvokeError>>::try_from(*error)
+    }
+}
+impl From<UnusedPubError> for soroban_sdk::InvokeError {
+    #[inline(always)]
+    fn from(val: UnusedPubError) -> soroban_sdk::InvokeError {
+        <_ as From<&UnusedPubError>>::from(&val)
+    }
+}
+impl From<&UnusedPubError> for soroban_sdk::InvokeError {
+    #[inline(always)]
+    fn from(val: &UnusedPubError) -> soroban_sdk::InvokeError {
+        match val {
+            UnusedPubError::Nope => soroban_sdk::InvokeError::Contract(1u32),
+        }
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedPubError {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &soroban_sdk::Val,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        use soroban_sdk::TryIntoVal;
+        let error: soroban_sdk::Error = val.try_into_val(env)?;
+        error.try_into().map_err(|_| soroban_sdk::ConversionError)
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, UnusedPubError> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &UnusedPubError,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        let error: soroban_sdk::Error = val.into();
+        Ok(error.into())
+    }
+}
+impl soroban_sdk::TryFromVal<soroban_sdk::Env, &UnusedPubError> for soroban_sdk::Val {
+    type Error = soroban_sdk::ConversionError;
+    #[inline(always)]
+    fn try_from_val(
+        env: &soroban_sdk::Env,
+        val: &&UnusedPubError,
+    ) -> Result<Self, soroban_sdk::ConversionError> {
+        <_ as soroban_sdk::TryFromVal<soroban_sdk::Env, UnusedPubError>>::try_from_val(env, *val)
     }
 }
 pub struct UnusedNonContractFnParam {
@@ -16544,6 +25131,13 @@ pub static __SPEC_XDR_TYPE_UNUSEDNONCONTRACTFNPARAM: [u8; 60usize] =
 impl UnusedNonContractFnParam {
     pub const fn spec_xdr() -> [u8; 60usize] {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x18UnusedNonContractFnParam\0\0\0\x01\0\0\0\0\0\0\0\x01x\0\0\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UnusedNonContractFnParam {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
     }
 }
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedNonContractFnParam {
@@ -16913,6 +25507,13 @@ impl UnusedNonContractFnReturn {
         *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x19UnusedNonContractFnReturn\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01x\0\0\0\0\0\0\x04"
     }
 }
+impl soroban_sdk::SpecShakingMarker for UnusedNonContractFnReturn {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedNonContractFnReturn {
     type Error = soroban_sdk::ConversionError;
     fn try_from_val(
@@ -17268,6 +25869,19 @@ impl ::core::cmp::PartialEq for UnusedNonPubStruct {
         self.x == other.x
     }
 }
+pub static __SPEC_XDR_TYPE_UNUSEDNONPUBSTRUCT: [u8; 56usize] = UnusedNonPubStruct::spec_xdr();
+impl UnusedNonPubStruct {
+    pub const fn spec_xdr() -> [u8; 56usize] {
+        *b"\0\0\0\x01\0\0\0\0\0\0\0\0\0\0\0\x12UnusedNonPubStruct\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01x\0\0\0\0\0\0\x04"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UnusedNonPubStruct {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {
+        <u32 as soroban_sdk::SpecShakingMarker>::spec_shaking_marker();
+    }
+}
 impl soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val> for UnusedNonPubStruct {
     type Error = soroban_sdk::ConversionError;
     fn try_from_val(
@@ -17615,6 +26229,17 @@ impl ::core::cmp::PartialEq for UnusedNonPubError {
         true
     }
 }
+pub static __SPEC_XDR_TYPE_UNUSEDNONPUBERROR: [u8; 56usize] = UnusedNonPubError::spec_xdr();
+impl UnusedNonPubError {
+    pub const fn spec_xdr() -> [u8; 56usize] {
+        *b"\0\0\0\x04\0\0\0\0\0\0\0\0\0\0\0\x11UnusedNonPubError\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x03Bad\0\0\0\0\x01"
+    }
+}
+impl soroban_sdk::SpecShakingMarker for UnusedNonPubError {
+    #[doc(hidden)]
+    #[inline(always)]
+    fn spec_shaking_marker() {}
+}
 impl TryFrom<soroban_sdk::Error> for UnusedNonPubError {
     type Error = soroban_sdk::Error;
     #[inline(always)]
@@ -17727,12 +26352,40 @@ impl Contract {
     pub fn with_error(_env: Env) -> Result<u32, UsedErrorEnum> {
         Ok(42)
     }
+    pub fn with_panic_error(env: Env, fail: bool) {
+        if fail {
+            {
+                (&env).panic_with_error(UsedPanicErrorEnum::Boom);
+            };
+        }
+    }
+    pub fn with_assert_error(env: Env, ok: bool) {
+        {
+            if !(ok) {
+                {
+                    (&env).panic_with_error(UsedAssertErrorEnum::Bad);
+                };
+            }
+        };
+    }
+    pub fn with_panic_raw_error(env: Env, fail: bool) {
+        if fail {
+            {
+                (&env).panic_with_error(soroban_sdk::Error::from_contract_error(7));
+            };
+        }
+    }
     pub fn with_vec(_env: Env, _v: Vec<UsedVecElement>) {}
+    pub fn with_vec_nested(_env: Env, _v: Vec<UsedVecElementNested>) {}
     pub fn with_map(_env: Env, _m: Map<UsedMapKey, UsedMapVal>) {}
     pub fn with_option(_env: Env, _o: Option<UsedOptionElement>) {}
     pub fn with_result(_env: Env) -> Result<UsedResultOk, UsedErrorEnum> {
         Ok(UsedResultOk { data: 1 })
     }
+    pub fn with_recursion(_env: Env, _r: UsedRecursiveRoot) {}
+    pub fn with_auth_contexts(_env: Env, _c: Vec<soroban_sdk::auth::Context>) {}
+    pub fn with_invoker_auth(_env: Env, _i: soroban_sdk::auth::InvokerContractAuthEntry) {}
+    pub fn with_executable(_env: Env, _e: soroban_sdk::Executable) {}
     pub fn publish_simple(env: Env) {
         UsedEventSimple {
             kind: Symbol::new(&env, "transfer"),
@@ -17838,6 +26491,51 @@ impl Contract {
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
+pub mod __Contract__with_panic_error__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_PANIC_ERROR: [u8; 52usize] =
+        super::Contract::spec_xdr_with_panic_error();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_panic_error() -> [u8; 52usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x10with_panic_error\0\0\0\x01\0\0\0\0\0\0\0\x04fail\0\0\0\x01\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_assert_error__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_ASSERT_ERROR: [u8; 56usize] =
+        super::Contract::spec_xdr_with_assert_error();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_assert_error() -> [u8; 56usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x11with_assert_error\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x02ok\0\0\0\0\0\x01\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_panic_raw_error__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_PANIC_RAW_ERROR: [u8; 56usize] =
+        super::Contract::spec_xdr_with_panic_raw_error();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_panic_raw_error() -> [u8; 56usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x14with_panic_raw_error\0\0\0\x01\0\0\0\0\0\0\0\x04fail\0\0\0\x01\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
 pub mod __Contract__with_vec__spec {
     #[doc(hidden)]
     #[allow(non_snake_case)]
@@ -17848,6 +26546,21 @@ impl Contract {
     #[allow(non_snake_case)]
     pub const fn spec_xdr_with_vec() -> [u8; 68usize] {
         *b"\0\0\0\0\0\0\0\0\0\0\0\x08with_vec\0\0\0\x01\0\0\0\0\0\0\0\x01v\0\0\0\0\0\x03\xea\0\0\x07\xd0\0\0\0\x0eUsedVecElement\0\0\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_vec_nested__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_VEC_NESTED: [u8; 80usize] =
+        super::Contract::spec_xdr_with_vec_nested();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_vec_nested() -> [u8; 80usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x0fwith_vec_nested\0\0\0\0\x01\0\0\0\0\0\0\0\x01v\0\0\0\0\0\x03\xea\0\0\x07\xd0\0\0\0\x14UsedVecElementNested\0\0\0\0"
     }
 }
 #[doc(hidden)]
@@ -17890,6 +26603,66 @@ impl Contract {
     #[allow(non_snake_case)]
     pub const fn spec_xdr_with_result() -> [u8; 80usize] {
         *b"\0\0\0\0\0\0\0\0\0\0\0\x0bwith_result\0\0\0\0\0\0\0\0\x01\0\0\x03\xe9\0\0\x07\xd0\0\0\0\x0cUsedResultOk\0\0\x07\xd0\0\0\0\rUsedErrorEnum\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_recursion__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_RECURSION: [u8; 76usize] =
+        super::Contract::spec_xdr_with_recursion();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_recursion() -> [u8; 76usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x0ewith_recursion\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01r\0\0\0\0\0\x07\xd0\0\0\0\x11UsedRecursiveRoot\0\0\0\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_auth_contexts__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_AUTH_CONTEXTS: [u8; 72usize] =
+        super::Contract::spec_xdr_with_auth_contexts();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_auth_contexts() -> [u8; 72usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x12with_auth_contexts\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01c\0\0\0\0\0\x03\xea\0\0\x07\xd0\0\0\0\x07Context\0\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_invoker_auth__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_INVOKER_AUTH: [u8; 84usize] =
+        super::Contract::spec_xdr_with_invoker_auth();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_invoker_auth() -> [u8; 84usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x11with_invoker_auth\0\0\0\0\0\0\x01\0\0\0\0\0\0\0\x01i\0\0\0\0\0\x07\xd0\0\0\0\x18InvokerContractAuthEntry\0\0\0\0"
+    }
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+pub mod __Contract__with_executable__spec {
+    #[doc(hidden)]
+    #[allow(non_snake_case)]
+    #[allow(non_upper_case_globals)]
+    pub static __SPEC_XDR_FN_WITH_EXECUTABLE: [u8; 68usize] =
+        super::Contract::spec_xdr_with_executable();
+}
+impl Contract {
+    #[allow(non_snake_case)]
+    pub const fn spec_xdr_with_executable() -> [u8; 68usize] {
+        *b"\0\0\0\0\0\0\0\0\0\0\0\x0fwith_executable\0\0\0\0\x01\0\0\0\0\0\0\0\x01e\0\0\0\0\0\x07\xd0\0\0\0\nExecutable\0\0\0\0\0\0"
     }
 }
 #[doc(hidden)]
@@ -18295,6 +27068,222 @@ impl<'a> ContractClient<'a> {
         }
         res
     }
+    pub fn with_panic_error(&self, fail: &bool) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_panic_error") },
+            ::soroban_sdk::Vec::from_array(&self.env, [fail.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_panic_error(
+        &self,
+        fail: &bool,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_panic_error") },
+            ::soroban_sdk::Vec::from_array(&self.env, [fail.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_assert_error(&self, ok: &bool) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_assert_error") },
+            ::soroban_sdk::Vec::from_array(&self.env, [ok.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_assert_error(
+        &self,
+        ok: &bool,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_assert_error") },
+            ::soroban_sdk::Vec::from_array(&self.env, [ok.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_panic_raw_error(&self, fail: &bool) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_panic_raw_error") },
+            ::soroban_sdk::Vec::from_array(&self.env, [fail.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_panic_raw_error(
+        &self,
+        fail: &bool,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_panic_raw_error") },
+            ::soroban_sdk::Vec::from_array(&self.env, [fail.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
     pub fn with_vec(&self, _v: &Vec<UsedVecElement>) -> () {
         use core::ops::Not;
         let old_auth_manager = self
@@ -18368,6 +27357,78 @@ impl<'a> ContractClient<'a> {
                 const SYMBOL: soroban_sdk::Symbol = soroban_sdk::Symbol::short("with_vec");
                 SYMBOL
             },
+            ::soroban_sdk::Vec::from_array(&self.env, [_v.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_vec_nested(&self, _v: &Vec<UsedVecElementNested>) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_vec_nested") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_v.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_vec_nested(
+        &self,
+        _v: &Vec<UsedVecElementNested>,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_vec_nested") },
             ::soroban_sdk::Vec::from_array(&self.env, [_v.into_val(&self.env)]),
         );
         if let Some(old_auth_manager) = old_auth_manager {
@@ -18595,6 +27656,294 @@ impl<'a> ContractClient<'a> {
             &self.address,
             &{ soroban_sdk::Symbol::new(&self.env, "with_result") },
             ::soroban_sdk::Vec::new(&self.env),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_recursion(&self, _r: &UsedRecursiveRoot) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_recursion") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_r.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_recursion(
+        &self,
+        _r: &UsedRecursiveRoot,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_recursion") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_r.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_auth_contexts(&self, _c: &Vec<soroban_sdk::auth::Context>) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_auth_contexts") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_c.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_auth_contexts(
+        &self,
+        _c: &Vec<soroban_sdk::auth::Context>,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_auth_contexts") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_c.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_invoker_auth(&self, _i: &soroban_sdk::auth::InvokerContractAuthEntry) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_invoker_auth") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_i.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_invoker_auth(
+        &self,
+        _i: &soroban_sdk::auth::InvokerContractAuthEntry,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_invoker_auth") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_i.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn with_executable(&self, _e: &soroban_sdk::Executable) -> () {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_executable") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_e.into_val(&self.env)]),
+        );
+        if let Some(old_auth_manager) = old_auth_manager {
+            self.env.host().set_auth_manager(old_auth_manager).unwrap();
+        }
+        res
+    }
+    pub fn try_with_executable(
+        &self,
+        _e: &soroban_sdk::Executable,
+    ) -> Result<
+        Result<(), <() as soroban_sdk::TryFromVal<soroban_sdk::Env, soroban_sdk::Val>>::Error>,
+        Result<soroban_sdk::Error, soroban_sdk::InvokeError>,
+    > {
+        use core::ops::Not;
+        let old_auth_manager = self
+            .env
+            .in_contract()
+            .not()
+            .then(|| self.env.host().snapshot_auth_manager().unwrap());
+        {
+            if let Some(set_auths) = self.set_auths {
+                self.env.set_auths(set_auths);
+            }
+            if let Some(mock_auths) = self.mock_auths {
+                self.env.mock_auths(mock_auths);
+            }
+            if self.mock_all_auths {
+                if self.allow_non_root_auth {
+                    self.env.mock_all_auths_allowing_non_root_auth();
+                } else {
+                    self.env.mock_all_auths();
+                }
+            }
+        }
+        use soroban_sdk::{FromVal, IntoVal};
+        let res = self.env.try_invoke_contract(
+            &self.address,
+            &{ soroban_sdk::Symbol::new(&self.env, "with_executable") },
+            ::soroban_sdk::Vec::from_array(&self.env, [_e.into_val(&self.env)]),
         );
         if let Some(old_auth_manager) = old_auth_manager {
             self.env.host().set_auth_manager(old_auth_manager).unwrap();
@@ -19485,7 +28834,29 @@ impl ContractArgs {
     }
     #[inline(always)]
     #[allow(clippy::unused_unit)]
+    pub fn with_panic_error<'i>(fail: &'i bool) -> (&'i bool,) {
+        (fail,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_assert_error<'i>(ok: &'i bool) -> (&'i bool,) {
+        (ok,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_panic_raw_error<'i>(fail: &'i bool) -> (&'i bool,) {
+        (fail,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
     pub fn with_vec<'i>(_v: &'i Vec<UsedVecElement>) -> (&'i Vec<UsedVecElement>,) {
+        (_v,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_vec_nested<'i>(
+        _v: &'i Vec<UsedVecElementNested>,
+    ) -> (&'i Vec<UsedVecElementNested>,) {
         (_v,)
     }
     #[inline(always)]
@@ -19502,6 +28873,30 @@ impl ContractArgs {
     #[allow(clippy::unused_unit)]
     pub fn with_result<'i>() -> () {
         ()
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_recursion<'i>(_r: &'i UsedRecursiveRoot) -> (&'i UsedRecursiveRoot,) {
+        (_r,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_auth_contexts<'i>(
+        _c: &'i Vec<soroban_sdk::auth::Context>,
+    ) -> (&'i Vec<soroban_sdk::auth::Context>,) {
+        (_c,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_invoker_auth<'i>(
+        _i: &'i soroban_sdk::auth::InvokerContractAuthEntry,
+    ) -> (&'i soroban_sdk::auth::InvokerContractAuthEntry,) {
+        (_i,)
+    }
+    #[inline(always)]
+    #[allow(clippy::unused_unit)]
+    pub fn with_executable<'i>(_e: &'i soroban_sdk::Executable) -> (&'i soroban_sdk::Executable,) {
+        (_e,)
     }
     #[inline(always)]
     #[allow(clippy::unused_unit)]
@@ -19695,6 +29090,153 @@ pub extern "C" fn __Contract__with_error__invoke_raw_extern() -> soroban_sdk::Va
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_panic_error` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_panic_error__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_panic_error(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_panic_error` instead")]
+pub fn __Contract__with_panic_error__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_panic_error__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_panic_error` instead")]
+pub extern "C" fn __Contract__with_panic_error__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_panic_error__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_assert_error` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_assert_error__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_assert_error(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_assert_error` instead")]
+pub fn __Contract__with_assert_error__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_assert_error__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_assert_error` instead")]
+pub extern "C" fn __Contract__with_assert_error__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_assert_error__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_panic_raw_error` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_panic_raw_error__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_panic_raw_error(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_panic_raw_error` instead")]
+pub fn __Contract__with_panic_raw_error__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_panic_raw_error__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_panic_raw_error` instead")]
+pub extern "C" fn __Contract__with_panic_raw_error__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_panic_raw_error__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
 #[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_vec` instead")]
 #[allow(deprecated)]
 pub fn __Contract__with_vec__invoke_raw(
@@ -19741,6 +29283,55 @@ pub extern "C" fn __Contract__with_vec__invoke_raw_extern(
 ) -> soroban_sdk::Val {
     #[allow(deprecated)]
     __Contract__with_vec__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_vec_nested` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_vec_nested__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_vec_nested(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_vec_nested` instead")]
+pub fn __Contract__with_vec_nested__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_vec_nested__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_vec_nested` instead")]
+pub extern "C" fn __Contract__with_vec_nested__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_vec_nested__invoke_raw(soroban_sdk::Env::default(), arg_0)
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
@@ -19875,6 +29466,202 @@ pub fn __Contract__with_result__invoke_raw_slice(
 pub extern "C" fn __Contract__with_result__invoke_raw_extern() -> soroban_sdk::Val {
     #[allow(deprecated)]
     __Contract__with_result__invoke_raw(soroban_sdk::Env::default())
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_recursion` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_recursion__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_recursion(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_recursion` instead")]
+pub fn __Contract__with_recursion__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_recursion__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_recursion` instead")]
+pub extern "C" fn __Contract__with_recursion__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_recursion__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_auth_contexts` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_auth_contexts__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_auth_contexts(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_auth_contexts` instead")]
+pub fn __Contract__with_auth_contexts__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_auth_contexts__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_auth_contexts` instead")]
+pub extern "C" fn __Contract__with_auth_contexts__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_auth_contexts__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_invoker_auth` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_invoker_auth__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_invoker_auth(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_invoker_auth` instead")]
+pub fn __Contract__with_invoker_auth__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_invoker_auth__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_invoker_auth` instead")]
+pub extern "C" fn __Contract__with_invoker_auth__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_invoker_auth__invoke_raw(soroban_sdk::Env::default(), arg_0)
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_executable` instead")]
+#[allow(deprecated)]
+pub fn __Contract__with_executable__invoke_raw(
+    env: soroban_sdk::Env,
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    soroban_sdk::IntoValForContractFn::into_val_for_contract_fn(
+        <Contract>::with_executable(
+            env.clone(),
+            <_ as soroban_sdk::unwrap::UnwrapOptimized>::unwrap_optimized(
+                <_ as soroban_sdk::TryFromValForContractFn<
+                    soroban_sdk::Env,
+                    soroban_sdk::Val,
+                >>::try_from_val_for_contract_fn(&env, &arg_0),
+            ),
+        ),
+        &env,
+    )
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_executable` instead")]
+pub fn __Contract__with_executable__invoke_raw_slice(
+    env: soroban_sdk::Env,
+    args: &[soroban_sdk::Val],
+) -> soroban_sdk::Val {
+    if args.len() != 1usize {
+        {
+            ::core::panicking::panic_fmt(format_args!(
+                "invalid number of input arguments: {0} expected, got {1}",
+                1usize,
+                args.len(),
+            ));
+        };
+    }
+    #[allow(deprecated)]
+    __Contract__with_executable__invoke_raw(env, args[0usize])
+}
+#[doc(hidden)]
+#[allow(non_snake_case)]
+#[deprecated(note = "use `ContractClient::new(&env, &contract_id).with_executable` instead")]
+pub extern "C" fn __Contract__with_executable__invoke_raw_extern(
+    arg_0: soroban_sdk::Val,
+) -> soroban_sdk::Val {
+    #[allow(deprecated)]
+    __Contract__with_executable__invoke_raw(soroban_sdk::Env::default(), arg_0)
 }
 #[doc(hidden)]
 #[allow(non_snake_case)]
@@ -20363,7 +30150,7 @@ pub extern "C" fn __Contract__publish_ref_event__invoke_raw_extern() -> soroban_
 #[doc(hidden)]
 #[allow(non_snake_case)]
 #[allow(unused)]
-fn __Contract____3ae329a87e054013c7d0218e0df6ab859badfc3d82df8b9c09a332196dc90194_ctor() {
+fn __Contract____ab801092146d2dc3559e05eefeb8ef94e3d8f8fb931034eff5a7cb779efe417a_ctor() {
     #[allow(unsafe_code)]
     {
         #[link_section = ".init_array"]
@@ -20375,7 +30162,7 @@ fn __Contract____3ae329a87e054013c7d0218e0df6ab859badfc3d82df8b9c09a332196dc9019
             #[allow(non_snake_case)]
             extern "C" fn f() -> ::ctor::__support::CtorRetType {
                 unsafe {
-                    __Contract____3ae329a87e054013c7d0218e0df6ab859badfc3d82df8b9c09a332196dc90194_ctor();
+                    __Contract____ab801092146d2dc3559e05eefeb8ef94e3d8f8fb931034eff5a7cb779efe417a_ctor();
                 };
                 core::default::Default::default()
             }
@@ -20399,9 +30186,29 @@ fn __Contract____3ae329a87e054013c7d0218e0df6ab859badfc3d82df8b9c09a332196dc9019
             &__Contract__with_error__invoke_raw_slice,
         );
         <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_panic_error",
+            #[allow(deprecated)]
+            &__Contract__with_panic_error__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_assert_error",
+            #[allow(deprecated)]
+            &__Contract__with_assert_error__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_panic_raw_error",
+            #[allow(deprecated)]
+            &__Contract__with_panic_raw_error__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
             "with_vec",
             #[allow(deprecated)]
             &__Contract__with_vec__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_vec_nested",
+            #[allow(deprecated)]
+            &__Contract__with_vec_nested__invoke_raw_slice,
         );
         <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
             "with_map",
@@ -20417,6 +30224,26 @@ fn __Contract____3ae329a87e054013c7d0218e0df6ab859badfc3d82df8b9c09a332196dc9019
             "with_result",
             #[allow(deprecated)]
             &__Contract__with_result__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_recursion",
+            #[allow(deprecated)]
+            &__Contract__with_recursion__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_auth_contexts",
+            #[allow(deprecated)]
+            &__Contract__with_auth_contexts__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_invoker_auth",
+            #[allow(deprecated)]
+            &__Contract__with_invoker_auth__invoke_raw_slice,
+        );
+        <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
+            "with_executable",
+            #[allow(deprecated)]
+            &__Contract__with_executable__invoke_raw_slice,
         );
         <Contract as soroban_sdk::testutils::ContractFunctionRegister>::register(
             "publish_simple",
@@ -20489,8 +30316,7 @@ mod test {
     use soroban_sdk::xdr::ScSpecEntry;
     use std::collections::HashSet;
     use std::vec::Vec;
-    const WASM: &[u8] = b"\x00asm\x01\x00\x00\x00\x01@\n`\x02~~\x01~`\x01~\x01~`\x03~~~\x01~`\x04~~~~\x01~`\x00\x01~`\x02\x7f\x7f\x01~`\x04\x7f\x7f\x7f\x7f\x01~`\x05~\x7f\x7f\x7f\x7f\x00`\x03\x7f\x7f\x7f\x00`\x01\x7f\x01~\x02+\x07\x01x\x011\x00\x00\x01i\x012\x00\x01\x01v\x01h\x00\x02\x01v\x01g\x00\x00\x01b\x01j\x00\x00\x01m\x019\x00\x02\x01m\x01a\x00\x03\x03\x1b\x1a\x04\x05\x00\x06\x04\x04\x04\x04\x04\x04\x04\x01\x07\x01\x01\x04\x01\x00\x04\x04\x08\t\x01\x04\x01\x01\x05\x03\x01\x00\x11\x06!\x04\x7f\x01A\x80\x80\xc0\x00\x0b\x7f\x00A\xbe\x85\xc0\x00\x0b\x7f\x00A\xe0\x85\xc0\x00\x0b\x7f\x00A\xe0\x85\xc0\x00\x0b\x07\xea\x02\x17\x06memory\x02\x00\x11publish_data_type\x00\x07\x13publish_nested_data\x00\x0b\x14publish_nested_topic\x00\x0c\x11publish_ref_event\x00\x0e\x0epublish_simple\x00\x0f\x12publish_topic_type\x00\x10\nwith_error\x00\x11\x0fwith_lib_struct\x00\x12\x08with_map\x00\x14\x0cwith_non_pub\x00\x15\x12with_non_pub_error\x00\x16\x0bwith_option\x00\x17\nwith_param\x00\x18\x0bwith_result\x00\x19\x0bwith_return\x00\x1a\nwith_tuple\x00\x1d\x11with_tuple_return\x00\x1e\x08with_vec\x00\x1f\x12with_wasm_imported\x00 \x01_\x03\x01\n__data_end\x03\x02\x0b__heap_base\x03\x03\n\xa6\x17\x1a\xae\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A k\"\x00$\x80\x80\x80\x80\x00A\x8c\x84\xc0\x80\x00A\x06\x10\x88\x80\x80\x80\x00!\x01A\x00-\x00\xa8\x81\xc0\x80\x00\x1aA\x00-\x00\xa6\x82\xc0\x80\x00\x1aA\xd4\x84\xc0\x80\x00A\x19\x10\x88\x80\x80\x80\x00 \x01\x10\x89\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80 7\x03\x18 \x00B\x84\x80\x80\x80\x107\x03\x10 \x00A\xe4\x83\xc0\x80\x00A\x02 \x00A\x10jA\x02\x10\x8a\x80\x80\x80\x007\x03\x08 \x01A\xb8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A j$\x80\x80\x80\x80\x00B\x02\x0bE\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x02$\x80\x80\x80\x80\x00 \x02 \x00 \x01\x10\x9b\x80\x80\x80\x00\x02@ \x02(\x02\x00A\x01G\r\x00\x00\x0b \x02)\x03\x08!\x03 \x02A\x10j$\x80\x80\x80\x80\x00 \x03\x0b\x92\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00 \x02 \x017\x03\x08 \x02 \x007\x03\x00A\x00!\x03\x03~\x02@ \x03A\x10G\r\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x02A\x10j \x03j \x02 \x03j)\x03\x007\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x02A\x10j\x10\x9c\x80\x80\x80\x00!\x01 \x02A j$\x80\x80\x80\x80\x00 \x01\x0f\x0b \x02A\x10j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b.\x00\x02@ \x01 \x03F\r\x00\x00\x0b \x00\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x85\x80\x80\x80\x00\x0b\xc5\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\xa5\x83\xc0\x80\x00A\x06\x10\x88\x80\x80\x80\x00!\x01A\x00-\x00\xd2\x81\xc0\x80\x00\x1aA\x00-\x00\xe0\x81\xc0\x80\x00\x1aA\x00-\x00\xde\x82\xc0\x80\x00\x1aA\x87\x85\xc0\x80\x00A\x1b\x10\x88\x80\x80\x80\x00 \x01\x10\x89\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xa0\x057\x03\x08 \x00A\xc0\x83\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x007\x03\x00 \x00A\xfc\x83\xc0\x80\x00A\x01 \x00A\x01\x10\x8a\x80\x80\x80\x007\x03\x08 \x01A\xb8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\xbd\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x8a\x82\xc0\x80\x00\x1aA\x00-\x00\x98\x82\xc0\x80\x00\x1aA\x00-\x00\xec\x82\xc0\x80\x00\x1aA\xa2\x85\xc0\x80\x00A\x1c\x10\x88\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xa0\x057\x03\x08 \x00A\xc0\x83\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x007\x03\x00 \x01A\xfc\x83\xc0\x80\x00A\x01 \x00A\x01\x10\x8a\x80\x80\x80\x00\x10\x89\x80\x80\x80\x00!\x01 \x00\x10\x8d\x80\x80\x80\x007\x03\x08 \x01A\x98\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x06\x00B\x8b\xc8\x01\x0b\xc3\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x8c\x81\xc0\x80\x00\x1aA\x00-\x00\xfe\x80\xc0\x80\x00\x1aA\x00-\x00\xd4\x80\xc0\x80\x00\x1aA\x00-\x00\xb6\x81\xc0\x80\x00\x1aA\xc0\x84\xc0\x80\x00A\x14\x10\x88\x80\x80\x80\x00B\x84\x80\x80\x80\x10\x10\x89\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xb0\x0c7\x03\x08 \x00A\xc0\x83\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x007\x03\x00 \x00A\xd8\x83\xc0\x80\x00A\x01 \x00A\x01\x10\x8a\x80\x80\x80\x007\x03\x08 \x01A\xb8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x7f\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x84\x84\xc0\x80\x00A\x08\x10\x88\x80\x80\x80\x00!\x01A\x00-\x00\xaa\x80\xc0\x80\x00\x1aA\xa0\x84\xc0\x80\x00A\x11\x10\x88\x80\x80\x80\x00 \x01\x10\x89\x80\x80\x80\x00!\x01 \x00\x10\x8d\x80\x80\x80\x007\x03\x08 \x01A\x98\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b}\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\xee\x81\xc0\x80\x00\x1aA\x00-\x00\xb4\x82\xc0\x80\x00\x1aA\xed\x84\xc0\x80\x00A\x1a\x10\x88\x80\x80\x80\x00B\x84\x80\x80\x80\x10\x10\x89\x80\x80\x80\x00!\x01 \x00\x10\x8d\x80\x80\x80\x007\x03\x08 \x01A\x98\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x13\x00A\x00-\x00\x80\x80\xc0\x80\x00\x1aB\x84\x80\x80\x80\xa0\x05\x0b\x8d\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02A\x00-\x00\xbe\x85\xc0\x80\x00\x1a\x02@\x03@ \x02A\x10F\r\x01 \x01 \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xd0\x85\xc0\x80\x00A\x02 \x01A\x02\x10\x93\x80\x80\x80\x00 \x011\x00\x00B\xcb\x00R\r\x00 \x011\x00\x08B\xcd\x00Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b1\x00\x02@ \x02 \x04F\r\x00\x00\x0b \x00 \x01\xadB \x86B\x04\x84 \x03\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x86\x80\x80\x80\x00\x1a\x0b(\x00A\x00-\x00\xfa\x82\xc0\x80\x00\x1aA\x00-\x00\x88\x83\xc0\x80\x00\x1a\x02@ \x00B\xff\x01\x83B\xcc\x00Q\r\x00\x00\x0bB\x02\x0bg\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00-\x00\xe2\x80\xc0\x80\x00\x1a \x01B\x027\x03\x08\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xc0\x83\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\x93\x80\x80\x80\x00 \x011\x00\x08B\x04Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x12\x00A\x00-\x00\xb8\x80\xc0\x80\x00\x1aB\x84\x80\x80\x80\x10\x0br\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00-\x00\xc4\x81\xc0\x80\x00\x1a\x02@ \x00B\x02Q\r\x00 \x01B\x027\x03\x08\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xcc\x83\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\x93\x80\x80\x80\x00 \x01)\x03\x08B\xff\x01\x83B\x04Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x8a\x02\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00A\x00!\x03A\x00-\x00\xfc\x81\xc0\x80\x00\x1aA\x00-\x00\xc6\x80\xc0\x80\x00\x1a\x02@\x03@ \x03A\x10F\r\x01 \x02A\x08j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xac\x83\xc0\x80\x00A\x02 \x02A\x08jA\x02\x10\x93\x80\x80\x80\x00 \x021\x00\x08B\x04R\r\x00 \x02B\x027\x03\x18 \x02)\x03\x10\"\x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xc0\x83\xc0\x80\x00A\x01 \x02A\x18jA\x01\x10\x93\x80\x80\x80\x00\x02@ \x02)\x03\x18\"\x00\xa7A\xff\x01q\"\x03A\x07F\r\x00 \x03A\xc1\x00G\r\x01 \x00\x10\x81\x80\x80\x80\x00\x1a\x0bA\x00-\x00\xf0\x80\xc0\x80\x00\x1a \x01B\xff\x01\x83B\x04R\r\x00 \x01B \x88\xa7A}jA}K\r\x01\x0b\x00\x0b \x02A j$\x80\x80\x80\x80\x00B\x02\x0bZ\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x96\x83\xc0\x80\x00\x1aA\x00-\x00\x80\x80\xc0\x80\x00\x1a \x00B\x84\x80\x80\x80\x107\x03\x08A\xcc\x83\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0bo\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x8e\x80\xc0\x80\x00\x1a \x00A\xd4\x83\xc0\x80\x00A\x01\x10\x9b\x80\x80\x80\x00\x02@ \x00(\x02\x00A\x01G\r\x00\x00\x0b \x00)\x03\x08!\x01 \x00B\x84\x80\x80\x80\x107\x03\x08 \x00 \x017\x03\x00 \x00\x10\x9c\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0b\xdb\x01\x02\x01~\x04\x7f\x02@\x02@ \x02A\tK\r\x00B\x00!\x03 \x02!\x04 \x01!\x05\x03@\x02@ \x04\r\x00 \x03B\x08\x86B\x0e\x84!\x03\x0c\x03\x0bA\x01!\x06\x02@ \x05-\x00\x00\"\x07A\xdf\x00F\r\x00\x02@\x02@ \x07APjA\xff\x01qA\nI\r\x00 \x07A\xbf\x7fjA\xff\x01qA\x1aI\r\x01 \x07A\x9f\x7fjA\xff\x01qA\x1aO\r\x04 \x07AEj!\x06\x0c\x02\x0b \x07ARj!\x06\x0c\x01\x0b \x07AKj!\x06\x0b \x03B\x06\x86 \x06\xadB\xff\x01\x83\x84!\x03 \x04A\x7fj!\x04 \x05A\x01j!\x05\x0c\x00\x0b\x0b \x01\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x84\x80\x80\x80\x00!\x03\x0b \x00B\x007\x03\x00 \x00 \x037\x03\x08\x0b\x17\x00 \x00\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x83\x80\x80\x80\x00\x0b\xc4\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02A\x00-\x00\x9a\x81\xc0\x80\x00\x1a\x02@\x02@ \x00B\xff\x01\x83B\xcb\x00R\r\x00\x02@\x03@ \x02A\x10F\r\x01 \x01A\x08j \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b \x00 \x01A\x08j\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x82\x80\x80\x80\x00\x1a \x01B\x027\x03\x18 \x01)\x03\x08\"\x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xc0\x83\xc0\x80\x00A\x01 \x01A\x18jA\x01\x10\x93\x80\x80\x80\x00 \x011\x00\x18B\x04R\r\x00 \x011\x00\x10B\x04Q\r\x01\x0b\x00\x0b \x01A j$\x80\x80\x80\x80\x00B\x02\x0bo\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\xc2\x82\xc0\x80\x00\x1a \x00B\x84\x80\x80\x80\x107\x03\x18A\xc0\x83\xc0\x80\x00A\x01 \x00A\x18jA\x01\x10\x8a\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80 7\x03\x10 \x00 \x017\x03\x08 \x00A\x08j\x10\x9c\x80\x80\x80\x00!\x01 \x00A j$\x80\x80\x80\x80\x00 \x01\x0b\x1e\x00A\x00-\x00\x9c\x80\xc0\x80\x00\x1a\x02@ \x00B\xff\x01\x83B\xcb\x00Q\r\x00\x00\x0bB\x02\x0b\x8d\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02A\x00-\x00\xd0\x82\xc0\x80\x00\x1a\x02@\x03@ \x02A\x10F\r\x01 \x01 \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xd0\x85\xc0\x80\x00A\x02 \x01A\x02\x10\x93\x80\x80\x80\x00 \x011\x00\x00B\x04R\r\x00 \x01)\x03\x08B\xfe\x01\x83P\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x0b\xea\x05\x01\x00A\x80\x80\xc0\x00\x0b\xe0\x05SpEcV1Hh\xdc\xaaa\x8d\xf7\rSpEcV1\xe7\xcf\x9b1n\x15\x13\xfeSpEcV1\xe2\x01y\xc9\x9a\xf8\xedtSpEcV1v1\x0eP\xa9C\xc7*SpEcV1\xa9<\xd8+\xb7\xa7\r\x17SpEcV1X\x03\xf6t\xc7\xd0\x01\"SpEcV1\'\xbd_A\r\x9a\x89\x02SpEcV1p\x8c\x0fN!\x082\xd8SpEcV1\xc2\xf4N\xbf\xebqvpSpEcV1K\xdf\'8m/\xe8\x1dSpEcV1@\xb9LO\xf9\xd1\xe8\xe2SpEcV1\xde\x1dMa\x01\xec\xb0ASpEcV1\xc2 \x1b\xdc\xc8gxZSpEcV1[Q+\xe9\xde\xd5\xf2>SpEcV1\xb3/\x97\xd5\x06\xbd3BSpEcV1\x0c\xf0\xf6w\xfd\x1a\x1b\x94SpEcV1\'\xf2\xa2\xb9\xd0)\xc0uSpEcV1\xf5\xd4\x9b\xa3\xccI\x13\xf7SpEcV1\x84\x08Y\xae\xa0\xf128SpEcV16\x83?\xf0\xcdW\xb1/SpEcV1\x94\xc7w/_\xebXcSpEcV1q\xa3z;6\xa6R\x01SpEcV1q^\xe2&\x9di\x9d\x0eSpEcV1Y\xa66\xb3\xecxE\x13SpEcV1\xb6\x1c\xfd\xdfhY-dSpEcV1 \xfbl\x04B\x82\xc0\xb4SpEcV1\xe3\xf2\x9b5%a\xfb\xd6SpEcV1[\xf4R\xdf\xdd\xb4\xb0\xbcSpEcV1\xaaX8\xde\xef\xbb6%SpEcV1k\xe4zxB\xd1+\x02anested\x00\xa4\x01\x10\x00\x01\x00\x00\x00\xa5\x01\x10\x00\x06\x00\x00\x00val\x00\xbc\x01\x10\x00\x03\x00\x00\x00data\xc8\x01\x10\x00\x04\x00\x00\x00A\x00\x00\x00\xa5\x01\x10\x00\x06\x00\x00\x00xy\x00\x00\xe0\x01\x10\x00\x01\x00\x00\x00\xe1\x01\x10\x00\x01\x00\x00\x00inner\x00\x00\x00\xf4\x01\x10\x00\x05\x00\x00\x00transfercoordsamount\x12\x02\x10\x00\x06\x00\x00\x00used_event_simplepayload1\x02\x10\x00\x07\x00\x00\x00used_event_with_refsused_event_with_data_typeused_event_with_topic_typeused_event_with_nested_dataused_event_with_nested_topicSpEcV1\xa3\x16\n\x8f\xc9\x92\xd2\x11f1f2\xcc\x02\x10\x00\x02\x00\x00\x00\xce\x02\x10\x00\x02\x00\x00\x00\x00\xaf6\x0econtractspecv0\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08with_map\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01m\x00\x00\x00\x00\x00\x03\xec\x00\x00\x07\xd0\x00\x00\x00\nUsedMapKey\x00\x00\x00\x00\x07\xd0\x00\x00\x00\nUsedMapVal\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08with_vec\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x0eUsedVecElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUnusedEnum\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01A\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUsedMapKey\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02K1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02K2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUsedMapVal\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_error\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_param\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x0fUsedParamStruct\x00\x00\x00\x00\x00\x00\x00\x00\x02ie\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedParamIntEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_tuple\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01t\x00\x00\x00\x00\x00\x03\xed\x00\x00\x00\x02\x00\x00\x07\xd0\x00\x00\x00\x10UsedTupleElement\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bUnusedEvent\x00\x00\x00\x00\x01\x00\x00\x00\x0cunused_event\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cUnusedStruct\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cUsedResultOk\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_option\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01o\x00\x00\x00\x00\x00\x03\xe8\x00\x00\x07\xd0\x00\x00\x00\x11UsedOptionElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_result\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x07\xd0\x00\x00\x00\x0cUsedResultOk\x00\x00\x07\xd0\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_return\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0eUsedReturnEnum\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rUnusedIntEnum\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02U1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02U2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x08NotFound\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07Invalid\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cwith_non_pub\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedNonPubStruct\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUsedReturnEnum\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01A\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUsedVecElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedNonPubError\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Fail\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedParamStruct\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01a\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x06nested\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedNestedInStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedRefDataType\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06nested\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedRefDataInner\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0epublish_simple\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedEventSimple\x00\x00\x00\x00\x01\x00\x00\x00\x11used_event_simple\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedNonPubStruct\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedParamIntEnum\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01X\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01Y\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedRefDataInner\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedRefTopicType\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04Send\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Recv\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedTupleElement\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fwith_lib_struct\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x07StructC\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UnusedNonPubError\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03Bad\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedEventDataType\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x01y\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedOptionElement\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedEventWithRefs\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x14used_event_with_refs\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x07\xd0\x00\x00\x00\x10UsedRefTopicType\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x0fUsedRefDataType\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UnusedNonPubStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventDataInner\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventDataOuter\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventDataInner\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventTopicType\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x08Transfer\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Mint\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedNestedInStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11publish_data_type\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11publish_ref_event\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11with_tuple_return\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xed\x00\x00\x00\x02\x00\x00\x07\xd0\x00\x00\x00\x16UsedTupleReturnElement\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedEventTopicInner\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedEventTopicOuter\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x13UsedEventTopicInner\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12publish_topic_type\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_non_pub_error\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\x0fUsedNonPubError\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_wasm_imported\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13publish_nested_data\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14publish_nested_topic\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15UsedEventWithDataType\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x19used_event_with_data_type\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x11UsedEventDataType\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedTupleReturnElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedEventWithTopicType\x00\x00\x00\x00\x00\x01\x00\x00\x00\x1aused_event_with_topic_type\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventTopicType\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x17UsedEventWithNestedData\x00\x00\x00\x00\x01\x00\x00\x00\x1bused_event_with_nested_data\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventDataOuter\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18UnusedNonContractFnParam\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18UsedEventWithNestedTopic\x00\x00\x00\x01\x00\x00\x00\x1cused_event_with_nested_topic\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04info\x00\x00\x07\xd0\x00\x00\x00\x13UsedEventTopicOuter\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x19UnusedNonContractFnReturn\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x1e\x11contractenvmetav0\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x00\x00O\x0econtractmetav0\x00\x00\x00\x00\x00\x00\x00\x05rsver\x00\x00\x00\x00\x00\x00\x061.91.0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12rssdk_spec_shaking\x00\x00\x00\x00\x00\x012\x00\x00\x00";
-    const WASM_NO_ENV: &[u8] = b"\x00asm\x01\x00\x00\x00\x01@\n`\x02~~\x01~`\x01~\x01~`\x03~~~\x01~`\x04~~~~\x01~`\x00\x01~`\x02\x7f\x7f\x01~`\x04\x7f\x7f\x7f\x7f\x01~`\x05~\x7f\x7f\x7f\x7f\x00`\x03\x7f\x7f\x7f\x00`\x01\x7f\x01~\x02+\x07\x01x\x011\x00\x00\x01i\x012\x00\x01\x01v\x01h\x00\x02\x01v\x01g\x00\x00\x01b\x01j\x00\x00\x01m\x019\x00\x02\x01m\x01a\x00\x03\x03\x1b\x1a\x04\x05\x00\x06\x04\x04\x04\x04\x04\x04\x04\x01\x07\x01\x01\x04\x01\x00\x04\x04\x08\t\x01\x04\x01\x01\x05\x03\x01\x00\x11\x06!\x04\x7f\x01A\x80\x80\xc0\x00\x0b\x7f\x00A\x9a\x82\xc0\x00\x0b\x7f\x00A\xb0\x82\xc0\x00\x0b\x7f\x00A\xb0\x82\xc0\x00\x0b\x07\xea\x02\x17\x06memory\x02\x00\x11publish_data_type\x00\x07\x13publish_nested_data\x00\x0b\x14publish_nested_topic\x00\x0c\x11publish_ref_event\x00\x0e\x0epublish_simple\x00\x0f\x12publish_topic_type\x00\x10\nwith_error\x00\x11\x0fwith_lib_struct\x00\x12\x08with_map\x00\x14\x0cwith_non_pub\x00\x15\x12with_non_pub_error\x00\x16\x0bwith_option\x00\x17\nwith_param\x00\x18\x0bwith_result\x00\x19\x0bwith_return\x00\x1a\nwith_tuple\x00\x1d\x11with_tuple_return\x00\x1e\x08with_vec\x00\x1f\x12with_wasm_imported\x00 \x01_\x03\x01\n__data_end\x03\x02\x0b__heap_base\x03\x03\n\xe6\x14\x1a\x9a\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A k\"\x00$\x80\x80\x80\x80\x00A\xe8\x80\xc0\x80\x00A\x06\x10\x88\x80\x80\x80\x00!\x01A\xb0\x81\xc0\x80\x00A\x19\x10\x88\x80\x80\x80\x00 \x01\x10\x89\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80 7\x03\x18 \x00B\x84\x80\x80\x80\x107\x03\x10 \x00A\xc0\x80\xc0\x80\x00A\x02 \x00A\x10jA\x02\x10\x8a\x80\x80\x80\x007\x03\x08 \x01A\x94\x81\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A j$\x80\x80\x80\x80\x00B\x02\x0bE\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x02$\x80\x80\x80\x80\x00 \x02 \x00 \x01\x10\x9b\x80\x80\x80\x00\x02@ \x02(\x02\x00A\x01G\r\x00\x00\x0b \x02)\x03\x08!\x03 \x02A\x10j$\x80\x80\x80\x80\x00 \x03\x0b\x92\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00 \x02 \x017\x03\x08 \x02 \x007\x03\x00A\x00!\x03\x03~\x02@ \x03A\x10G\r\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x02A\x10j \x03j \x02 \x03j)\x03\x007\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x02A\x10j\x10\x9c\x80\x80\x80\x00!\x01 \x02A j$\x80\x80\x80\x80\x00 \x01\x0f\x0b \x02A\x10j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b.\x00\x02@ \x01 \x03F\r\x00\x00\x0b \x00\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x85\x80\x80\x80\x00\x0b\xa7\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x81\x80\xc0\x80\x00A\x06\x10\x88\x80\x80\x80\x00!\x01A\xe3\x81\xc0\x80\x00A\x1b\x10\x88\x80\x80\x80\x00 \x01\x10\x89\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xa0\x057\x03\x08 \x00A\x9c\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x007\x03\x00 \x00A\xd8\x80\xc0\x80\x00A\x01 \x00A\x01\x10\x8a\x80\x80\x80\x007\x03\x08 \x01A\x94\x81\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x9f\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\xfe\x81\xc0\x80\x00A\x1c\x10\x88\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xa0\x057\x03\x08 \x00A\x9c\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x007\x03\x00 \x01A\xd8\x80\xc0\x80\x00A\x01 \x00A\x01\x10\x8a\x80\x80\x80\x00\x10\x89\x80\x80\x80\x00!\x01 \x00\x10\x8d\x80\x80\x80\x007\x03\x08 \x01A\xf4\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x06\x00B\x8b\xc8\x01\x0b\x9b\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x9c\x81\xc0\x80\x00A\x14\x10\x88\x80\x80\x80\x00B\x84\x80\x80\x80\x10\x10\x89\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xb0\x0c7\x03\x08 \x00A\x9c\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x007\x03\x00 \x00A\xb4\x80\xc0\x80\x00A\x01 \x00A\x01\x10\x8a\x80\x80\x80\x007\x03\x08 \x01A\x94\x81\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0bu\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\xe0\x80\xc0\x80\x00A\x08\x10\x88\x80\x80\x80\x00!\x01A\xfc\x80\xc0\x80\x00A\x11\x10\x88\x80\x80\x80\x00 \x01\x10\x89\x80\x80\x80\x00!\x01 \x00\x10\x8d\x80\x80\x80\x007\x03\x08 \x01A\xf4\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0bi\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\xc9\x81\xc0\x80\x00A\x1a\x10\x88\x80\x80\x80\x00B\x84\x80\x80\x80\x10\x10\x89\x80\x80\x80\x00!\x01 \x00\x10\x8d\x80\x80\x80\x007\x03\x08 \x01A\xf4\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\t\x00B\x84\x80\x80\x80\xa0\x05\x0b\x83\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02\x02@\x03@ \x02A\x10F\r\x01 \x01 \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa0\x82\xc0\x80\x00A\x02 \x01A\x02\x10\x93\x80\x80\x80\x00 \x011\x00\x00B\xcb\x00R\r\x00 \x011\x00\x08B\xcd\x00Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b1\x00\x02@ \x02 \x04F\r\x00\x00\x0b \x00 \x01\xadB \x86B\x04\x84 \x03\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x86\x80\x80\x80\x00\x1a\x0b\x14\x00\x02@ \x00B\xff\x01\x83B\xcc\x00Q\r\x00\x00\x0bB\x02\x0b]\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00 \x01B\x027\x03\x08\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\x9c\x80\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\x93\x80\x80\x80\x00 \x011\x00\x08B\x04Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x08\x00B\x84\x80\x80\x80\x10\x0bh\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00\x02@ \x00B\x02Q\r\x00 \x01B\x027\x03\x08\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa8\x80\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\x93\x80\x80\x80\x00 \x01)\x03\x08B\xff\x01\x83B\x04Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\xec\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x02A\x08j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\x88\x80\xc0\x80\x00A\x02 \x02A\x08jA\x02\x10\x93\x80\x80\x80\x00 \x021\x00\x08B\x04R\r\x00 \x02B\x027\x03\x18 \x02)\x03\x10\"\x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\x9c\x80\xc0\x80\x00A\x01 \x02A\x18jA\x01\x10\x93\x80\x80\x80\x00\x02@ \x02)\x03\x18\"\x00\xa7A\xff\x01q\"\x03A\x07F\r\x00 \x03A\xc1\x00G\r\x01 \x00\x10\x81\x80\x80\x80\x00\x1a\x0b \x01B\xff\x01\x83B\x04R\r\x00 \x01B \x88\xa7A}jA}K\r\x01\x0b\x00\x0b \x02A j$\x80\x80\x80\x80\x00B\x02\x0bF\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00 \x00B\x84\x80\x80\x80\x107\x03\x08A\xa8\x80\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x8a\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0be\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00 \x00A\xb0\x80\xc0\x80\x00A\x01\x10\x9b\x80\x80\x80\x00\x02@ \x00(\x02\x00A\x01G\r\x00\x00\x0b \x00)\x03\x08!\x01 \x00B\x84\x80\x80\x80\x107\x03\x08 \x00 \x017\x03\x00 \x00\x10\x9c\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0b\xdb\x01\x02\x01~\x04\x7f\x02@\x02@ \x02A\tK\r\x00B\x00!\x03 \x02!\x04 \x01!\x05\x03@\x02@ \x04\r\x00 \x03B\x08\x86B\x0e\x84!\x03\x0c\x03\x0bA\x01!\x06\x02@ \x05-\x00\x00\"\x07A\xdf\x00F\r\x00\x02@\x02@ \x07APjA\xff\x01qA\nI\r\x00 \x07A\xbf\x7fjA\xff\x01qA\x1aI\r\x01 \x07A\x9f\x7fjA\xff\x01qA\x1aO\r\x04 \x07AEj!\x06\x0c\x02\x0b \x07ARj!\x06\x0c\x01\x0b \x07AKj!\x06\x0b \x03B\x06\x86 \x06\xadB\xff\x01\x83\x84!\x03 \x04A\x7fj!\x04 \x05A\x01j!\x05\x0c\x00\x0b\x0b \x01\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x84\x80\x80\x80\x00!\x03\x0b \x00B\x007\x03\x00 \x00 \x037\x03\x08\x0b\x17\x00 \x00\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x83\x80\x80\x80\x00\x0b\xba\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x01$\x80\x80\x80\x80\x00\x02@\x02@ \x00B\xff\x01\x83B\xcb\x00R\r\x00A\x00!\x02\x02@\x03@ \x02A\x10F\r\x01 \x01A\x08j \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b \x00 \x01A\x08j\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x82\x80\x80\x80\x00\x1a \x01B\x027\x03\x18 \x01)\x03\x08\"\x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\x9c\x80\xc0\x80\x00A\x01 \x01A\x18jA\x01\x10\x93\x80\x80\x80\x00 \x011\x00\x18B\x04R\r\x00 \x011\x00\x10B\x04Q\r\x01\x0b\x00\x0b \x01A j$\x80\x80\x80\x80\x00B\x02\x0be\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A k\"\x00$\x80\x80\x80\x80\x00 \x00B\x84\x80\x80\x80\x107\x03\x18A\x9c\x80\xc0\x80\x00A\x01 \x00A\x18jA\x01\x10\x8a\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80 7\x03\x10 \x00 \x017\x03\x08 \x00A\x08j\x10\x9c\x80\x80\x80\x00!\x01 \x00A j$\x80\x80\x80\x80\x00 \x01\x0b\x14\x00\x02@ \x00B\xff\x01\x83B\xcb\x00Q\r\x00\x00\x0bB\x02\x0b\x83\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02\x02@\x03@ \x02A\x10F\r\x01 \x01 \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa0\x82\xc0\x80\x00A\x02 \x01A\x02\x10\x93\x80\x80\x80\x00 \x011\x00\x00B\x04R\r\x00 \x01)\x03\x08B\xfe\x01\x83P\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x0b\xba\x02\x01\x00A\x80\x80\xc0\x00\x0b\xb0\x02anested\x00\x00\x00\x10\x00\x01\x00\x00\x00\x01\x00\x10\x00\x06\x00\x00\x00val\x00\x18\x00\x10\x00\x03\x00\x00\x00data$\x00\x10\x00\x04\x00\x00\x00A\x00\x00\x00\x01\x00\x10\x00\x06\x00\x00\x00xy\x00\x00<\x00\x10\x00\x01\x00\x00\x00=\x00\x10\x00\x01\x00\x00\x00inner\x00\x00\x00P\x00\x10\x00\x05\x00\x00\x00transfercoordsamountn\x00\x10\x00\x06\x00\x00\x00used_event_simplepayload\x8d\x00\x10\x00\x07\x00\x00\x00used_event_with_refsused_event_with_data_typeused_event_with_topic_typeused_event_with_nested_dataused_event_with_nested_topicf1f2\x00\x00\x1a\x01\x10\x00\x02\x00\x00\x00\x1c\x01\x10\x00\x02\x00\x00\x00\x00\xc3)\x0econtractspecv0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08with_map\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01m\x00\x00\x00\x00\x00\x03\xec\x00\x00\x07\xd0\x00\x00\x00\nUsedMapKey\x00\x00\x00\x00\x07\xd0\x00\x00\x00\nUsedMapVal\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08with_vec\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x0eUsedVecElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUnusedEnum\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01A\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUsedMapKey\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02K1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02K2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUsedMapVal\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_error\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_param\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x0fUsedParamStruct\x00\x00\x00\x00\x00\x00\x00\x00\x02ie\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedParamIntEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_tuple\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01t\x00\x00\x00\x00\x00\x03\xed\x00\x00\x00\x02\x00\x00\x07\xd0\x00\x00\x00\x10UsedTupleElement\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bUnusedEvent\x00\x00\x00\x00\x01\x00\x00\x00\x0cunused_event\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cUnusedStruct\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cUsedResultOk\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_option\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01o\x00\x00\x00\x00\x00\x03\xe8\x00\x00\x07\xd0\x00\x00\x00\x11UsedOptionElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_result\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x07\xd0\x00\x00\x00\x0cUsedResultOk\x00\x00\x07\xd0\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_return\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0eUsedReturnEnum\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rUnusedIntEnum\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02U1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02U2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x08NotFound\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07Invalid\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cwith_non_pub\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedNonPubStruct\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUsedReturnEnum\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01A\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUsedVecElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedParamStruct\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01a\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x06nested\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedNestedInStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedRefDataType\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06nested\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedRefDataInner\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0epublish_simple\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedEventSimple\x00\x00\x00\x00\x01\x00\x00\x00\x11used_event_simple\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedParamIntEnum\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01X\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01Y\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedRefDataInner\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedRefTopicType\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04Send\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Recv\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedTupleElement\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fwith_lib_struct\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x07StructC\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedEventDataType\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x01y\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedOptionElement\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedEventWithRefs\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x14used_event_with_refs\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x07\xd0\x00\x00\x00\x10UsedRefTopicType\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x0fUsedRefDataType\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventDataInner\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventDataOuter\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventDataInner\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventTopicType\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x08Transfer\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Mint\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedNestedInStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11publish_data_type\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11publish_ref_event\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11with_tuple_return\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xed\x00\x00\x00\x02\x00\x00\x07\xd0\x00\x00\x00\x16UsedTupleReturnElement\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedEventTopicInner\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedEventTopicOuter\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x13UsedEventTopicInner\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12publish_topic_type\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_non_pub_error\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\x0fUsedNonPubError\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_wasm_imported\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13publish_nested_data\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14publish_nested_topic\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15UsedEventWithDataType\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x19used_event_with_data_type\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x11UsedEventDataType\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedTupleReturnElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedEventWithTopicType\x00\x00\x00\x00\x00\x01\x00\x00\x00\x1aused_event_with_topic_type\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventTopicType\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x17UsedEventWithNestedData\x00\x00\x00\x00\x01\x00\x00\x00\x1bused_event_with_nested_data\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventDataOuter\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18UnusedNonContractFnParam\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18UsedEventWithNestedTopic\x00\x00\x00\x01\x00\x00\x00\x1cused_event_with_nested_topic\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04info\x00\x00\x07\xd0\x00\x00\x00\x13UsedEventTopicOuter\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x19UnusedNonContractFnReturn\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x1e\x11contractenvmetav0\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00\x00\x00+\x0econtractmetav0\x00\x00\x00\x00\x00\x00\x00\x05rsver\x00\x00\x00\x00\x00\x00\x061.91.0\x00\x00";
+    const WASM: &[u8] = b"\x00asm\x01\x00\x00\x00\x01^\x10`\x02~~\x01~`\x01~\x01~`\x03~~~\x01~`\x04~~~~\x01~`\x00\x00`\x00\x01~`\x02\x7f\x7f\x01~`\x04\x7f\x7f\x7f\x7f\x01~`\x01~\x00`\x02\x7f\x7f\x00`\x03~\x7f\x7f\x01~`\x02\x7f\x7f\x01\x7f`\x02\x7f~\x00`\x05~\x7f\x7f\x7f\x7f\x00`\x03\x7f\x7f\x7f\x00`\x01\x7f\x01~\x02I\x0c\x01x\x011\x00\x00\x01v\x013\x00\x01\x01i\x012\x00\x01\x01v\x01h\x00\x02\x01v\x01g\x00\x00\x01m\x01a\x00\x03\x01b\x01m\x00\x02\x01b\x01j\x00\x00\x01v\x011\x00\x00\x01b\x018\x00\x01\x01x\x015\x00\x01\x01m\x019\x00\x02\x0365\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x04\x05\x06\x00\x07\x05\x05\x05\x05\x05\x05\x01\x08\x01\x05\x01\t\n\x0b\x0c\x01\r\x0c\x01\x01\x01\x05\x01\x01\x01\x00\x01\x05\x05\x0e\x0f\x01\x05\x01\x01\x01\x04\x04\x04\x05\x01p\x01\x0c\x0c\x05\x03\x01\x00\x11\x06!\x04\x7f\x01A\x80\x80\xc0\x00\x0b\x7f\x00A\xd2\x88\xc0\x00\x0b\x7f\x00A\xa0\x8a\xc0\x00\x0b\x7f\x00A\xa0\x8a\xc0\x00\x0b\x07\x86\x04\x1f\x06memory\x02\x00\x11publish_data_type\x00\x17\x13publish_nested_data\x00\x1b\x14publish_nested_topic\x00\x1c\x11publish_ref_event\x00\x1e\x0epublish_simple\x00\x1f\x12publish_topic_type\x00 \x11with_assert_error\x00!\x12with_auth_contexts\x00#\nwith_error\x00$\x0fwith_executable\x00%\x11with_invoker_auth\x00*\x0fwith_lib_struct\x00-\x08with_map\x00.\x0cwith_non_pub\x00/\x12with_non_pub_error\x000\x0bwith_option\x001\x10with_panic_error\x002\x14with_panic_raw_error\x003\nwith_param\x004\x0ewith_recursion\x005\x0bwith_result\x006\x0bwith_return\x007\nwith_tuple\x00:\x11with_tuple_return\x00;\x08with_vec\x00<\x0fwith_vec_nested\x00=\x12with_wasm_imported\x00>\x01_\x03\x01\n__data_end\x03\x02\x0b__heap_base\x03\x03\t\x11\x01\x00A\x01\x0b\x0b\x0f\x11\x13\x12\x0e\r\x14\x15\x16\x0c\x10\n\xac05\x0c\x00A\x00-\x00\x9c\x80\xc0\x80\x00\x1a\x0b\x16\x00A\x00-\x00\xfe\x80\xc0\x80\x00\x1aA\x00-\x00\xd4\x80\xc0\x80\x00\x1a\x0b\x0c\x00A\x00-\x00\x8c\x81\xc0\x80\x00\x1a\x0bJ\x01\x01\x7f#\x80\x80\x80\x80\x00!\x00A\x00-\x00\xea\x83\xc0\x80\x00\x1a \x00A\x10k\"\x00A\x81\x80\x80\x80\x006\x02\x0c \x00(\x02\x0c\x1aA\x00-\x00\xd2\x81\xc0\x80\x00\x1aA\x00-\x00\xe0\x81\xc0\x80\x00\x1aA\x00-\x00\xee\x81\xc0\x80\x00\x1a\x0b6\x01\x01\x7f#\x80\x80\x80\x80\x00!\x00A\x00-\x00\xec\x82\xc0\x80\x00\x1a \x00A\x10k\"\x00A\x82\x80\x80\x80\x006\x02\x0c \x00(\x02\x0c\x1aA\x00-\x00\xfa\x82\xc0\x80\x00\x1a\x0b\x0c\x00A\x00-\x00\xb2\x83\xc0\x80\x00\x1a\x0b\x86\x01\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x00A\x83\x80\x80\x80\x006\x02\x0c \x00(\x02\x0c\x1aA\x00-\x00\xc4\x88\xc0\x80\x00\x1a \x00A\x84\x80\x80\x80\x006\x02\x08 \x00(\x02\x08\x1aA\x00-\x00\xf0\x87\xc0\x80\x00\x1aA\x00-\x00\xe2\x87\xc0\x80\x00\x1aA\x00-\x00\x8c\x88\xc0\x80\x00\x1a \x00A\x83\x80\x80\x80\x006\x02\x04 \x00(\x02\x04\x1aA\x00-\x00\xe2\x87\xc0\x80\x00\x1aA\x00-\x00\x9a\x88\xc0\x80\x00\x1aA\x00-\x00\xfe\x87\xc0\x80\x00\x1a\x0b\x02\x00\x0bk\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x00A\x83\x80\x80\x80\x006\x02\x0c \x00(\x02\x0c\x1aA\x00-\x00\xc4\x88\xc0\x80\x00\x1aA\x00-\x00\xe2\x87\xc0\x80\x00\x1aA\x00-\x00\x8c\x88\xc0\x80\x00\x1a \x00A\x83\x80\x80\x80\x006\x02\x08 \x00(\x02\x08\x1aA\x00-\x00\xe2\x87\xc0\x80\x00\x1aA\x00-\x00\x9a\x88\xc0\x80\x00\x1aA\x00-\x00\xa8\x88\xc0\x80\x00\x1a\x0b\x0c\x00A\x00-\x00\xf8\x83\xc0\x80\x00\x1a\x0b\x0c\x00A\x00-\x00\x86\x84\xc0\x80\x00\x1a\x0b\xae\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A k\"\x00$\x80\x80\x80\x80\x00A\xb0\x86\xc0\x80\x00A\x06\x10\x98\x80\x80\x80\x00!\x01A\x00-\x00\xa8\x81\xc0\x80\x00\x1aA\x00-\x00\x88\x83\xc0\x80\x00\x1aA\xf8\x86\xc0\x80\x00A\x19\x10\x98\x80\x80\x80\x00 \x01\x10\x99\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80 7\x03\x18 \x00B\x84\x80\x80\x80\x107\x03\x10 \x00A\x88\x86\xc0\x80\x00A\x02 \x00A\x10jA\x02\x10\x9a\x80\x80\x80\x007\x03\x08 \x01A\xdc\x86\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A j$\x80\x80\x80\x80\x00B\x02\x0bE\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x02$\x80\x80\x80\x80\x00 \x02 \x00 \x01\x10\xb8\x80\x80\x80\x00\x02@ \x02(\x02\x00A\x01G\r\x00\x00\x0b \x02)\x03\x08!\x03 \x02A\x10j$\x80\x80\x80\x80\x00 \x03\x0b\x92\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00 \x02 \x017\x03\x08 \x02 \x007\x03\x00A\x00!\x03\x03~\x02@ \x03A\x10G\r\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x02A\x10j \x03j \x02 \x03j)\x03\x007\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x02A\x10j\x10\xb9\x80\x80\x80\x00!\x01 \x02A j$\x80\x80\x80\x80\x00 \x01\x0f\x0b \x02A\x10j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b.\x00\x02@ \x01 \x03F\r\x00\x00\x0b \x00\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84 \x01\xadB \x86B\x04\x84\x10\x8b\x80\x80\x80\x00\x0b\xc5\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\xdd\x84\xc0\x80\x00A\x06\x10\x98\x80\x80\x80\x00!\x01A\x00-\x00\xfc\x81\xc0\x80\x00\x1aA\x00-\x00\x8a\x82\xc0\x80\x00\x1aA\x00-\x00\xce\x83\xc0\x80\x00\x1aA\xab\x87\xc0\x80\x00A\x1b\x10\x98\x80\x80\x80\x00 \x01\x10\x99\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xa0\x057\x03\x08 \x00A\xa8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x007\x03\x00 \x00A\xa0\x86\xc0\x80\x00A\x01 \x00A\x01\x10\x9a\x80\x80\x80\x007\x03\x08 \x01A\xdc\x86\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\xbd\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\xd0\x82\xc0\x80\x00\x1aA\x00-\x00\xde\x82\xc0\x80\x00\x1aA\x00-\x00\xdc\x83\xc0\x80\x00\x1aA\xc6\x87\xc0\x80\x00A\x1c\x10\x98\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xa0\x057\x03\x08 \x00A\xa8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x007\x03\x00 \x01A\xa0\x86\xc0\x80\x00A\x01 \x00A\x01\x10\x9a\x80\x80\x80\x00\x10\x99\x80\x80\x80\x00!\x01 \x00\x10\x9d\x80\x80\x80\x007\x03\x08 \x01A\xbc\x86\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x06\x00B\x8b\xc8\x01\x0b\xc7\x01\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00 \x00A\x85\x80\x80\x80\x006\x02\x08 \x00(\x02\x08\x1a \x00A\x86\x80\x80\x80\x006\x02\x08 \x00(\x02\x08\x1aA\x00-\x00\xb6\x81\xc0\x80\x00\x1aA\xe4\x86\xc0\x80\x00A\x14\x10\x98\x80\x80\x80\x00B\x84\x80\x80\x80\x10\x10\x99\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80\xb0\x0c7\x03\x08 \x00A\xa8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x007\x03\x00 \x00A\xfc\x85\xc0\x80\x00A\x01 \x00A\x01\x10\x9a\x80\x80\x80\x007\x03\x08 \x01A\xdc\x86\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x7f\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\xa8\x86\xc0\x80\x00A\x08\x10\x98\x80\x80\x80\x00!\x01A\x00-\x00\xaa\x80\xc0\x80\x00\x1aA\xc4\x86\xc0\x80\x00A\x11\x10\x98\x80\x80\x80\x00 \x01\x10\x99\x80\x80\x80\x00!\x01 \x00\x10\x9d\x80\x80\x80\x007\x03\x08 \x01A\xbc\x86\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0b}\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x98\x82\xc0\x80\x00\x1aA\x00-\x00\x96\x83\xc0\x80\x00\x1aA\x91\x87\xc0\x80\x00A\x1a\x10\x98\x80\x80\x80\x00B\x84\x80\x80\x80\x10\x10\x99\x80\x80\x80\x00!\x01 \x00\x10\x9d\x80\x80\x80\x007\x03\x08 \x01A\xbc\x86\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00\x10\x80\x80\x80\x80\x00\x1a \x00A\x10j$\x80\x80\x80\x80\x00B\x02\x0bJ\x01\x01\x7f\x02@\x02@A\x01A\x02A\x00 \x00\xa7A\xff\x01q\"\x01\x1b \x01A\x01F\x1b\"\x01A\x02F\r\x00 \x01A\x01qE\r\x01B\x02\x0f\x0b\x00\x0bA\x00-\x00\xc2\x82\xc0\x80\x00\x1aB\x83\x80\x80\x80\x10\x10\xa2\x80\x80\x80\x00\x00\x0b\x0b\x00 \x00\x10\x8a\x80\x80\x80\x00\x1a\x0b0\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01A\x87\x80\x80\x80\x006\x02\x0c \x01(\x02\x0c\x1a\x02@ \x00B\xff\x01\x83B\xcb\x00Q\r\x00\x00\x0bB\x02\x0b\x13\x00A\x00-\x00\x80\x80\xc0\x80\x00\x1aB\x84\x80\x80\x80\xa0\x05\x0b\xc0\x02\x03\x01\x7f\x01~\x01\x7f#\x80\x80\x80\x80\x00A k\"\x01$\x80\x80\x80\x80\x00A\x00-\x00\xb6\x88\xc0\x80\x00\x1a\x02@ \x00B\xff\x01\x83B\xcb\x00R\r\x00 \x00\x10\x81\x80\x80\x80\x00!\x02 \x01A\x006\x02\x08 \x01 \x007\x03\x00 \x01 \x02B \x88>\x02\x0c \x01A\x10j \x01\x10\xa6\x80\x80\x80\x00 \x01)\x03\x10\"\x00B\x02Q\r\x00 \x00\xa7A\x01q\r\x00\x02@ \x01)\x03\x18\"\x00\xa7A\xff\x01q\"\x03A\xca\x00F\r\x00 \x03A\x0eG\r\x01\x0b\x02@\x02@\x02@\x02@ \x00A\xc4\x84\xc0\x80\x00A\x03\x10\xa7\x80\x80\x80\x00B \x88\xa7\x0e\x03\x01\x02\x00\x04\x0b \x01(\x02\x08 \x01(\x02\x0c\x10\xa8\x80\x80\x80\x00\r\x03\x0c\x02\x0b \x01(\x02\x08 \x01(\x02\x0c\x10\xa8\x80\x80\x80\x00A\x01K\r\x02 \x01A\x10j \x01\x10\xa6\x80\x80\x80\x00 \x01)\x03\x10\"\x00B\x02Q\r\x02 \x00\xa7A\x01q\r\x02 \x01A\x10j \x01)\x03\x18\x10\xa9\x80\x80\x80\x00 \x01(\x02\x10A\x01G\r\x01\x0c\x02\x0b \x01(\x02\x08 \x01(\x02\x0c\x10\xa8\x80\x80\x80\x00\r\x01\x0b \x01A j$\x80\x80\x80\x80\x00B\x02\x0f\x0b\x00\x0bJ\x02\x01~\x01\x7fB\x02!\x02\x02@ \x01(\x02\x08\"\x03 \x01(\x02\x0cO\r\x00 \x00 \x01)\x03\x00 \x03\xadB \x86B\x04\x84\x10\x88\x80\x80\x80\x007\x03\x08 \x01 \x03A\x01j6\x02\x08B\x00!\x02\x0b \x00 \x027\x03\x00\x0b\x1c\x00 \x00 \x01\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x86\x80\x80\x80\x00\x0b\x19\x00\x02@ \x01 \x00I\r\x00 \x01 \x00k\x0f\x0b\x10\xc0\x80\x80\x80\x00\x00\x0bB\x01\x01~B\x01!\x02\x02@ \x01B\xff\x01\x83B\xc8\x00R\r\x00 \x01\x10\x89\x80\x80\x80\x00B\x80\x80\x80\x80p\x83B\x80\x80\x80\x80\x80\x04R\r\x00 \x00 \x017\x03\x08B\x00!\x02\x0b \x00 \x027\x03\x00\x0b\xd3\x07\x03\x01\x7f\x01~\x01\x7f#\x80\x80\x80\x80\x00A\xc0\x00k\"\x01$\x80\x80\x80\x80\x00 \x01A\x83\x80\x80\x80\x006\x02\x18 \x01(\x02\x18\x1aA\x00-\x00\xc4\x88\xc0\x80\x00\x1a \x01A\x84\x80\x80\x80\x006\x02\x18 \x01(\x02\x18\x1aA\x00-\x00\xf0\x87\xc0\x80\x00\x1aA\x00-\x00\xe2\x87\xc0\x80\x00\x1aA\x00-\x00\x8c\x88\xc0\x80\x00\x1a \x01A\x83\x80\x80\x80\x006\x02\x18 \x01(\x02\x18\x1aA\x00-\x00\xe2\x87\xc0\x80\x00\x1aA\x00-\x00\x9a\x88\xc0\x80\x00\x1aA\x00-\x00\xfe\x87\xc0\x80\x00\x1a\x02@\x02@ \x00B\xff\x01\x83B\xcb\x00R\r\x00 \x00\x10\x81\x80\x80\x80\x00!\x02 \x01A\x006\x02\x10 \x01 \x007\x03\x08 \x01 \x02B \x88>\x02\x14 \x01A\x18j \x01A\x08j\x10\xa6\x80\x80\x80\x00 \x01)\x03\x18\"\x00B\x02Q\r\x00 \x00\xa7A\x01q\r\x00\x02@ \x01)\x03 \"\x00\xa7A\xff\x01q\"\x03A\xca\x00F\r\x00 \x03A\x0eG\r\x01\x0b\x02@\x02@\x02@ \x00A\xe0\x85\xc0\x80\x00A\x03\x10\xa7\x80\x80\x80\x00B \x88\xa7\x0e\x03\x00\x01\x02\x03\x0b \x01(\x02\x10 \x01(\x02\x14\x10\xa8\x80\x80\x80\x00A\x01K\r\x02 \x01A\x18j \x01A\x08j\x10\xa6\x80\x80\x80\x00 \x01)\x03\x18\"\x00B\x02Q\r\x02 \x00\xa7A\x01q\r\x02 \x01)\x03 !\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x01A0j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x00B\xff\x01\x83B\xcc\x00R\r\x02 \x00A\xa4\x89\xc0\x80\x00A\x02 \x01A0jA\x02\x10\xab\x80\x80\x80\x00 \x01)\x030!\x00A\x00!\x03\x02@\x03@ \x03A\x18F\r\x01 \x01A\x18j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x00B\xff\x01\x83B\xcc\x00R\r\x02 \x00A\xe8\x88\xc0\x80\x00A\x03 \x01A\x18jA\x03\x10\xab\x80\x80\x80\x00 \x011\x00\x18B\xcb\x00R\r\x02 \x011\x00 B\xcd\x00R\r\x02\x02@ \x01-\x00(\"\x03A\x0eF\r\x00 \x03A\xca\x00G\r\x03\x0b \x011\x008B\xcb\x00R\r\x02\x0c\x03\x0b \x01(\x02\x10 \x01(\x02\x14\x10\xa8\x80\x80\x80\x00A\x01K\r\x01 \x01A\x18j \x01A\x08j\x10\xa6\x80\x80\x80\x00 \x01)\x03\x18\"\x00B\x02Q\r\x01 \x00\xa7A\x01q\r\x01 \x01)\x03 !\x00A\x00!\x03\x02@\x03@ \x03A\x10F\r\x01 \x01A0j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x00B\xff\x01\x83B\xcc\x00R\r\x01 \x00A\xc4\x89\xc0\x80\x00A\x02 \x01A0jA\x02\x10\xab\x80\x80\x80\x00 \x01A\x18j \x01)\x030\x10\xac\x80\x80\x80\x00 \x01(\x02\x18\r\x01 \x01A\x18j \x01)\x038\x10\xa9\x80\x80\x80\x00 \x01(\x02\x18A\x01G\r\x02\x0c\x01\x0b \x01(\x02\x10 \x01(\x02\x14\x10\xa8\x80\x80\x80\x00A\x01K\r\x00 \x01A\x18j \x01A\x08j\x10\xa6\x80\x80\x80\x00 \x01)\x03\x18\"\x00B\x02Q\r\x00 \x00\xa7A\x01q\r\x00 \x01)\x03 !\x00A\x00!\x03\x02@\x03@ \x03A\x18F\r\x01 \x01A\x18j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xe4\x89\xc0\x80\x00A\x03 \x01A\x18jA\x03\x10\xab\x80\x80\x80\x00 \x011\x00\x18B\xcb\x00R\r\x00 \x01A0j \x01)\x03 \x10\xac\x80\x80\x80\x00 \x01(\x020\r\x00 \x01A0j \x01)\x03(\x10\xa9\x80\x80\x80\x00 \x01(\x020A\x01G\r\x01\x0b\x00\x0b \x01A\xc0\x00j$\x80\x80\x80\x80\x00B\x02\x0b1\x00\x02@ \x02 \x04F\r\x00\x00\x0b \x00 \x01\xadB \x86B\x04\x84 \x03\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x85\x80\x80\x80\x00\x1a\x0b\xb3\x02\x03\x01\x7f\x01~\x01\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00\x02@\x02@ \x01B\xff\x01\x83B\xcb\x00Q\r\x00 \x00B\x017\x03\x00\x0c\x01\x0b \x01\x10\x81\x80\x80\x80\x00!\x03 \x02A\x006\x02\x08 \x02 \x017\x03\x00 \x02 \x03B \x88>\x02\x0c \x02A\x10j \x02\x10\xa6\x80\x80\x80\x00\x02@ \x02)\x03\x10\"\x01B\x02Q\r\x00 \x01\xa7A\x01q\r\x00\x02@ \x02)\x03\x18\"\x01\xa7A\xff\x01q\"\x04A\xca\x00F\r\x00 \x04A\x0eG\r\x01\x0b\x02@ \x01A\x84\x89\xc0\x80\x00A\x01\x10\xa7\x80\x80\x80\x00B\xff\xff\xff\xff\x0fV\r\x00 \x02(\x02\x08 \x02(\x02\x0c\x10\xa8\x80\x80\x80\x00A\x01K\r\x00 \x02A\x10j \x02\x10\xa6\x80\x80\x80\x00 \x02)\x03\x10\"\x01B\x02Q\r\x00 \x01\xa7A\x01q\r\x00 \x02A\x10j \x02)\x03\x18\x10\xa9\x80\x80\x80\x00 \x02(\x02\x10\r\x00 \x02)\x03\x18!\x01 \x00B\x007\x03\x00 \x00 \x017\x03\x08\x0c\x02\x0b \x00B\x017\x03\x00\x0c\x01\x0b \x00B\x017\x03\x00\x0b \x02A j$\x80\x80\x80\x80\x00\x0b\x9e\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00 \x01A\x83\x80\x80\x80\x006\x02\x00 \x01(\x02\x00\x1aA\x00!\x02A\x00-\x00\xfc\x89\xc0\x80\x00\x1a\x02@\x03@ \x02A\x10F\r\x01 \x01 \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\x90\x8a\xc0\x80\x00A\x02 \x01A\x02\x10\xab\x80\x80\x80\x00 \x011\x00\x00B\xcb\x00R\r\x00 \x011\x00\x08B\xcd\x00Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0bA\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01A\x88\x80\x80\x80\x006\x02\x0c \x01(\x02\x0c\x1a \x01A\x89\x80\x80\x80\x006\x02\x08 \x01(\x02\x08\x1a\x02@ \x00B\xff\x01\x83B\xcc\x00Q\r\x00\x00\x0bB\x02\x0bg\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00-\x00\xe2\x80\xc0\x80\x00\x1a \x01B\x027\x03\x08\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa8\x84\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\xab\x80\x80\x80\x00 \x011\x00\x08B\x04Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x12\x00A\x00-\x00\xb8\x80\xc0\x80\x00\x1aB\x84\x80\x80\x80\x10\x0br\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00-\x00\xc4\x81\xc0\x80\x00\x1a\x02@ \x00B\x02Q\r\x00 \x01B\x027\x03\x08\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xf8\x84\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\xab\x80\x80\x80\x00 \x01)\x03\x08B\xff\x01\x83B\x04Q\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0bI\x01\x01\x7f\x02@\x02@A\x01A\x02A\x00 \x00\xa7A\xff\x01q\"\x01\x1b \x01A\x01F\x1b\"\x01A\x02F\r\x00 \x01A\x01q\r\x01B\x02\x0f\x0b\x00\x0bA\x00-\x00\xb4\x82\xc0\x80\x00\x1aB\x83\x80\x80\x80\x10\x10\xa2\x80\x80\x80\x00\x00\x0b@\x01\x01\x7f\x02@\x02@A\x01A\x02A\x00 \x00\xa7A\xff\x01q\"\x01\x1b \x01A\x01F\x1b\"\x01A\x02F\r\x00 \x01A\x01q\r\x01B\x02\x0f\x0b\x00\x0bB\x83\x80\x80\x80\xf0\x00\x10\xa2\x80\x80\x80\x00\x00\x0b\x8a\x02\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x02$\x80\x80\x80\x80\x00A\x00!\x03A\x00-\x00\xa6\x82\xc0\x80\x00\x1aA\x00-\x00\xc6\x80\xc0\x80\x00\x1a\x02@\x03@ \x03A\x10F\r\x01 \x02A\x08j \x03jB\x027\x03\x00 \x03A\x08j!\x03\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xe4\x84\xc0\x80\x00A\x02 \x02A\x08jA\x02\x10\xab\x80\x80\x80\x00 \x021\x00\x08B\x04R\r\x00 \x02B\x027\x03\x18 \x02)\x03\x10\"\x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa8\x84\xc0\x80\x00A\x01 \x02A\x18jA\x01\x10\xab\x80\x80\x80\x00\x02@ \x02)\x03\x18\"\x00\xa7A\xff\x01q\"\x03A\x07F\r\x00 \x03A\xc1\x00G\r\x01 \x00\x10\x82\x80\x80\x80\x00\x1a\x0bA\x00-\x00\xf0\x80\xc0\x80\x00\x1a \x01B\xff\x01\x83B\x04R\r\x00 \x01B \x88\xa7A}jA}K\r\x01\x0b\x00\x0b \x02A j$\x80\x80\x80\x80\x00B\x02\x0b\x90\x04\x03\x01\x7f\x01~\x01\x7f#\x80\x80\x80\x80\x00A0k\"\x01$\x80\x80\x80\x80\x00A\x00-\x00\xea\x83\xc0\x80\x00\x1a \x01A\x81\x80\x80\x80\x006\x02  \x01(\x02 \x1aA\x00-\x00\xd2\x81\xc0\x80\x00\x1aA\x00-\x00\xe0\x81\xc0\x80\x00\x1aA\x00-\x00\xee\x81\xc0\x80\x00\x1a \x01B\x027\x03\x08\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa8\x84\xc0\x80\x00A\x01 \x01A\x08jA\x01\x10\xab\x80\x80\x80\x00 \x01)\x03\x08\"\x00B\xff\x01\x83B\xcb\x00R\r\x00 \x00\x10\x81\x80\x80\x80\x00!\x02 \x01A\x006\x02\x18 \x01 \x007\x03\x10 \x01 \x02B \x88>\x02\x1c \x01A j \x01A\x10j\x10\xa6\x80\x80\x80\x00 \x01)\x03 \"\x00B\x02Q\r\x00 \x00\xa7A\x01q\r\x00\x02@ \x01)\x03(\"\x00\xa7A\xff\x01q\"\x03A\xca\x00F\r\x00 \x03A\x0eG\r\x01\x0b\x02@\x02@\x02@ \x00A\x98\x85\xc0\x80\x00A\x02\x10\xa7\x80\x80\x80\x00B \x88\xa7\x0e\x02\x01\x00\x03\x0b \x01(\x02\x18 \x01(\x02\x1c\x10\xa8\x80\x80\x80\x00A\x01K\r\x02 \x01A j \x01A\x10j\x10\xa6\x80\x80\x80\x00 \x01)\x03 \"\x00B\x02Q\r\x02 \x00\xa7A\x01q\r\x02 \x01)\x03(!\x00 \x01B\x027\x03  \x00B\xff\x01\x83B\xcc\x00R\r\x02 \x00A\xa8\x84\xc0\x80\x00A\x01 \x01A jA\x01\x10\xab\x80\x80\x80\x00 \x011\x00 B\xcb\x00Q\r\x01\x0c\x02\x0b \x01(\x02\x18 \x01(\x02\x1c\x10\xa8\x80\x80\x80\x00A\x01K\r\x01 \x01A j \x01A\x10j\x10\xa6\x80\x80\x80\x00 \x01)\x03 \"\x00B\x02Q\r\x01 \x00\xa7A\x01q\r\x01 \x01)\x03(!\x00 \x01B\x027\x03  \x00B\xff\x01\x83B\xcc\x00R\r\x01 \x00A\xa8\x84\xc0\x80\x00A\x01 \x01A jA\x01\x10\xab\x80\x80\x80\x00 \x011\x00 B\x04R\r\x01\x0b \x01A0j$\x80\x80\x80\x80\x00B\x02\x0f\x0b\x00\x0bZ\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x94\x84\xc0\x80\x00\x1aA\x00-\x00\x80\x80\xc0\x80\x00\x1a \x00B\x84\x80\x80\x80\x107\x03\x08A\xf8\x84\xc0\x80\x00A\x01 \x00A\x08jA\x01\x10\x9a\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0bo\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A\x10k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\x8e\x80\xc0\x80\x00\x1a \x00A\xf8\x85\xc0\x80\x00A\x01\x10\xb8\x80\x80\x80\x00\x02@ \x00(\x02\x00A\x01G\r\x00\x00\x0b \x00)\x03\x08!\x01 \x00B\x84\x80\x80\x80\x107\x03\x08 \x00 \x017\x03\x00 \x00\x10\xb9\x80\x80\x80\x00!\x01 \x00A\x10j$\x80\x80\x80\x80\x00 \x01\x0b\xdb\x01\x02\x01~\x04\x7f\x02@\x02@ \x02A\tK\r\x00B\x00!\x03 \x02!\x04 \x01!\x05\x03@\x02@ \x04\r\x00 \x03B\x08\x86B\x0e\x84!\x03\x0c\x03\x0bA\x01!\x06\x02@ \x05-\x00\x00\"\x07A\xdf\x00F\r\x00\x02@\x02@ \x07APjA\xff\x01qA\nI\r\x00 \x07A\xbf\x7fjA\xff\x01qA\x1aI\r\x01 \x07A\x9f\x7fjA\xff\x01qA\x1aO\r\x04 \x07AEj!\x06\x0c\x02\x0b \x07ARj!\x06\x0c\x01\x0b \x07AKj!\x06\x0b \x03B\x06\x86 \x06\xadB\xff\x01\x83\x84!\x03 \x04A\x7fj!\x04 \x05A\x01j!\x05\x0c\x00\x0b\x0b \x01\xadB \x86B\x04\x84 \x02\xadB \x86B\x04\x84\x10\x87\x80\x80\x80\x00!\x03\x0b \x00B\x007\x03\x00 \x00 \x037\x03\x08\x0b\x17\x00 \x00\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x84\x80\x80\x80\x00\x0b\xc4\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02A\x00-\x00\x9a\x81\xc0\x80\x00\x1a\x02@\x02@ \x00B\xff\x01\x83B\xcb\x00R\r\x00\x02@\x03@ \x02A\x10F\r\x01 \x01A\x08j \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b \x00 \x01A\x08j\xadB \x86B\x04\x84B\x84\x80\x80\x80 \x10\x83\x80\x80\x80\x00\x1a \x01B\x027\x03\x18 \x01)\x03\x08\"\x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\xa8\x84\xc0\x80\x00A\x01 \x01A\x18jA\x01\x10\xab\x80\x80\x80\x00 \x011\x00\x18B\x04R\r\x00 \x011\x00\x10B\x04Q\r\x01\x0b\x00\x0b \x01A j$\x80\x80\x80\x80\x00B\x02\x0bo\x02\x01\x7f\x01~#\x80\x80\x80\x80\x00A k\"\x00$\x80\x80\x80\x80\x00A\x00-\x00\xa4\x83\xc0\x80\x00\x1a \x00B\x84\x80\x80\x80\x107\x03\x18A\xa8\x84\xc0\x80\x00A\x01 \x00A\x18jA\x01\x10\x9a\x80\x80\x80\x00!\x01 \x00B\x84\x80\x80\x80 7\x03\x10 \x00 \x017\x03\x08 \x00A\x08j\x10\xb9\x80\x80\x80\x00!\x01 \x00A j$\x80\x80\x80\x80\x00 \x01\x0b0\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01A\x8a\x80\x80\x80\x006\x02\x0c \x01(\x02\x0c\x1a\x02@ \x00B\xff\x01\x83B\xcb\x00Q\r\x00\x00\x0bB\x02\x0b0\x01\x01\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01A\x8b\x80\x80\x80\x006\x02\x0c \x01(\x02\x0c\x1a\x02@ \x00B\xff\x01\x83B\xcb\x00Q\r\x00\x00\x0bB\x02\x0b\x8d\x01\x01\x02\x7f#\x80\x80\x80\x80\x00A\x10k\"\x01$\x80\x80\x80\x80\x00A\x00!\x02A\x00-\x00\xc0\x83\xc0\x80\x00\x1a\x02@\x03@ \x02A\x10F\r\x01 \x01 \x02jB\x027\x03\x00 \x02A\x08j!\x02\x0c\x00\x0b\x0b\x02@\x02@ \x00B\xff\x01\x83B\xcc\x00R\r\x00 \x00A\x90\x8a\xc0\x80\x00A\x02 \x01A\x02\x10\xab\x80\x80\x80\x00 \x011\x00\x00B\x04R\r\x00 \x01)\x03\x08B\xfe\x01\x83P\r\x01\x0b\x00\x0b \x01A\x10j$\x80\x80\x80\x80\x00B\x02\x0b\x03\x00\x00\x0b\t\x00\x10\xbf\x80\x80\x80\x00\x00\x0b\x0b\xaa\n\x01\x00A\x80\x80\xc0\x00\x0b\xa0\nSpEcV1Hh\xdc\xaaa\x8d\xf7\rSpEcV1\xe7\xcf\x9b1n\x15\x13\xfeSpEcV1\xe2\x01y\xc9\x9a\xf8\xedtSpEcV1v1\x0eP\xa9C\xc7*SpEcV1\xa9<\xd8+\xb7\xa7\r\x17SpEcV1X\x03\xf6t\xc7\xd0\x01\"SpEcV1\'\xbd_A\r\x9a\x89\x02SpEcV1p\x8c\x0fN!\x082\xd8SpEcV1\xc2\xf4N\xbf\xebqvpSpEcV1K\xdf\'8m/\xe8\x1dSpEcV1@\xb9LO\xf9\xd1\xe8\xe2SpEcV1\xde\x1dMa\x01\xec\xb0ASpEcV1\xc2 \x1b\xdc\xc8gxZSpEcV1[Q+\xe9\xde\xd5\xf2>SpEcV1\xb3/\x97\xd5\x06\xbd3BSpEcV1?\xd9\xb3q\xdep>\xf3SpEcV1*\\\x9c\xf4e\xaa\x1e]SpEcV1u2\x0b\x97\xae\xcd\x86\xbfSpEcV1\x0c\xf0\xf6w\xfd\x1a\x1b\x94SpEcV1\'\xf2\xa2\xb9\xd0)\xc0uSpEcV1\xf5\xd4\x9b\xa3\xccI\x13\xf7SpEcV1\x84\x08Y\xae\xa0\xf128SpEcV1\r\xb76\xae\x93D\xef\x1aSpEcV1\x8b\x89\x1f#\xbd\x157\xf4SpEcV16\x83?\xf0\xcdW\xb1/SpEcV1\x94\xc7w/_\xebXcSpEcV1\xb4\xabN]\xe3\xeaA\xd6SpEcV1\x13?J\x12d\xden|SpEcV1q\xa3z;6\xa6R\x01SpEcV1q^\xe2&\x9di\x9d\x0eSpEcV1Y\xa66\xb3\xecxE\x13SpEcV1\xcf@%X\xde+J@SpEcV1\xb6\x1c\xfd\xdfhY-dSpEcV1 \xfbl\x04B\x82\xc0\xb4SpEcV1\xe3\xf2\x9b5%a\xfb\xd6SpEcV1\xe6Q\xd5T\x13\x8a\xb7lSpEcV1[\xf4R\xdf\xdd\xb4\xb0\xbcSpEcV1\xaaX8\xde\xef\xbb6%SpEcV1k\xe4zxB\xd1+\x02val\x00\x00\x00\"\x02\x10\x00\x03\x00\x00\x00StellarAssetAccount\x00\x80\x04\x10\x00\x04\x00\x00\x000\x02\x10\x00\x0c\x00\x00\x00<\x02\x10\x00\x07\x00\x00\x00anested\x00\\\x02\x10\x00\x01\x00\x00\x00]\x02\x10\x00\x06\x00\x00\x00datat\x02\x10\x00\x04\x00\x00\x00NotRecursiveRecursive\x00\x00\x00\x80\x02\x10\x00\x0c\x00\x00\x00\x8c\x02\x10\x00\t\x00\x00\x00ContractCreateContractHostFnCreateContractWithCtorHostFn\xa8\x02\x10\x00\x08\x00\x00\x00\xb0\x02\x10\x00\x14\x00\x00\x00\xc4\x02\x10\x00\x1c\x00\x00\x00A\x00\x00\x00]\x02\x10\x00\x06\x00\x00\x00xy\x00\x00\x04\x03\x10\x00\x01\x00\x00\x00\x05\x03\x10\x00\x01\x00\x00\x00inner\x00\x00\x00\x18\x03\x10\x00\x05\x00\x00\x00transfercoordsamount6\x03\x10\x00\x06\x00\x00\x00used_event_simplepayloadU\x03\x10\x00\x07\x00\x00\x00used_event_with_refsused_event_with_data_typeused_event_with_topic_typeused_event_with_nested_dataused_event_with_nested_topicSpEcV1\xb6\xb1Hy\xda\xca\xaf\xccSpEcV1\x9e)H\x8e\xf0\x01{{SpEcV1ULqD\xd3\xfa:\x1fSpEcV1\x15\xe5\x1a,\xc0\xc7\xef\xd4SpEcV1s\x94\x0c\x1926\x1d\x90SpEcV1\xa3J\xcf\xf7D\x93\x0bBSpEcV1L|{\r\xf4\xf2\x1a\xa8SpEcV1\xf1\xf9\x90\x07E*e\xfdargscontractfn_name\x00\x00\x00R\x04\x10\x00\x04\x00\x00\x00V\x04\x10\x00\x08\x00\x00\x00^\x04\x10\x00\x07\x00\x00\x00Wasm\x80\x04\x10\x00\x04\x00\x00\x00contextsub_invocations\x00\x00\x8c\x04\x10\x00\x07\x00\x00\x00\x93\x04\x10\x00\x0f\x00\x00\x00executablesalt\x00\x00\xb4\x04\x10\x00\n\x00\x00\x00\xbe\x04\x10\x00\x04\x00\x00\x00constructor_args\xd4\x04\x10\x00\x10\x00\x00\x00\xb4\x04\x10\x00\n\x00\x00\x00\xbe\x04\x10\x00\x04\x00\x00\x00SpEcV1\xa3\x16\n\x8f\xc9\x92\xd2\x11f1f2\x00\x00\n\x05\x10\x00\x02\x00\x00\x00\x0c\x05\x10\x00\x02\x00\x00\x00\x00\x87`\x0econtractspecv0\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventD\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_d\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07Context\x00\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x08Contract\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x14CreateContractHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x1cCreateContractWithCtorHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nExecutable\x00\x00\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Wasm\x00\x00\x00\x01\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStellarAsset\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07Account\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x04args\x00\x00\x03\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08contract\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x07fn_name\x00\x00\x00\x00\x11\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Wasm\x00\x00\x00\x01\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15SubContractInvocation\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x07context\x00\x00\x00\x07\xd0\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x00\x00\x00\x00\x0fsub_invocations\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x08Contract\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x15SubContractInvocation\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x14CreateContractHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x1cCreateContractWithCtorHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\nexecutable\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04salt\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x10constructor_args\x00\x00\x03\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nexecutable\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04salt\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08UsedLeaf\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08with_map\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01m\x00\x00\x00\x00\x00\x03\xec\x00\x00\x07\xd0\x00\x00\x00\nUsedMapKey\x00\x00\x00\x00\x07\xd0\x00\x00\x00\nUsedMapVal\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08with_vec\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x0eUsedVecElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUnusedEnum\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01A\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUsedMapKey\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02K1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02K2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nUsedMapVal\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_error\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_param\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x0fUsedParamStruct\x00\x00\x00\x00\x00\x00\x00\x00\x02ie\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedParamIntEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nwith_tuple\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01t\x00\x00\x00\x00\x00\x03\xed\x00\x00\x00\x02\x00\x00\x07\xd0\x00\x00\x00\x10UsedTupleElement\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bUnusedEvent\x00\x00\x00\x00\x01\x00\x00\x00\x0cunused_event\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cUnusedStruct\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cUsedResultOk\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_option\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01o\x00\x00\x00\x00\x00\x03\xe8\x00\x00\x07\xd0\x00\x00\x00\x11UsedOptionElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_result\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x07\xd0\x00\x00\x00\x0cUsedResultOk\x00\x00\x07\xd0\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0bwith_return\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0eUsedReturnEnum\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rUnusedIntEnum\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02U1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02U2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\rUsedErrorEnum\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x08NotFound\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07Invalid\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cwith_non_pub\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedNonPubStruct\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUnusedPubError\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Nope\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUsedReturnEnum\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01A\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0eUsedVecElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedNonPubError\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Fail\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedParamStruct\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01a\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x06nested\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedNestedInStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedRefDataType\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06nested\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x10UsedRefDataInner\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0epublish_simple\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0ewith_recursion\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01r\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x11UsedRecursiveRoot\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fUsedEventSimple\x00\x00\x00\x00\x01\x00\x00\x00\x11used_event_simple\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedNonPubStruct\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedParamIntEnum\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01X\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01Y\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedRefDataInner\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedRefTopicType\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04Send\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Recv\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10UsedTupleElement\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fwith_executable\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01e\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\nExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fwith_lib_struct\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x07StructC\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fwith_vec_nested\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01v\x00\x00\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x14UsedVecElementNested\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UnusedNonPubError\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03Bad\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedEventDataType\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x01y\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedOptionElement\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04data\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedRecursiveLeaf\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x11UsedRecursiveRoot\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedRecursiveNode\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x0cNotRecursive\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x08UsedLeaf\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\tRecursive\x00\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x11UsedRecursiveLeaf\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedRecursiveRoot\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x07\xd0\x00\x00\x00\x11UsedRecursiveNode\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10with_panic_error\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04fail\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11UsedEventWithRefs\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x14used_event_with_refs\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x07\xd0\x00\x00\x00\x10UsedRefTopicType\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x0fUsedRefDataType\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UnusedNonPubStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventDataInner\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventDataOuter\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventDataInner\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedEventTopicType\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x08Transfer\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Mint\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedNestedInStruct\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x07\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12UsedPanicErrorEnum\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Boom\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11publish_data_type\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11publish_ref_event\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11with_assert_error\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02ok\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11with_invoker_auth\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01i\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11with_tuple_return\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xed\x00\x00\x00\x02\x00\x00\x07\xd0\x00\x00\x00\x16UsedTupleReturnElement\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedAssertErrorEnum\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03Bad\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedEventTopicInner\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedEventTopicOuter\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x13UsedEventTopicInner\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13UsedVecInnerElement\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12publish_topic_type\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_auth_contexts\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01c\x00\x00\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x07Context\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_non_pub_error\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x03\xe9\x00\x00\x00\x04\x00\x00\x07\xd0\x00\x00\x00\x0fUsedNonPubError\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12with_wasm_imported\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01s\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14UsedVecElementNested\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x05inner\x00\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x13UsedVecInnerElement\x00\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\tvec_inner\x00\x00\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x16UsedVecInnerVecElement\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13publish_nested_data\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14publish_nested_topic\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14with_panic_raw_error\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04fail\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x15UsedEventWithDataType\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x19used_event_with_data_type\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x11UsedEventDataType\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedTupleReturnElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedVecInnerVecElement\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x03val\x00\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x16UsedEventWithTopicType\x00\x00\x00\x00\x00\x01\x00\x00\x00\x1aused_event_with_topic_type\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventTopicType\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x17UsedEventWithNestedData\x00\x00\x00\x00\x01\x00\x00\x00\x1bused_event_with_nested_data\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04kind\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x07payload\x00\x00\x00\x07\xd0\x00\x00\x00\x12UsedEventDataOuter\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18UnusedNonContractFnParam\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x18UsedEventWithNestedTopic\x00\x00\x00\x01\x00\x00\x00\x1cused_event_with_nested_topic\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x04info\x00\x00\x07\xd0\x00\x00\x00\x13UsedEventTopicOuter\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x06amount\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x19UnusedNonContractFnReturn\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x01x\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x02\x00\x00\x00\xe3Context of a single authorized call performed by an address.\n\nCustom account contracts that implement `__check_auth` special function\nreceive a list of `Context` values corresponding to all the calls that\nneed to be authorized.\x00\x00\x00\x00\x00\x00\x00\x00\x07Context\x00\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x14Contract invocation.\x00\x00\x00\x08Contract\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x01\x00\x00\x00=Contract that has a constructor with no arguments is created.\x00\x00\x00\x00\x00\x00\x14CreateContractHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x01\x00\x00\x00DContract that has a constructor with 1 or more arguments is created.\x00\x00\x00\x1cCreateContractWithCtorHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x01\x00\x00\x00\xbdAuthorization context of a single contract call.\n\nThis struct corresponds to a `require_auth_for_args` call for an address\nfrom `contract` function with `fn_name` name and `args` arguments.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x04args\x00\x00\x03\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08contract\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x07fn_name\x00\x00\x00\x00\x11\x00\x00\x00\x02\x00\x00\x00_Contract executable used for creating a new contract and used in\n`CreateContractHostFnContext`.\x00\x00\x00\x00\x00\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Wasm\x00\x00\x00\x01\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x008Value of contract node in InvokerContractAuthEntry tree.\x00\x00\x00\x00\x00\x00\x00\x15SubContractInvocation\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x07context\x00\x00\x00\x07\xd0\x00\x00\x00\x0fContractContext\x00\x00\x00\x00\x00\x00\x00\x00\x0fsub_invocations\x00\x00\x00\x03\xea\x00\x00\x07\xd0\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x02\x00\x00\x01/A node in the tree of authorizations performed on behalf of the current\ncontract as invoker of the contracts deeper in the call stack.\n\nThis is used as an argument of `authorize_as_current_contract` host function.\n\nThis tree corresponds `require_auth[_for_args]` calls on behalf of the\ncurrent contract.\x00\x00\x00\x00\x00\x00\x00\x00\x18InvokerContractAuthEntry\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x12Invoke a contract.\x00\x00\x00\x00\x00\x08Contract\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x15SubContractInvocation\x00\x00\x00\x00\x00\x00\x01\x00\x00\x005Create a contract passing 0 arguments to constructor.\x00\x00\x00\x00\x00\x00\x14CreateContractHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x01\x00\x00\x00=Create a contract passing 0 or more arguments to constructor.\x00\x00\x00\x00\x00\x00\x1cCreateContractWithCtorHostFn\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x01\x00\x00\x00vAuthorization context for `create_contract` host function that creates a\nnew contract on behalf of authorizer address.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x1bCreateContractHostFnContext\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\nexecutable\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04salt\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x01\x00\x00\x00\xd6Authorization context for `create_contract` host function that creates a\nnew contract on behalf of authorizer address.\nThis is the same as `CreateContractHostFnContext`, but also has\ncontract constructor arguments.\x00\x00\x00\x00\x00\x00\x00\x00\x00*CreateContractWithConstructorHostFnContext\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x10constructor_args\x00\x00\x03\xea\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nexecutable\x00\x00\x00\x00\x07\xd0\x00\x00\x00\x12ContractExecutable\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04salt\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\nExecutable\x00\x00\x00\x00\x00\x03\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x04Wasm\x00\x00\x00\x01\x00\x00\x03\xee\x00\x00\x00 \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStellarAsset\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07Account\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumA\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumB\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x02\x00\x00\x00\x07\x00\x00\x00\x07\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x05EnumC\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x07StructA\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x01\x00\x00\x07\xd0\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorA\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorB\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00\x0c\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06ErrorC\x00\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02E1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02E2\x00\x00\x00\x00\x00e\x00\x00\x00\x00\x00\x00\x00\x02E3\x00\x00\x00\x00\x00f\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventA\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_a\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventB\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_b\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x0b\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventC\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_c\x00\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x11\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02f3\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x05\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x06EventD\x00\x00\x00\x00\x00\x01\x00\x00\x00\x07event_d\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructA\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructB\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07StructC\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02f1\x00\x00\x00\x00\x03\xea\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x02f2\x00\x00\x00\x00\x00\x13\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntA\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x03\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntB\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x00\x1e\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08EnumIntC\x00\x00\x00\x03\x00\x00\x00\x00\x00\x00\x00\x02V1\x00\x00\x00\x00\x00d\x00\x00\x00\x00\x00\x00\x00\x02V2\x00\x00\x00\x00\x00\xc8\x00\x00\x00\x00\x00\x00\x00\x02V3\x00\x00\x00\x00\x01,\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleA\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleB\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\n\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0cStructTupleC\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x010\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x011\x00\x00\x00\x00\x00\x00\x0b\x00\x1e\x11contractenvmetav0\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00O\x0econtractmetav0\x00\x00\x00\x00\x00\x00\x00\x05rsver\x00\x00\x00\x00\x00\x00\x061.91.0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12rssdk_spec_shaking\x00\x00\x00\x00\x00\x012\x00\x00\x00";
     extern crate test;
     #[rustc_test_marker = "test::test_spec_shaking_v2"]
     #[doc(hidden)]
@@ -20500,9 +30326,9 @@ mod test {
             ignore: false,
             ignore_message: ::core::option::Option::None,
             source_file: "tests/spec_shaking_v2/src/test.rs",
-            start_line: 16usize,
+            start_line: 11usize,
             start_col: 4usize,
-            end_line: 16usize,
+            end_line: 11usize,
             end_col: 24usize,
             compile_fail: false,
             no_run: false,
@@ -20535,8 +30361,13 @@ mod test {
             "with_param",
             "with_return",
             "with_error",
+            "with_panic_error",
+            "with_assert_error",
+            "with_panic_raw_error",
             "with_vec",
+            "with_vec_nested",
             "with_map",
+            "with_recursion",
             "publish_simple",
             "publish_topic_type",
             "publish_data_type",
@@ -20547,6 +30378,9 @@ mod test {
             "with_wasm_imported",
             "with_option",
             "with_result",
+            "with_auth_contexts",
+            "with_invoker_auth",
+            "with_executable",
             "with_non_pub",
             "with_non_pub_error",
             "with_tuple",
@@ -20563,10 +30397,15 @@ mod test {
             "UsedReturnEnum",
             "UsedParamIntEnum",
             "UsedErrorEnum",
+            "UsedPanicErrorEnum",
+            "UsedAssertErrorEnum",
             "UsedNestedInStruct",
             "UsedVecElement",
             "UsedMapKey",
             "UsedMapVal",
+            "UsedVecInnerVecElement",
+            "UsedVecInnerElement",
+            "UsedVecElementNested",
             "UsedOptionElement",
             "UsedResultOk",
             "UsedEventSimple",
@@ -20590,6 +30429,18 @@ mod test {
             "UsedNonPubError",
             "StructC",
             "StructA",
+            "UsedRecursiveRoot",
+            "UsedRecursiveNode",
+            "UsedRecursiveLeaf",
+            "UsedLeaf",
+            "Context",
+            "ContractContext",
+            "CreateContractHostFnContext",
+            "CreateContractWithConstructorHostFnContext",
+            "ContractExecutable",
+            "InvokerContractAuthEntry",
+            "SubContractInvocation",
+            "Executable",
         ];
         for name in used {
             if !filtered_names.contains(name) {
@@ -20603,11 +30454,25 @@ mod test {
                 }
             }
         }
+        match (&markers.len(), &used.len()) {
+            (left_val, right_val) => {
+                if !(*left_val == *right_val) {
+                    let kind = ::core::panicking::AssertKind::Eq;
+                    ::core::panicking::assert_failed(
+                        kind,
+                        &*left_val,
+                        &*right_val,
+                        ::core::option::Option::None,
+                    );
+                }
+            }
+        };
         let unused = [
             "UnusedStruct",
             "UnusedEnum",
             "UnusedIntEnum",
             "UnusedEvent",
+            "UnusedPubError",
             "UnusedNonContractFnParam",
             "UnusedNonContractFnReturn",
             "UnusedNonPubStruct",
@@ -20628,6 +30493,7 @@ mod test {
             "EventA",
             "EventB",
             "EventC",
+            "EventD",
         ];
         let all_names: HashSet<std::string::String> =
             entries.iter().filter_map(entry_name).collect();
@@ -20653,176 +30519,19 @@ mod test {
                 }
             }
         }
-    }
-    extern crate test;
-    #[rustc_test_marker = "test::test_spec_shaking_v2_no_env_fallback_to_v1"]
-    #[doc(hidden)]
-    pub const test_spec_shaking_v2_no_env_fallback_to_v1: test::TestDescAndFn =
-        test::TestDescAndFn {
-            desc: test::TestDesc {
-                name: test::StaticTestName("test::test_spec_shaking_v2_no_env_fallback_to_v1"),
-                ignore: false,
-                ignore_message: ::core::option::Option::None,
-                source_file: "tests/spec_shaking_v2/src/test.rs",
-                start_line: 173usize,
-                start_col: 4usize,
-                end_line: 173usize,
-                end_col: 46usize,
-                compile_fail: false,
-                no_run: false,
-                should_panic: test::ShouldPanic::No,
-                test_type: test::TestType::UnitTest,
-            },
-            testfn: test::StaticTestFn(
-                #[coverage(off)]
-                || test::assert_test_result(test_spec_shaking_v2_no_env_fallback_to_v1()),
-            ),
-        };
-    fn test_spec_shaking_v2_no_env_fallback_to_v1() {
-        let entries = soroban_spec::read::from_wasm(WASM_NO_ENV).unwrap();
-        let markers = soroban_spec::shaking::find_all(WASM_NO_ENV);
-        if !markers.is_empty() {
-            {
-                ::core::panicking::panic_fmt(
-                    format_args!(
-                        "no markers should be present when experimental_spec_shaking_v2 is disabled due to missing env var, found {0}",
-                        markers.len(),
-                    ),
-                );
-            }
-        }
-        let all_names: HashSet<std::string::String> =
-            entries.iter().filter_map(entry_name).collect();
-        let fn_names: Vec<std::string::String> = entries
-            .iter()
-            .filter_map(|e| {
-                if let ScSpecEntry::FunctionV0(f) = e {
-                    Some(f.name.to_utf8_string_lossy())
-                } else {
-                    None
-                }
-            })
-            .collect();
-        for expected_fn in [
-            "with_param",
-            "with_return",
-            "with_error",
-            "with_vec",
-            "with_map",
-            "publish_simple",
-            "publish_topic_type",
-            "publish_data_type",
-            "publish_nested_topic",
-            "publish_nested_data",
-            "publish_ref_event",
-            "with_lib_struct",
-            "with_wasm_imported",
-            "with_option",
-            "with_result",
-            "with_non_pub",
-            "with_non_pub_error",
-            "with_tuple",
-            "with_tuple_return",
-        ] {
-            if !fn_names.contains(&expected_fn.into()) {
-                {
-                    ::core::panicking::panic_fmt(format_args!("fn {0} missing", expected_fn));
-                }
-            }
-        }
-        let pub_types = [
-            "UsedParamStruct",
-            "UsedReturnEnum",
-            "UsedParamIntEnum",
-            "UsedErrorEnum",
-            "UsedNestedInStruct",
-            "UsedVecElement",
-            "UsedMapKey",
-            "UsedMapVal",
-            "UsedEventSimple",
-            "UsedEventTopicType",
-            "UsedEventWithTopicType",
-            "UsedEventDataType",
-            "UsedEventWithDataType",
-            "UsedEventTopicOuter",
-            "UsedEventTopicInner",
-            "UsedEventWithNestedTopic",
-            "UsedEventDataOuter",
-            "UsedEventDataInner",
-            "UsedEventWithNestedData",
-            "UsedRefTopicType",
-            "UsedRefDataType",
-            "UsedRefDataInner",
-            "UsedEventWithRefs",
-            "UsedOptionElement",
-            "UsedResultOk",
-            "UsedTupleElement",
-            "UsedTupleReturnElement",
-            "UnusedNonContractFnParam",
-            "UnusedNonContractFnReturn",
-            "UnusedStruct",
-            "UnusedEnum",
-            "UnusedIntEnum",
-            "UnusedEvent",
-        ];
-        for name in pub_types {
-            if !all_names.contains(name) {
-                {
-                    ::core::panicking::panic_fmt(format_args!(
-                        "pub type/event {0} should have a spec entry without the feature",
-                        name,
-                    ));
-                }
-            }
-        }
-        let non_pub_types = [
-            "UsedNonPubStruct",
-            "UsedNonPubError",
-            "UnusedNonPubStruct",
-            "UnusedNonPubError",
-        ];
-        for name in non_pub_types {
-            if !!all_names.contains(name) {
-                {
-                    ::core::panicking::panic_fmt(format_args!(
-                        "non-pub type {0} should NOT have a spec entry without the feature",
-                        name,
-                    ));
-                }
-            }
-        }
-        let lib_imported_types = [
-            "StructA",
-            "StructB",
-            "StructC",
-            "StructTupleA",
-            "StructTupleB",
-            "StructTupleC",
-            "EnumA",
-            "EnumB",
-            "EnumC",
-            "EnumIntA",
-            "EnumIntB",
-            "EnumIntC",
-            "ErrorA",
-            "ErrorB",
-            "ErrorC",
-            "EventA",
-            "EventB",
-            "EventC",
-        ];
-        for name in lib_imported_types {
-            if !all_names.contains(name) {
-                {
-                    ::core::panicking::panic_fmt(
-                        format_args!(
-                            "lib-imported type {0} should have a spec entry (rlib statics linked into cdylib)",
-                            name,
-                        ),
+        match (&(all_names.len() - filtered_names.len()), &unused.len()) {
+            (left_val, right_val) => {
+                if !(*left_val == *right_val) {
+                    let kind = ::core::panicking::AssertKind::Eq;
+                    ::core::panicking::assert_failed(
+                        kind,
+                        &*left_val,
+                        &*right_val,
+                        ::core::option::Option::None,
                     );
                 }
             }
-        }
+        };
     }
     /// Extract the name from a non-function spec entry.
     fn entry_name(entry: &ScSpecEntry) -> Option<std::string::String> {
@@ -20841,8 +30550,5 @@ mod test {
 #[doc(hidden)]
 pub fn main() -> () {
     extern crate test;
-    test::test_main_static(&[
-        &test_spec_shaking_v2,
-        &test_spec_shaking_v2_no_env_fallback_to_v1,
-    ])
+    test::test_main_static(&[&test_spec_shaking_v2])
 }

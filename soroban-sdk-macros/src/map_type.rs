@@ -1,14 +1,15 @@
 use quote::ToTokens;
-use stellar_xdr::curr as stellar_xdr;
 use stellar_xdr::{
     ScSpecTypeBytesN, ScSpecTypeDef, ScSpecTypeMap, ScSpecTypeOption, ScSpecTypeResult,
     ScSpecTypeTuple, ScSpecTypeUdt, ScSpecTypeVec,
 };
 use syn::{
-    spanned::Spanned, Error, Expr, ExprLit, GenericArgument, Ident, Lit, Path, PathArguments,
-    PathSegment, Type, TypePath, TypeTuple,
+    ext::IdentExt as _, spanned::Spanned, Error, Expr, ExprLit, GenericArgument, Ident, Lit, Path,
+    PathArguments, PathSegment, Type, TypePath, TypeTuple,
 };
 use syn::{Generics, TypeReference};
+
+use crate::syn_ext::ident_to_type;
 
 // These constants' values must match the definitions of the constants with the
 // same names in soroban_sdk::crypto::bls12_381.
@@ -35,13 +36,10 @@ pub const BN254_G2_SERIALIZED_SIZE: u32 = BN254_G1_SERIALIZED_SIZE * 2; // 128
 /// - If the type mapped from `ident` is not a UDT
 /// - If `generics` has any parameters, as UDTs don't support generics
 pub fn is_mapped_type_udt(ident: &Ident, generics: &Generics) -> Result<(), Error> {
-    let name = ident.to_string();
-    let ty: Type = syn::parse_str(&name).map_err(|e| {
-        Error::new(
-            ident.span(),
-            format!("type `{}` cannot be used in XDR spec: {}", ident, e),
-        )
-    })?;
+    // Wrap the Ident directly into a Type rather than stringifying and
+    // re-parsing — the latter would fail for raw keyword idents like `r#type`
+    // because the unraw'd form (`type`) isn't a valid Rust Type.
+    let ty = ident_to_type(ident.clone());
     match map_type(&ty, false, false) {
         Ok(ScSpecTypeDef::Udt(_)) => {
             // `ty` does not contain the generics, so check manually here
@@ -56,6 +54,7 @@ pub fn is_mapped_type_udt(ident: &Ident, generics: &Generics) -> Result<(), Erro
         }
         _ => {
             // Check if the error originated from the UDT-arm of `map_type`
+            let name = ident.unraw().to_string();
             let _ = ScSpecTypeDef::Udt(ScSpecTypeUdt {
                 name: name.try_into().map_err(|e| {
                     Error::new(
@@ -90,7 +89,7 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                 Some(PathSegment {
                     ident,
                     arguments: PathArguments::None,
-                }) => match &ident.to_string()[..] {
+                }) => match &ident.unraw().to_string()[..] {
                     "Val" => Ok(ScSpecTypeDef::Val),
                     "u64" => Ok(ScSpecTypeDef::U64),
                     "i64" => Ok(ScSpecTypeDef::I64),
@@ -116,16 +115,18 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                     )),
                     // The BLS and BN types defined below are represented in the contract's
                     // interface by their underlying data types, i.e.
-                    // Fp/Fp2/G1Affine/G2Affine => BytesN<N>, Fr => U256. This approach
-                    // simplifies integration with contract development tooling, as it
-                    // avoids introducing new spec types for these constructs.
+                    // Bls12381Fp/Bls12381Fp2/Bls12381G1Affine/Bls12381G2Affine => BytesN<N>,
+                    // Bls12381Fr/Bn254Fr => U256. This approach simplifies integration with
+                    // contract development tooling, as it avoids introducing new spec types
+                    // for these constructs.
                     //
                     // While this is functionally sound because the types are
                     // essentially newtypes over their inner representations, it means
-                    // that the specific semantic meaning of `G1Affine`, `G2Affine`, or
-                    // `Fr` is not directly visible in the compiled WASM interface. For
-                    // example, a contract function expecting a `G1Affine` will appear
-                    // in the WASM interface as expecting a `BytesN<96>`.
+                    // that the specific semantic meaning of `Bls12381G1Affine`,
+                    // `Bls12381G2Affine`, `Bls12381Fr`, or `Bn254Fr` is not directly visible
+                    // in the compiled WASM interface. For example, a contract function
+                    // expecting a `Bls12381G1Affine` will appear in the WASM interface as
+                    // expecting a `BytesN<96>`.
                     //
                     // Future enhancements might allow the macro to automatically deduce
                     // and utilize the inner types for types defined using the New Type
@@ -133,8 +134,8 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                     // type aliases:
                     // https://github.com/stellar/rs-soroban-sdk/issues/1063
 
-                    // These BLS12-381 unprefixed type names
-                    // will be removed in a future release.
+                    // These BLS12-381 unprefixed type names are deprecated.
+                    // Use the Bls12381-prefixed names instead.
                     "Fp" => Ok(ScSpecTypeDef::BytesN(ScSpecTypeBytesN {
                         n: FP_SERIALIZED_SIZE,
                     })),
@@ -147,6 +148,8 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                     "G2Affine" => Ok(ScSpecTypeDef::BytesN(ScSpecTypeBytesN {
                         n: G2_SERIALIZED_SIZE,
                     })),
+                    // Deprecated: `Fr` maps to BLS12-381 Fr for backward compat.
+                    // Use `Bls12381Fr` or `Bn254Fr` instead.
                     "Fr" => Ok(ScSpecTypeDef::U256),
                     // BLS12-381 prefixed type names
                     "Bls12381Fp" => Ok(ScSpecTypeDef::BytesN(ScSpecTypeBytesN {
@@ -161,6 +164,7 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                     "Bls12381G2Affine" => Ok(ScSpecTypeDef::BytesN(ScSpecTypeBytesN {
                         n: G2_SERIALIZED_SIZE,
                     })),
+                    "Bls12381Fr" => Ok(ScSpecTypeDef::U256),
                     // BN254 prefixed type names
                     "Bn254Fp" => Ok(ScSpecTypeDef::BytesN(ScSpecTypeBytesN {
                         n: BN254_FP_SERIALIZED_SIZE,
@@ -171,6 +175,9 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                     "Bn254G2Affine" => Ok(ScSpecTypeDef::BytesN(ScSpecTypeBytesN {
                         n: BN254_G2_SERIALIZED_SIZE,
                     })),
+                    "Bn254Fr" => Ok(ScSpecTypeDef::U256),
+                    // Deprecated alias for Bn254Fr
+                    "BnScalar" => Ok(ScSpecTypeDef::U256),
                     s => Ok(ScSpecTypeDef::Udt(ScSpecTypeUdt {
                         name: s.try_into().map_err(|e| {
                             Error::new(
@@ -185,7 +192,7 @@ pub fn map_type(t: &Type, allow_ref: bool, allow_hash: bool) -> Result<ScSpecTyp
                     arguments: PathArguments::AngleBracketed(angle_bracketed),
                 }) => {
                     let args = angle_bracketed.args.iter().collect::<Vec<_>>();
-                    match &ident.to_string()[..] {
+                    match &ident.unraw().to_string()[..] {
                         "Result" => {
                             let (ok, err) = match args.as_slice() {
                                 [GenericArgument::Type(ok), GenericArgument::Type(err)] => (ok, err),

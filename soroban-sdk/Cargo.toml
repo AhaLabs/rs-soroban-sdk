@@ -17,12 +17,12 @@ doctest = false
 
 [build-dependencies]
 rustc_version = "0.4.1"
-crate-git-revision = "0.0.6"
+crate-git-revision = "0.0.9"
 
 [dependencies]
 soroban-sdk-macros = { workspace = true }
 stellar-strkey = { workspace = true }
-bytes-lit = "0.0.5"
+bytes-lit = "0.0.6"
 visibility = "0.1.1"
 
 [target.'cfg(target_family="wasm")'.dependencies]
@@ -46,7 +46,7 @@ ctor = { version = "0.5.0", optional = true }
 soroban-sdk-macros = { workspace = true, features = ["testutils"] }
 soroban-env-host = { workspace = true, features = ["testutils"] }
 soroban-ledger-snapshot = { workspace = true, features = ["testutils"] }
-stellar-xdr = { workspace = true, features = ["curr", "std"] }
+stellar-xdr = { workspace = true, features = ["std"] }
 soroban-spec = { workspace = true }
 ed25519-dalek = "2.0.0"
 rand = "0.8.5"
@@ -62,12 +62,11 @@ sha2 = "0.10.7"
 ark-bn254 = { version = "0.5", default-features = false, features = ["curve"] }
 ark-bls12-381 = { version = "0.5", default-features = false, features = ["curve"] }
 ark-ff = { version = "0.5", default-features = false }
+trybuild = "1.0.115"
 
 [features]
-default = ["experimental_spec_shaking_v2"]
 alloc = []
 testutils = ["soroban-sdk-macros/testutils", "soroban-env-host/testutils", "soroban-ledger-snapshot/testutils", "dep:ed25519-dalek", "dep:arbitrary", "dep:derive_arbitrary", "dep:ctor", "dep:soroban-ledger-snapshot"]
-experimental_spec_shaking_v2 = ["soroban-sdk-macros/experimental_spec_shaking_v2"]
 docs = []
 
 # Umbrella feature that enables all hazmat sub-features (backwards compatible)
