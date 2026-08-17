@@ -70,9 +70,31 @@ pub fn remove_attributes_from_item(data: &mut Data, attrs: &[&str]) {
 #[cfg(test)]
 mod test {
     use quote::{quote, ToTokens};
-    use syn::DeriveInput;
+    use syn::{parse_quote, Attribute, DeriveInput};
 
-    use super::remove_attributes_from_item;
+    use super::{pass_through_attr_to_gen_code, remove_attributes_from_item};
+
+    /// External verification tools register rustc tool namespaces and attach
+    /// tool attributes to user fns — e.g. Flux's `#[flux_tool::sig(...)]`
+    /// (what `#[flux_rs::sig]` expands to under its driver). Those attributes
+    /// must NOT be copied onto macro-generated fns (dispatch, client, spec):
+    /// a duplicated spec on a generated wrapper breaks the tool run. This
+    /// pins the allowlist so generated code only ever inherits
+    /// doc/cfg/allow/deny.
+    #[test]
+    fn tool_attrs_are_not_passed_through_to_gen_code() {
+        let tool: Attribute = parse_quote!(#[flux_tool::sig(fn(x: i32) -> i32)]);
+        assert!(!pass_through_attr_to_gen_code(&tool));
+
+        let doc: Attribute = parse_quote!(#[doc = "kept"]);
+        let cfg: Attribute = parse_quote!(#[cfg(test)]);
+        let allow: Attribute = parse_quote!(#[allow(unused)]);
+        let deny: Attribute = parse_quote!(#[deny(unused)]);
+        assert!(pass_through_attr_to_gen_code(&doc));
+        assert!(pass_through_attr_to_gen_code(&cfg));
+        assert!(pass_through_attr_to_gen_code(&allow));
+        assert!(pass_through_attr_to_gen_code(&deny));
+    }
 
     #[test]
     fn test_remove_attributes_from_item_struct_named() {
